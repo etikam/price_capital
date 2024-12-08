@@ -44,7 +44,6 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 
-
 class PhysicalPersonForm(forms.ModelForm):
     class Meta:
         model = PhysicalPerson
@@ -59,6 +58,15 @@ class PhysicalPersonForm(forms.ModelForm):
             'photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
+    def clean_telephone(self):
+        telephone = self.cleaned_data.get('telephone')
+        if not telephone.isdigit():
+            raise ValidationError("Le numéro de téléphone doit contenir uniquement des chiffres.")
+        if len(telephone) < 8 or len(telephone) > 15:
+            raise ValidationError("Le numéro de téléphone doit contenir entre 8 et 15 chiffres.")
+        return telephone
+
+
 class MoralPersonForm(forms.ModelForm):
     class Meta:
         model = MoralPerson
@@ -70,3 +78,9 @@ class MoralPersonForm(forms.ModelForm):
             'rccm': forms.TextInput(attrs={'class': 'form-control'}),
             'logo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
+
+    def clean_rccm(self):
+        rccm = self.cleaned_data.get('rccm')
+        if len(rccm) < 5:
+            raise ValidationError("Le RCCM doit contenir au moins 5 caractères.")
+        return rccm

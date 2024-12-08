@@ -13,12 +13,13 @@ from .forms import CustomUserCreationForm
 from users.models import User, PhysicalPerson, MoralPerson
 from .utils.mailing import send_activation_email
 from django.contrib.auth.decorators import login_required
-from .forms import PhysicalPersonForm, MoralPersonForm
+from .forms import PhysicalPersonForm, MoralPersonForm, PhysicalPersonForm, MoralPersonForm 
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 # class CustomLoginView(LoginView):
 #     authentication_form = CustomAuthenticationForm
@@ -107,12 +108,30 @@ class ActivationUserView(View):
 
         return render(request, "registration/activation_invalid.html")
 
-@login_required(login_url="auth:login")
-def user_profile(request):
-    if request.method == "POST":
-        pass
-    
-    return render(request,"registration/user_profile.html")
+
+def profile_view(request):
+    user = request.user
+
+    # Déterminez si l'utilisateur est une personne physique ou morale
+    if hasattr(user, 'physical_person'):
+        form = PhysicalPersonForm(request.POST or None, request.FILES or None, instance=user.physical_person)
+    elif hasattr(user, 'moral_person'):
+        form = MoralPersonForm(request.POST or None, request.FILES or None, instance=user.moral_person)
+    else:
+        messages.error(request, "Aucun profil associé à cet utilisateur.")
+        return redirect('home')
+
+    # Si le formulaire est soumis et valide
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, "Votre profil a été mis à jour avec succès.")
+        return redirect('auth:profile_user')
+
+    context = {
+        'form': form,
+        'user': user
+    }
+    return render(request, 'registration/user_profile.html', context)
 
 
 

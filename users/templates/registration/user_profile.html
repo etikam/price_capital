@@ -5,128 +5,68 @@
 {% endblock %}
 
 {% block hero %}
-<!-- Hero section (si nécessaire) -->
-{% endblock %}
+  
+{% endblock hero %}
+  
 
 {% block content %}
-  <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;"> 
-    <div class="container p-4" style="max-width: 700px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); margin-top: 70px;"> 
-      <h2 class="text-center mb-4">Mon Profil</h2>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="container p-4" style="max-width: 700px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); margin-top: 70px;">
+    <h2 class="text-center mb-4">Mon Profil</h2>
 
-      <!-- Affichage des messages (success/error) -->
-      {% if messages %}
-        <div class="alert alert-success">
-          {% for message in messages %}
-            <p>{{ message }}</p>
-          {% endfor %}
-        </div>
-      {% endif %}
+    <!-- Messages de succès ou d'erreur -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
 
-      <!-- Informations de l'utilisateur -->
-      <form method="post" enctype="multipart/form-data" action="{% url 'auth:profile_user' %}">
-        {% csrf_token %}
-
-        <!-- Affichage de la photo de profil (si disponible) -->
-        <div class="form-group mb-3 text-center">
-          <label for="profile_image" class="form-label">Photo de Profil</label>
-          {% if user.profile_image %}
-            <img src="{{ user.profile_image.url }}" alt="Profile Image" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+    <!-- Formulaire -->
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <!-- Photo de profil -->
+      <div class="form-group mb-3 text-center">
+        <label for="profile_image" class="form-label">Photo de Profil</label>
+        <div class="mb-2">
+          {% if user.physical_person and user.physical_person.photo %}
+            <img src="{{ user.physical_person.photo.url }}" alt="Photo de Profil" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
           {% else %}
             <i class="fas fa-user-circle" style="font-size: 150px; color: #6c757d;"></i>
           {% endif %}
-          <br>
-          <label for="profile_image" class="form-label mt-2">Changer la Photo</label>
-          <input type="file" class="form-control" id="profile_image" name="profile_image">
         </div>
+        <input type="file" class="form-control" id="profile_image" name="photo">
+      </div>
 
-        <!-- Affichage de l'email (non modifiable) -->
-        <div class="form-group mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" value="{{ user.email }}" class="form-control" id="email" disabled>
-        </div>
-
-        <!-- Affichage des informations supplémentaires en fonction du type d'utilisateur -->
-        {% if user.moral_person %}
-          <!-- Si c'est une personne morale -->
-          <div class="form-group mb-3">
-            <label for="company_name" class="form-label">Nom de l'entreprise</label>
-            <input type="text" value="{{ user.moral_person.company_name }}" class="form-control" id="company_name"  >
-          </div>
-          <div class="form-group mb-3">
-            <label for="telephone" class="form-label">Téléphone</label>
-            <input type="text" value="{{ user.moral_person.telephone }}" class="form-control" id="telephone"  >
-          </div>
-          <div class="form-group mb-3">
-            <label for="adresse" class="form-label">Adresse</label>
-            <textarea class="form-control" id="adresse" >{{ user.moral_person.adresse }}</textarea>
-          </div>
-          <div class="form-group mb-3">
-            <label for="rccm" class="form-label">RCCM</label>
-            <input type="text" value="{{ user.moral_person.rccm }}" class="form-control" id="rccm" >
-          </div>
-          <div class="form-group mb-3">
-            <label for="logo" class="form-label">Logo de l'entreprise</label>
+      <!-- Logo de l'entreprise -->
+      {% if user.moral_person %}
+        <div class="form-group mb-3 text-center">
+          <label for="logo" class="form-label">Logo de l'Entreprise</label>
+          <div class="mb-2">
             {% if user.moral_person.logo %}
-              <img src="{{ user.moral_person.logo.url }}" alt="Logo" style="width: 100px;">
+              <img src="{{ user.moral_person.logo.url }}" alt="Logo de l'Entreprise" class="rounded" style="width: 150px; height: 150px; object-fit: cover;">
             {% else %}
-              <i class="fas fa-building" style="font-size: 50px;"></i>
-            {% endif %}
-            <br>
-            <label for="logo" class="form-label mt-2">Changer le logo</label>
-            <input type="file" class="form-control" id="logo" name="logo">
-          </div>
-        {% elif user.physical_person %}
-          <!-- Si c'est une personne physique -->
-          <div class="form-group mb-3">
-            <label for="first_name" class="form-label">Prénom</label>
-            <input type="text" value="{{ user.physical_person.first_name }}" class="form-control" id="first_name" >
-          </div>
-          <div class="form-group mb-3">
-            <label for="last_name" class="form-label">Nom</label>
-            <input type="text" value="{{ user.physical_person.last_name }}" class="form-control" id="last_name" >
-          </div>
-          <div class="form-group mb-3">
-            <label for="telephone" class="form-label">Téléphone</label>
-            <input type="text" value="{{ user.physical_person.telephone }}" class="form-control" id="telephone" >
-          </div>
-          <div class="form-group mb-3">
-            <label for="adresse" class="form-label">Adresse</label>
-            <textarea class="form-control" id="adresse" >{{ user.physical_person.adresse }}</textarea>
-          </div>
-          <div class="form-group mb-3">
-            <label for="birthday" class="form-label">Date de naissance</label>
-            <input type="text" value="{{ user.physical_person.birthday|date:'d F Y' }}" class="form-control" id="birthday" disabled >
-          </div>
-          <div class="form-group mb-3">
-            <label for="id_card" class="form-label">Carte d'identité</label>
-            {% if user.physical_person.id_card %}
-              <img src="{{ user.physical_person.id_card.url }}" alt="ID Card" style="width: 150px;">
-            {% else %}
-              <i class="fas fa-id-card" style="font-size: 50px;"></i>
+              <i class="fas fa-building" style="font-size: 150px; color: #6c757d;"></i>
             {% endif %}
           </div>
-          <div class="form-group mb-3">
-            <label for="photo" class="form-label">Photo de Profil</label>
-            {% if user.physical_person.photo %}
-              <img src="{{ user.physical_person.photo.url }}" alt="Profile Photo" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
-            {% else %}
-              <i class="fas fa-user-circle" style="font-size: 150px; color: #6c757d;"></i>
-            {% endif %}
-            <br>
-            <label for="photo" class="form-label mt-2">Changer la photo de profil</label>
-            <input type="file" class="form-control" id="photo" name="photo">
-          </div>
-        {% endif %}
-
-        <!-- Bouton pour modifier les enregistrements -->
-        <div class="form-group text-center">
-          <button type="submit" class="btn btn-primary w-100">Modifier les informations</button>
+          <input type="file" class="form-control" id="logo" name="logo">
         </div>
-      </form>
-    </div>
+      {% endif %}
+
+      <!-- Champs du formulaire -->
+      {{ form.as_p }}
+
+      <!-- Bouton pour soumettre -->
+      <div class="form-group text-center mt-4">
+        <button type="submit" class="btn btn-primary w-100">Enregistrer les modifications</button>
+      </div>
+    </form>
   </div>
+</div>
 {% endblock content %}
 
+
 {% block footer %}
-  <!-- Footer content (if needed) -->
+  
 {% endblock footer %}
+  
