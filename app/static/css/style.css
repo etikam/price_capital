@@ -257,105 +257,131 @@
     }
 }
 /*** Navbar End ***/
-
-/*** Carousel Hero Header Start ***/
-.header-carousel .header-carousel-item img {
-    object-fit: cover;
+/*** Carousel Start ***/
+.carousel .carousel-inner .carousel-item {
+    position: relative;
+    overflow: hidden;
+    height: 100vh;
 }
 
-.header-carousel .header-carousel-item,
-.header-carousel .header-carousel-item img {
-        height: 500px;
-}
-
-
-.header-carousel .owl-nav .owl-prev,
-.header-carousel .owl-nav .owl-next {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    border-radius: 60px;
-    background: var(--bs-primary);
-    color: var(--bs-white);
-    font-size: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.carousel .carousel-inner .carousel-item img {
+    animation-name: image-zoom ;
+    animation-duration: 10s;
+    animation-delay: 1s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
     transition: 0.5s;
 }
 
-.header-carousel .owl-nav .owl-prev {
-    bottom: 30px;
-    left: 30px;
-    margin-left: 90px;
-}
-.header-carousel .owl-nav .owl-next {
-    bottom: 30px;
-    left: 30px;
-}
+@keyframes image-zoom {
+    0%  {width: 100%; height: 100%; -webkit-filter: blur(0px); opacity: 1;}
 
-.header-carousel .owl-nav .owl-prev:hover,
-.header-carousel .owl-nav .owl-next:hover {
-    box-shadow: inset 0 0 100px 0 var(--bs-light);
-    color: var(--bs-primary);
+    25% {width: 115%; height: 115%; -webkit-filter: blur(3px); opacity: 0.9;}
+
+    50% {width: 130%; height: 130%; -webkit-filter: blur(10px); opacity: 0.7;}
+
+    75% {width: 115%; height: 115%; -webkit-filter: blur(3px); opacity: 0.9;}
+
+    100% {width: 100%; height: 100%; -webkit-filter: blur(0px); opacity: 1;}
 }
 
-
-.header-carousel .header-carousel-item .carousel-caption {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    bottom: 0;
-    padding-top: 120px;
-    background: rgba(0, 0, 0, .7);
-    display: flex;
-    align-items: center;
+@media (min-width: 992px) {
+    .carousel .carousel-inner .carousel-item img {
+        height: 100%;
+        object-fit: cover;   
+    }
 }
 
 @media (max-width: 991px) {
-    .header-carousel .header-carousel-item .carousel-caption {
-        padding-top: 45px;
+    .carousel .carousel-inner .carousel-item {
+        height: 700px;
+    }
+    .carousel .carousel-inner .carousel-item img {
+        height: 700px;
+        object-fit: cover;    
     }
 }
 
-@media (max-width: 767px) {
-    .header-carousel .owl-nav .owl-prev {
-        left: 50%;
-        transform: translateX(-50%);
-        margin-left: -45px;
+@media (max-width: 576px) {
+    .carousel-item .carousel-caption h1 {
+        font-size: 36px;
     }
 
-
-    .header-carousel .owl-nav .owl-next {
-        left: 50%;
-        transform: translateX(-50%);
-        margin-left: 45px;
+    .carousel-item .carousel-caption p.fs-5 {
+        font-size: 15px;
     }
 }
 
-
-.header-carousel .header-carousel-item img {
-    animation-name: image-zoom;
-    animation-duration: 10s;
-    animation-delay: 1s;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-    transition: 1s;
+.carousel .carousel-inner .carousel-item::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .5);
+    z-index: 1;
 }
 
-@keyframes image-zoom {
-    0%  {height: 100%; opacity: 0.9;}
-
-    25% {height: 110%; opacity: 0.50;}
-
-    50% {height: 115%; opacity: 1;}
-
-    75% {height: 110%; opacity: 0.50;}
-
-    100% {height: 100%; opacity: 0.9;}
+.carousel .carousel-inner .carousel-item .carousel-caption {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 2;
 }
-/*** Carousel Hero Header End ***/
+
+.carousel .carousel-indicators {
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+    z-index: 5;
+}
+
+.carousel .carousel-indicators li,
+.carousel .carousel-indicators li,
+.carousel .carousel-indicators li {
+    margin-right: 30px !important;
+    width: 10px;
+    height: 10px;
+    border: 6px solid var(--bs-secondary);
+    background: var(--bs-white);
+    transition: 0.5s;
+}
+
+.carousel .carousel-indicators li.active {
+    border: 10px solid var(--bs-primary);
+}
+
+.carousel .carousel-control-prev,
+.carousel .carousel-control-next {
+    background: transparent;
+}
+
+.carousel .carousel-control-prev .carousel-control-prev-icon {
+    position: absolute;
+    left: 0;
+    padding: 25px 30px;
+    background: var(--bs-primary);
+
+}
+
+.carousel .carousel-control-next .carousel-control-next-icon {
+    position: absolute;
+    right: 0;
+    padding: 25px 30px;
+    background: var(--bs-primary);
+
+}
+
+.carousel .carousel-control-prev .carousel-control-prev-icon:hover,
+.carousel .carousel-control-next .carousel-control-next-icon:hover {
+    background: var(--bs-secondary);
+    color: var(--bs-white);
+}
+/*** Carousel End ***/
 
 
 /*** Single Page Hero Header Start ***/

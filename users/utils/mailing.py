@@ -69,3 +69,38 @@ def send_activation_email(user):
             fail_silently=True,
             html_message=html_message,  # Contenu HTML
         )
+        
+        
+        
+
+def send_password_reset_mail(user):
+
+        # Générer les variables nécessaires
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        reset_link = f"http://{settings.DOMAIN_URL}{reverse('auth:reset_password', kwargs={'uid': uid, 'token': token})}"
+
+        # Préparer le contexte pour le template
+        context = {
+            "user": user,
+            "domain": settings.DOMAIN_URL,
+            "uid": uid,
+            "token": token,
+            "activation_link": reset_link,
+        }
+
+        # Charger le sujet et le message HTML
+        subject = "Réinitialisation de mot de passe"
+        html_message = render_to_string("registration/reset_password_email.html", context)
+
+      
+        # Envoi de l'email
+        send_mail(
+            subject,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=True,
+            html_message=html_message,  # Contenu HTML
+        )
+        
+    

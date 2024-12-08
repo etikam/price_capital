@@ -1,130 +1,49 @@
 {% load static %}
 
-    <!-- Carousel Start -->
-    <div class="header-carousel owl-carousel" >
-        <div class="header-carousel-item">
-            <img src="{% static 'img/carousel3.jpg' %}" class="img-fluid w-100" alt="Image" />
-            <div class="carousel-caption">
-                <div class="container">
-                    <div class="row gy-0 gx-5">
-                        <div class="col-lg-0 col-xl-5"></div>
-                        <div class="col-xl-7 animated fadeInLeft">
-                            <div class="text-sm-center text-md-end">
-
-                                <h1 class="display-4 text-uppercase text-white mb-4">
-                                   Vous Investissez avec surété sur des projet rentables
-                                </h1>
-                                <p class="mb-5 fs-5">
-                                    Lorem Ipsum is simply dummy text of the printing and
-                                    typesetting industry. Lorem Ipsum has been the industry's
-                                    standard dummy...
-                                </p>
-                                <div class="d-flex justify-content-center justify-content-md-end flex-shrink-0 mb-4">
-                                    <a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" href="#"><i
-                                            class="fas fa-play-circle me-2"></i> Démo</a>
-                                    
-                                </div>
-                                {% comment %} <div class="d-flex align-items-center justify-content-center justify-content-md-end">
-                                    <h2 class="text-white me-2">Follow Us:</h2>
-                                    <div class="d-flex justify-content-end ms-2">
-                                        <a class="btn btn-md-square btn-light rounded-circle me-2" href=""><i
-                                                class="fab fa-facebook-f"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle mx-2" href=""><i
-                                                class="fab fa-twitter"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle mx-2" href=""><i
-                                                class="fab fa-instagram"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle ms-2" href=""><i
-                                                class="fab fa-linkedin-in"></i></a>
-                                    </div>
-                                </div> {% endcomment %}
-                            </div>
-                        </div>
-                    </div>
+<div class="container-fluid overflow-hidden px-0">
+    <div id="carouselId" class="carousel slide" data-bs-ride="carousel" style="height: 70%;">
+        <ol class="carousel-indicators fadeInUp animate__animated" data-animation="fadeInUp" data-delay="1s" style="animation-delay: 1s;">
+            <li data-bs-target="#carouselId" data-bs-slide-to="0" class="active" aria-current="true" aria-label="First slide"></li>
+            <li data-bs-target="#carouselId" data-bs-slide-to="1" aria-label="Second slide"></li>
+            <li data-bs-target="#carouselId" data-bs-slide-to="2" aria-label="Third slide"></li>
+        </ol>
+        <div class="carousel-inner" role="listbox">
+            <div class="carousel-item active">
+                <img src="{% static 'img/carousel1.jpg' %}" class="img-fluid w-100" alt="First slide"/>
+                <div class="carousel-caption">
+                    <h1 class="display-1 text-capitalize text-white mb-4 fadeInUp animate__animated" data-animation="fadeInUp" data-delay="1.3s" style="animation-delay: 1.3s;">
+                        Investissez avec confiance dans des projets rentables.
+                    </h1>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'img/carousel2.jpg' %}" class="img-fluid w-100" alt="Second slide"/>
+                <div class="carousel-caption">
+                    <h1 class="display-1 text-capitalize text-white mb-4 fadeInUp animate__animated" data-animation="fadeInUp" data-delay="1.3s" style="animation-delay: 1.3s;">
+                        Trouvez des investissements stratégiques et durables.
+                    </h1>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'img/carousel3.jpg' %}" class="img-fluid w-100" alt="Third slide"/>
+                <div class="carousel-caption">
+                    <h1 class="display-1 text-capitalize text-white mb-4 fadeInUp animate__animated" data-animation="fadeInUp" data-delay="1.3s" style="animation-delay: 1.3s;">
+                        Des experts pour vous accompagner tout au long de votre projet.
+                    </h1>
                 </div>
             </div>
         </div>
-        <div class="header-carousel-item">
-            <img src="{% static 'img/carousel2.jpg' %}" class="img-fluid w-100" alt="Image" />
-            <div class="carousel-caption">
-                <div class="container">
-                    <div class="row g-5">
-                        <div class="col-12 animated fadeInUp">
-                            <div class="text-center">
-                                <h4 class="text-primary text-uppercase fw-bold mb-4">
-                                    Chez Prices Capital
-                                </h4>
-                                <h1 class="display-4 text-uppercase text-white mb-4">
-                                    Trouvez un investissement et un accompagnement pour votre projet
-                                </h1>
-                                <p class="mb-5 fs-5">
-                                    Lorem Ipsum is simply dummy text of the printing and
-                                    typesetting industry. Lorem Ipsum has been the industry's
-                                    standard dummy...
-                                </p>
-                                <div class="d-flex justify-content-center flex-shrink-0 mb-4">
-                                    <a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" href="#"><i
-                                            class="fas fa-play-circle me-2"></i>Démo</a>
-                                </div>
-                                {% comment %} <div class="d-flex align-items-center justify-content-center">
-                                    <h2 class="text-white me-2">Follow Us:</h2>
-                                    <div class="d-flex justify-content-end ms-2">
-                                        <a class="btn btn-md-square btn-light rounded-circle me-2" href=""><i
-                                                class="fab fa-facebook-f"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle mx-2" href=""><i
-                                                class="fab fa-twitter"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle mx-2" href=""><i
-                                                class="fab fa-instagram"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle ms-2" href=""><i
-                                                class="fab fa-linkedin-in"></i></a>
-                                    </div>
-                                </div> {% endcomment %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="header-carousel-item">
-            <img src="{% static 'img/carousel1.jpg' %}" class="img-fluid w-100" alt="Image" />
-            <div class="carousel-caption">
-                <div class="container">
-                    <div class="row g-5">
-                        <div class="col-12 animated fadeInUp">
-                            <div class="text-center">
-                                <h4 class="text-primary text-uppercase fw-bold mb-4">
-                                    Chez Prices Capital
-                                </h4>
-                                <h1 class="display-4 text-uppercase text-white mb-4">
-                                    Trouvez un investissement et un accompagnement pour votre projet
-                                </h1>
-                                <p class="mb-5 fs-5">
-                                    Lorem Ipsum is simply dummy text of the printing and
-                                    typesetting industry. Lorem Ipsum has been the industry's
-                                    standard dummy...
-                                </p>
-                                <div class="d-flex justify-content-center flex-shrink-0 mb-4">
-                                    <a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" href="#"><i
-                                            class="fas fa-play-circle me-2"></i>Démo</a>
-                                </div>
-                                {% comment %} <div class="d-flex align-items-center justify-content-center">
-                                    <h2 class="text-white me-2">Follow Us:</h2>
-                                    <div class="d-flex justify-content-end ms-2">
-                                        <a class="btn btn-md-square btn-light rounded-circle me-2" href=""><i
-                                                class="fab fa-facebook-f"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle mx-2" href=""><i
-                                                class="fab fa-twitter"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle mx-2" href=""><i
-                                                class="fab fa-instagram"></i></a>
-                                        <a class="btn btn-md-square btn-light rounded-circle ms-2" href=""><i
-                                                class="fab fa-linkedin-in"></i></a>
-                                    </div>
-                                </div> {% endcomment %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon btn-lg-square fadeInLeft animate__animated" aria-hidden="true" data-animation="fadeInLeft" data-delay="1.1s" style="animation-delay: 1.3s;">
+                <i class="fas fa-chevron-left fa-2x"></i>
+            </span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselId" data-bs-slide="next">
+            <span class="carousel-control-next-icon btn-lg-square fadeInRight animate__animated" aria-hidden="true" data-animation="fadeInRight" data-delay="1.1s" style="animation-delay: 1.3s;">
+                <i class="fas fa-chevron-right fa-2x"></i>
+            </span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
-    <!-- Carousel End -->
+</div>

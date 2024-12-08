@@ -1,13 +1,15 @@
 {% load static %}
 
+<div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+    <h4 class="text-primary">Projets Soumis</h4>
+    <h1 class="display-5 mb-4">Découvrez Nos Projets Soumis</h1>
+
+</div>
+{% include 'app/home/_partials/project_filters.html' %}
 <div class="container-fluid service pb-5">
     <div class="container pb-5">
-        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
-            <h4 class="text-primary">Projets Soumis</h4>
-            <h1 class="display-5 mb-4">Découvrez Nos Projets Soumis</h1>
-
-        </div>
-        {% include 'app/home/_partials/project_filters.html' %}
+       
+       
         <div class="row g-4">
             <!-- Projet 1 -->
             <div class="col-md-6 col-lg-4 wow fadeInUp project-item" data-wow-delay="0.2s" data-category="tourism" data-budget="low" data-status="ongoing">

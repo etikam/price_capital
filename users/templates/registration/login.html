@@ -42,11 +42,12 @@
         <div class="mb-3">{{ form.password.label_tag }}
           {{ form.password }}
           {{ form.password.errors }}</div>
+          
+        <button type="submit" class="btn btn-primary text-center" >Se connecter</button>
 
-        <button type="submit" class="btn btn-primary">Se connecter</button>
-
-        <a href="{% url 'auth:register'%}">Je n'ai pas de compte</a>
       </form>
+      <a href="{% url 'auth:register'%}" class="link m-3">Je n'ai pas de compte</a>
+      <a href="#" class="link m-3">Mot de passe oublié</a>
     </div>
   </div>
 {% endblock %}
