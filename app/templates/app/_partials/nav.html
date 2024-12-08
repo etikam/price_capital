@@ -1,0 +1,67 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
+    <a href="{% url 'home' %}" class="navbar-brand p-0">
+        <h1 class="text-primary">
+            <i class="fas fa-search-dollar me-3"></i>Prices Capital
+        </h1>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="fa fa-bars"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto py-0">
+            <a href="#" class="nav-item nav-link active">Accueil</a>
+            <a href="#" class="nav-item nav-link">Soumission</a>
+            <a href="#" class="nav-item nav-link">Blog</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link" data-bs-toggle="dropdown">
+                    <span class="dropdown-toggle">Nos Services</span>
+                </a>
+                <div class="dropdown-menu m-0">
+                    <a href="feature.html" class="dropdown-item">Service1</a>
+                    <a href="feature.html" class="dropdown-item">Service2</a>
+                    <a href="feature.html" class="dropdown-item">Service3</a>
+                </div>
+            </div>
+            <a href="#" class="nav-item nav-link">Nous contacter</a>
+        </div>
+
+        {% if user.is_authenticated %}
+            <!-- Lien vers "Mon Profil" avec une image miniature ou une icône de profil par défaut -->
+            
+            
+            {% if user.moral_person %}
+            <a href="{% url 'auth:profile_user' %}" class="nav-item nav-link" title="Mon logo">
+                    {% if user.moral_person.logo %}
+                        <!-- Afficher l'image du profil si elle existe -->
+                        <img src="{{ user.moral_person.logo.url }}" alt="Mon Logo" class="rounded-circle" style="width: 30px; height: 30px;">
+                    {% else %}
+                        <!-- Afficher une icône d'utilisateur si l'image de profil est manquante -->
+                        <i class="fas fa-user-circle" style="font-size: 30px;"></i>
+                    {% endif %}
+                {% endif %}
+            </a>
+
+
+            {% if user.physical_person %}
+                <a href="{% url 'auth:profile_user' %}" class="nav-item nav-link" title="Mon profile">
+                    {% if user.physical_person.photo %}
+                        <!-- Afficher l'image du profil si elle existe -->
+                        <img src="{{ user.physical_person.photo.url }}" alt="Profile Image" class="rounded-circle" style="width: 30px; height: 30px;">
+                    {% else %}
+                        <!-- Afficher une icône d'utilisateur si l'image de profil est manquante -->
+                        <i class="fas fa-user-circle" style="font-size: 30px;"></i>
+                    {% endif %}
+                </a>
+        {% endif %}
+
+
+            <!-- Déconnexion -->
+            <a href="{% url 'auth:logout' %}" class="btn btn-secondary rounded-pill py-2 px-4 my-3 my-lg-0 flex-shrink-0">Déconnexion</a>
+        {% else %}
+            <a href="{% url 'auth:login' %}" class="btn btn-secondary rounded-pill py-2 px-4 my-3 my-lg-0 flex-shrink-0">Connexion</a>
+            <a href="{% url 'auth:register' %}" class="btn btn-primary rounded-pill py-2 px-4 my-3 my-lg-0 flex-shrink-0">Inscription</a>
+        {% endif %}
+    </div>
+</nav>

@@ -1,0 +1,105 @@
+{% load static %}
+
+<div class="container-fluid service pb-5">
+    <div class="container pb-5">
+        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+            <h4 class="text-primary">Projets Soumis</h4>
+            <h1 class="display-5 mb-4">Découvrez Nos Projets Soumis</h1>
+
+        </div>
+        {% include 'app/home/_partials/project_filters.html' %}
+        <div class="row g-4">
+            <!-- Projet 1 -->
+            <div class="col-md-6 col-lg-4 wow fadeInUp project-item" data-wow-delay="0.2s" data-category="tourism" data-budget="low" data-status="ongoing">
+                <div class="service-item">
+                    <div class="service-img">
+                        <img src="{% static 'img/service-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                    </div>
+                    <div class="rounded-bottom p-4">
+                        <a href="#" class="h4 d-inline-block mb-4">Consultation en Stratégie</a>
+                        <p class="mb-4">
+                            Un projet axé sur l'élaboration de stratégies adaptées aux défis actuels et futurs pour les entreprises et organisations.
+                        </p>
+                        <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Voir Détails</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Projet 2 -->
+            <div class="col-md-6 col-lg-4 wow fadeInUp project-item" data-wow-delay="0.4s" data-category="social" data-budget="medium" data-status="completed">
+                <div class="service-item">
+                    <div class="service-img">
+                        <img src="{% static 'img/service-2.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                    </div>
+                    <div class="rounded-bottom p-4">
+                        <a href="#" class="h4 d-inline-block mb-4">Conseil Financier</a>
+                        <p class="mb-4">
+                            Une initiative visant à offrir des solutions financières innovantes et durables pour divers secteurs économiques.
+                        </p>
+                        <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Voir Détails</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Projet 3 -->
+            <div class="col-md-6 col-lg-4 wow fadeInUp project-item" data-wow-delay="0.6s" data-category="agriculture" data-budget="high" data-status="upcoming">
+                <div class="service-item">
+                    <div class="service-img">
+                        <img src="{% static 'img/service-3.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                    </div>
+                    <div class="rounded-bottom p-4">
+                        <a href="#" class="h4 d-inline-block mb-4">Gestion des Projets</a>
+                        <p class="mb-4">
+                            Un projet centré sur la gestion efficace et efficiente des ressources pour atteindre des résultats optimaux.
+                        </p>
+                        <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Voir Détails</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Projet 4 -->
+            <div class="col-md-6 col-lg-4 wow fadeInUp project-item" data-wow-delay="0.2s" data-category="technology" data-budget="medium" data-status="ongoing">
+                <div class="service-item">
+                    <div class="service-img">
+                        <img src="{% static 'img/service-4.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                    </div>
+                    <div class="rounded-bottom p-4">
+                        <a href="#" class="h4 d-inline-block mb-4">Optimisation de l'Approvisionnement</a>
+                        <p class="mb-4">
+                            Ce projet propose des solutions pour améliorer la gestion de la chaîne d'approvisionnement et réduire les coûts.
+                        </p>
+                        <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Voir Détails</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Projet 5 -->
+            <div class="col-md-6 col-lg-4 wow fadeInUp project-item" data-wow-delay="0.4s" data-category="social" data-budget="low" data-status="completed">
+                <div class="service-item">
+                    <div class="service-img">
+                        <img src="{% static 'img/service-5.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                    </div>
+                    <div class="rounded-bottom p-4">
+                        <a href="#" class="h4 d-inline-block mb-4">Consultation RH</a>
+                        <p class="mb-4">
+                            Un projet pour améliorer la gestion des talents et le développement des compétences dans les entreprises.
+                        </p>
+                        <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Voir Détails</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Projet 6 -->
+            <div class="col-md-6 col-lg-4 wow fadeInUp project-item" data-wow-delay="0.6s" data-category="technology" data-budget="high" data-status="upcoming">
+                <div class="service-item">
+                    <div class="service-img">
+                        <img src="{% static 'img/service-6.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                    </div>
+                    <div class="rounded-bottom p-4">
+                        <a href="#" class="h4 d-inline-block mb-4">Consultation en Marketing</a>
+                        <p class="mb-4">
+                            Ce projet explore des stratégies marketing innovantes pour renforcer la visibilité et l'impact des marques.
+                        </p>
+                        <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Voir Détails</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Projects Submitted End -->
