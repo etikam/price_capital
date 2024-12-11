@@ -1,0 +1,100 @@
+{% load static %}
+<html lang="fr">
+  <head>
+   
+    {% include 'app/_partials/meta_data.html' %}
+    <!-- Google Web Fonts -->
+   {% include 'app/_partials/styles.html' %}
+
+   
+   {% block style %}
+    
+   {% endblock style %}
+    
+  </head>
+
+  <body>
+    
+    <!-- Messages Start -->
+    
+    {% block messages %}
+      
+
+      
+    {% if messages %}
+    <div class="container mt-2">
+          <div class="row">
+              <div class="col-12">
+                  {% for message in messages %}
+                      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                          {{ message }}
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                      {% endfor %}
+                    </div>
+          </div>
+        </div>
+        {% endif %}
+  <!-- Messages End -->
+  {% endblock messages %}
+
+
+  
+  {% block topbar %}
+        <!-- Topbar Start -->
+        {% include 'app/_partials/topbar.html' %}
+        <!-- Topbar End -->
+  {% endblock topbar %}
+    
+
+
+
+    <!-- Navbar & Hero Start -->
+    <div class="container-fluid position-relative p-0">
+        {% include 'app/_partials/nav.html' %}
+
+        
+        {% block hero %}   
+            {% include 'app/_partials/hero.html' %}
+        {% endblock hero %}
+            
+    <!-- Navbar & Hero End -->
+    </div>
+    <!-- Abvout Start -->
+<div class="container">
+{% block content %}
+    
+
+{% endblock content %}
+</div>
+  
+
+{% block plus %}
+  
+{% endblock plus %}
+  
+{% block footer %}
+  
+{% include 'app/_partials/footer.html' %}
+{% endblock footer %}
+
+
+{% block script %}
+  
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+    <script src="{% static 'lib/lightbox/js/lightbox.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% endblock script %}
+  </body>
+</html>

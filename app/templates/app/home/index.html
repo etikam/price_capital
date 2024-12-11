@@ -1,0 +1,330 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<!-- project tart -->
+{% include 'app/home/_partials/projects.html' %}
+<!-- project End -->
+
+<!-- About us -->
+    {% include 'app/home/_partials/about.html' %}
+<!-- About End -->
+
+
+<!-- Features Start -->
+<!-- <div class="container-fluid feature pb-5">
+    <div class="container pb-5">
+        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+            <h4 class="text-primary">Our Features</h4>
+            <h1 class="display-5 mb-4">
+                Connecting businesses, ideas, and people for greater impact.
+            </h1>
+            <p class="mb-0">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur
+                adipisci facilis cupiditate recusandae aperiam temporibus corporis
+                itaque quis facere, numquam, ad culpa deserunt sint dolorem autem
+                obcaecati, ipsam mollitia hic.
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="feature-item p-4">
+                    <div class="feature-icon p-4 mb-4">
+                        <i class="fas fa-chart-line fa-4x text-primary"></i>
+                    </div>
+                    <h4>Global Management</h4>
+                    <p class="mb-4">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea hic
+                        laborum odit pariatur...
+                    </p>
+                    <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Learn More</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.4s">
+                <div class="feature-item p-4">
+                    <div class="feature-icon p-4 mb-4">
+                        <i class="fas fa-university fa-4x text-primary"></i>
+                    </div>
+                    <h4>Corporate Banking</h4>
+                    <p class="mb-4">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea hic
+                        laborum odit pariatur...
+                    </p>
+                    <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Learn More</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="feature-item p-4">
+                    <div class="feature-icon p-4 mb-4">
+                        <i class="fas fa-file-alt fa-4x text-primary"></i>
+                    </div>
+                    <h4>Asset Management</h4>
+                    <p class="mb-4">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea hic
+                        laborum odit pariatur...
+                    </p>
+                    <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Learn More</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.8s">
+                <div class="feature-item p-4">
+                    <div class="feature-icon p-4 mb-4">
+                        <i class="fas fa-hand-holding-usd fa-4x text-primary"></i>
+                    </div>
+                    <h4>Investment Bank</h4>
+                    <p class="mb-4">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea hic
+                        laborum odit pariatur...
+                    </p>
+                    <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!-- Features End -->
+
+<!-- Offer Start -->
+<!-- <div class="container-fluid offer-section pb-5">
+    <div class="container pb-5">
+        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+            <h4 class="text-primary">Our Offer</h4>
+            <h1 class="display-5 mb-4">Benefits We offer</h1>
+            <p class="mb-0">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur
+                adipisci facilis cupiditate recusandae aperiam temporibus corporis
+                itaque quis facere, numquam, ad culpa deserunt sint dolorem autem
+                obcaecati, ipsam mollitia hic.
+            </p>
+        </div>
+        <div class="row g-5 align-items-center">
+            <div class="col-xl-5 wow fadeInLeft" data-wow-delay="0.2s">
+                <div class="nav nav-pills bg-light rounded p-5">
+                    <a class="accordion-link p-4 active mb-4" data-bs-toggle="pill" href="#collapseOne">
+                        <h5 class="mb-0">
+                            Lending money for investment of your new projects
+                        </h5>
+                    </a>
+                    <a class="accordion-link p-4 mb-4" data-bs-toggle="pill" href="#collapseTwo">
+                        <h5 class="mb-0">
+                            Lending money for investment of your new projects
+                        </h5>
+                    </a>
+                    <a class="accordion-link p-4 mb-4" data-bs-toggle="pill" href="#collapseThree">
+                        <h5 class="mb-0">
+                            Mobile payment is more flexible and easy for all investors
+                        </h5>
+                    </a>
+                    <a class="accordion-link p-4 mb-0" data-bs-toggle="pill" href="#collapseFour">
+                        <h5 class="mb-0">
+                            all transaction is kept free for the member of pro traders
+                        </h5>
+                    </a>
+                </div>
+            </div>
+            <div class="col-xl-7 wow fadeInRight" data-wow-delay="0.4s">
+                <div class="tab-content">
+                    <div id="collapseOne" class="tab-pane fade show p-0 active">
+                        <div class="row g-4">
+                            <div class="col-md-7">
+                                <img src="{% static 'img/offer-1.jpg' %}" class="img-fluid w-100 rounded" alt="" />
+                            </div>
+                            <div class="col-md-5">
+                                <h1 class="display-5 mb-4">
+                                    The stock market provides a venue...
+                                </h1>
+                                <p class="mb-4">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                    Corporis amet sequi molestiae tenetur eum mollitia,
+                                    blanditiis, magnam illo magni error dolore unde
+                                    perspiciatis tempore et totam corrupti dignissimos aut
+                                    praesentium?
+                                </p>
+                                <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="collapseTwo" class="tab-pane fade show p-0">
+                        <div class="row g-4">
+                            <div class="col-md-7">
+                                <img src="{% static 'img/offer-2.jpg' %}" class="img-fluid w-100 rounded" alt="" />
+                            </div>
+                            <div class="col-md-5">
+                                <h1 class="display-5 mb-4">
+                                    The stock market provides a venue...
+                                </h1>
+                                <p class="mb-4">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                    Corporis amet sequi molestiae tenetur eum mollitia,
+                                    blanditiis, magnam illo magni error dolore unde
+                                    perspiciatis tempore et totam corrupti dignissimos aut
+                                    praesentium?
+                                </p>
+                                <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="collapseThree" class="tab-pane fade show p-0">
+                        <div class="row g-4">
+                            <div class="col-md-7">
+                                <img src="{% static 'img/offer-3.jpg' %}" class="img-fluid w-100 rounded" alt="" />
+                            </div>
+                            <div class="col-md-5">
+                                <h1 class="display-5 mb-4">
+                                    The stock market provides a venue...
+                                </h1>
+                                <p class="mb-4">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                    Corporis amet sequi molestiae tenetur eum mollitia,
+                                    blanditiis, magnam illo magni error dolore unde
+                                    perspiciatis tempore et totam corrupti dignissimos aut
+                                    praesentium?
+                                </p>
+                                <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="collapseFour" class="tab-pane fade show p-0">
+                        <div class="row g-4">
+                            <div class="col-md-7">
+                                <img src="{% static 'img/offer-4.jpg' %}" class="img-fluid w-100 rounded" alt="" />
+                            </div>
+                            <div class="col-md-5">
+                                <h1 class="display-5 mb-4">
+                                    The stock market provides a venue...
+                                </h1>
+                                <p class="mb-4">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                    Corporis amet sequi molestiae tenetur eum mollitia,
+                                    blanditiis, magnam illo magni error dolore unde
+                                    perspiciatis tempore et totam corrupti dignissimos aut
+                                    praesentium?
+                                </p>
+                                <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!-- Offer End -->
+
+<!-- realised project -->
+    {% include 'app/home/_partials/realised_projects.html' %}
+<!-- Blog realised project -->
+
+<!-- FAQs Start -->
+    {% include 'app/home/_partials/faqs.html' %}
+<!-- FAQs End -->
+
+<!-- Team Start -->
+<!-- <div class="container-fluid team pb-5">
+    <div class="container pb-5">
+        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+            <h4 class="text-primary">Our Team</h4>
+            <h1 class="display-5 mb-4">Meet Our Advisers</h1>
+            <p class="mb-0">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur
+                adipisci facilis cupiditate recusandae aperiam temporibus corporis
+                itaque quis facere, numquam, ad culpa deserunt sint dolorem autem
+                obcaecati, ipsam mollitia hic.
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="team-item">
+                    <div class="team-img">
+                        <img src="{% static 'img/team-1.jpg' %}" class="img-fluid" alt="" />
+                    </div>
+                    <div class="team-title">
+                        <h4 class="mb-0">David James</h4>
+                        <p class="mb-0">Profession</p>
+                    </div>
+                    <div class="team-icon">
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-0" href=""><i
+                                class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.4s">
+                <div class="team-item">
+                    <div class="team-img">
+                        <img src="{% static 'img/team-2.jpg' %}" class="img-fluid" alt="" />
+                    </div>
+                    <div class="team-title">
+                        <h4 class="mb-0">David James</h4>
+                        <p class="mb-0">Profession</p>
+                    </div>
+                    <div class="team-icon">
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-0" href=""><i
+                                class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="team-item">
+                    <div class="team-img">
+                        <img src="{% static 'img/team-3.jpg' %}" class="img-fluid" alt="" />
+                    </div>
+                    <div class="team-title">
+                        <h4 class="mb-0">David James</h4>
+                        <p class="mb-0">Profession</p>
+                    </div>
+                    <div class="team-icon">
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-0" href=""><i
+                                class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.8s">
+                <div class="team-item">
+                    <div class="team-img">
+                        <img src="{% static 'img/team-4.jpg' %}" class="img-fluid" alt="" />
+                    </div>
+                    <div class="team-title">
+                        <h4 class="mb-0">David James</h4>
+                        <p class="mb-0">Profession</p>
+                    </div>
+                    <div class="team-icon">
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-3" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-primary btn-sm-square rounded-circle me-0" href=""><i
+                                class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!-- Team End -->
+
+<!-- Testimonial Start -->
+    {% include 'app/home/_partials/testimonies.html' %}
+<!-- Testimonial End -->
+{% endblock content %}

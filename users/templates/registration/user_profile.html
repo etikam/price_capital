@@ -1,0 +1,72 @@
+{% extends 'app/base.html' %}
+
+{% block title %}
+  Mon Profil
+{% endblock %}
+
+{% block hero %}
+  
+{% endblock hero %}
+  
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="container p-4" style="max-width: 700px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); margin-top: 70px;">
+    <h2 class="text-center mb-4">Mon Profil</h2>
+
+    <!-- Messages de succès ou d'erreur -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Formulaire -->
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <!-- Photo de profil -->
+      <div class="form-group mb-3 text-center">
+        <label for="profile_image" class="form-label">Photo de Profil</label>
+        <div class="mb-2">
+          {% if user.physical_person and user.physical_person.photo %}
+            <img src="{{ user.physical_person.photo.url }}" alt="Photo de Profil" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+          {% else %}
+            <i class="fas fa-user-circle" style="font-size: 150px; color: #6c757d;"></i>
+          {% endif %}
+        </div>
+        <input type="file" class="form-control" id="profile_image" name="photo">
+      </div>
+
+      <!-- Logo de l'entreprise -->
+      {% if user.moral_person %}
+        <div class="form-group mb-3 text-center">
+          <label for="logo" class="form-label">Logo de l'Entreprise</label>
+          <div class="mb-2">
+            {% if user.moral_person.logo %}
+              <img src="{{ user.moral_person.logo.url }}" alt="Logo de l'Entreprise" class="rounded" style="width: 150px; height: 150px; object-fit: cover;">
+            {% else %}
+              <i class="fas fa-building" style="font-size: 150px; color: #6c757d;"></i>
+            {% endif %}
+          </div>
+          <input type="file" class="form-control" id="logo" name="logo">
+        </div>
+      {% endif %}
+
+      <!-- Champs du formulaire -->
+      {{ form.as_p }}
+
+      <!-- Bouton pour soumettre -->
+      <div class="form-group text-center mt-4">
+        <button type="submit" class="btn btn-primary w-100">Enregistrer les modifications</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}
+
+
+{% block footer %}
+  
+{% endblock footer %}
+  

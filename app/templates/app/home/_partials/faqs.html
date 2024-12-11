@@ -1,0 +1,115 @@
+{% load static %}
+<!-- FAQs Start -->
+<div class="container-fluid faq-section pb-5">
+    <div class="container pb-5 overflow-hidden">
+        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+            <h4 class="text-primary">FAQs</h4>
+            <h1 class="display-5 mb-4">Questions Fréquemment Posées</h1>
+            <p class="mb-0">
+                Retrouvez ici les réponses aux questions les plus courantes sur le processus de soumission de projets et les mécanismes de financement disponibles. Nous avons rassemblé ces informations pour vous guider et simplifier vos démarches.
+            </p>
+        </div>
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 wow fadeInLeft" data-wow-delay="0.2s">
+                <div class="accordion accordion-flush bg-light rounded p-5" id="accordionFlushSection">
+                    <div class="accordion-item rounded-top">
+                        <h2 class="accordion-header" id="flush-headingOne">
+                            <button class="accordion-button collapsed rounded-top" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                aria-controls="flush-collapseOne">
+                                Comment soumettre un projet ?
+                            </button>
+                        </h2>
+                        <div id="flush-collapseOne" class="accordion-collapse collapse"
+                            aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushSection">
+                            <div class="accordion-body">
+                                Pour soumettre un projet, commencez par créer un compte sur notre plateforme. Une fois inscrit, téléchargez le formulaire de soumission, remplissez-le en suivant les instructions, puis soumettez-le accompagné des documents requis.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseTwo" aria-expanded="false"
+                                aria-controls="flush-collapseTwo">
+                                Quels sont les critères d’éligibilité ?
+                            </button>
+                        </h2>
+                        <div id="flush-collapseTwo" class="accordion-collapse collapse"
+                            aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushSection">
+                            <div class="accordion-body">
+                                Les projets doivent être innovants, réalisables et avoir un impact socio-économique positif. Consultez nos directives pour connaître les secteurs prioritaires et les conditions spécifiques.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseThree" aria-expanded="false"
+                                aria-controls="flush-collapseThree">
+                                Comment sont évalués les projets ?
+                            </button>
+                        </h2>
+                        <div id="flush-collapseThree" class="accordion-collapse collapse"
+                            aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushSection">
+                            <div class="accordion-body">
+                                Les projets sont évalués par un comité d’experts selon plusieurs critères : innovation, faisabilité, impact, plan financier et durabilité. Les projets sélectionnés passeront à l’étape suivante pour une évaluation détaillée.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseFour" aria-expanded="false"
+                                aria-controls="flush-collapseFour">
+                                Quels types de financement sont disponibles ?
+                            </button>
+                        </h2>
+                        <div id="flush-collapseFour" class="accordion-collapse collapse"
+                            aria-labelledby="flush-headingFour" data-bs-parent="#accordionFlushSection">
+                            <div class="accordion-body">
+                                Nous offrons plusieurs options de financement, notamment des subventions, des prêts à taux réduit et des investissements participatifs. La nature du financement dépend du type et de l’impact attendu de votre projet.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingFive">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseFive" aria-expanded="false"
+                                aria-controls="flush-collapseFive">
+                                Quand et comment recevrai-je une réponse ?
+                            </button>
+                        </h2>
+                        <div id="flush-collapseFive" class="accordion-collapse collapse"
+                            aria-labelledby="flush-headingFive" data-bs-parent="#accordionFlushSection">
+                            <div class="accordion-body">
+                                Les candidats recevront une réponse dans un délai de 4 à 6 semaines après la soumission. Les résultats seront envoyés par e-mail, et les projets retenus recevront des instructions pour la suite.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item rounded-bottom">
+                        <h2 class="accordion-header" id="flush-headingSix">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseSix" aria-expanded="false"
+                                aria-controls="flush-collapseSix">
+                                Puis-je soumettre plusieurs projets ?
+                            </button>
+                        </h2>
+                        <div id="flush-collapseSix" class="accordion-collapse collapse"
+                            aria-labelledby="flush-headingSix" data-bs-parent="#accordionFlushSection">
+                            <div class="accordion-body">
+                                Oui, vous pouvez soumettre plusieurs projets, à condition qu’ils soient distincts et respectent les critères d’éligibilité. Veuillez noter que chaque projet nécessite un dossier séparé.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 wow fadeInRight" data-wow-delay="0.2s">
+                <div class="bg-primary rounded">
+                    <img src="{% static 'img/about-2.png' %}" class="img-fluid w-100" alt="FAQ Illustration" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- FAQs End -->
