@@ -74,7 +74,6 @@ def send_activation_email(user):
         
 
 def send_password_reset_mail(user):
-
         # Générer les variables nécessaires
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
