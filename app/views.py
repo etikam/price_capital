@@ -2,16 +2,23 @@ from django.shortcuts import render, redirect
 from app.forms import ProjectSubmissionForm
 from app.forms import PorteurProjectForm
 from django.contrib import messages
-from app.models import PorteurProject
+from app.models import PorteurProject, Project, ValidatedProject
 from django.contrib.auth.decorators import login_required
 from app.utils.mailing import send_success_submision_project_mail
-
+from django.core.paginator import Paginator
 # Create your views here.
 
 
 def index(request):
-
-    return render(request, "app/home/index.html")
+    projects = ValidatedProject.objects.filter(is_approved=True)  # Récupérer tous les projets (ou appliquer un filtre selon vos besoins)
+    paginator = Paginator(projects, 6)  
+    page_number = request.GET.get('page')  
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        "page_obj":page_obj
+    }
+    return render(request, "app/home/index.html", context)
 
 
 @login_required(login_url="auth:login")
@@ -79,3 +86,35 @@ def project_submision(request):
         "form_owner": form_owner,
     }
     return render(request, "app/project/submision.html", context)
+
+def cabinet_home(request):
+    context = {}
+    return render(request,"app/project/salon.html",context)
+
+
+def incoming(request):
+    # Filtrer les projets soumis ou en cours de validation
+    projets = Project.objects.filter(status__in=["submited","accepted","rejected"])
+    # projets = Project.objects.filter(status="submited")
+    
+    context = {
+        'projets': projets,
+    }
+    return render(request, 'app/project/incoming.html', context)
+
+
+def validated(request):
+    # Filtrer les projets dont le status n'est ni "submited" ni "rejected"
+    projets = Project.objects.exclude(status__in=["submited", "rejected","accepted"])
+
+    context = {
+        "projets": projets,
+    }
+    return render(request,'app/project/validated.html', context)
+
+def rejected(request):
+
+    context = {}
+    return render(request,'app/project/rejected.html', context)
+
+

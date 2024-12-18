@@ -1,0 +1,79 @@
+{% extends 'app/project/salon.html' %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        Projets soumis et non validés
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple" class="table w-100">
+            <thead>
+                <tr>
+                    <th style="width: fit-content;">#</th>
+                    <th>Titre</th>
+                    <th>Localisation</th>
+                    <th>Budget</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for projet in projets %}
+                <tr>
+                    <!-- Colonne avec boutons dropdown -->
+                    <td style="width: fit-content; white-space: nowrap;">
+                        <div class="dropdown">
+                            <button
+                                class="btn btn-secondary btn-sm dropdown-toggle"
+                                type="button"
+                                id="dropdownMenuButton{{ projet.id }}"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                Options
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ projet.id }}">
+                                <li>
+                                    <button class="dropdown-item btn btn-sm btn-link w-100 text-start">
+                                        Détails
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item btn btn-sm btn-link w-100 text-start">
+                                        Reformuler
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item btn btn-sm btn-link w-100 text-start text-danger">
+                                        Rejeter
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                    
+                    <!-- Autres colonnes -->
+                    <td>{{ projet.title }}</td>
+                    <td>{{ projet.location }}</td>
+                    <td>{{ projet.goal|floatformat:2 }} {{ projet.get_currency_display }}</td>
+                    <td>
+                        <span class="alert 
+                            {% if projet.status == 'submited' %}alert-secondary
+                            {% elif projet.status == 'ongoing' %}alert-warning
+                            {% elif projet.status == 'completed' %}alert-primary
+                            {% elif projet.status == 'rejected' %}alert-danger
+                            {% elif projet.status == 'accepted' %}alert-success
+                            {% else %}alert-light
+                            {% endif %} 
+                            p-2 m-0 d-inline-block">
+                            {{ projet.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}
+

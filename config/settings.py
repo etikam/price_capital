@@ -147,7 +147,7 @@ EMAIL_HOST_USER = 'etiro2005@gmail.com'
 EMAIL_HOST_PASSWORD = 'mily hlmt vbzi ymfd'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DOMAIN_URL = "192.168.1.139:8000" #un domaine de developpement que je dois changer en production
+DOMAIN_URL = "127.0.0.1:8000" #un domaine de developpement que je dois changer en production
 
 
 

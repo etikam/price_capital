@@ -1,0 +1,74 @@
+{% extends 'app/project/salon.html' %}
+
+{% block content %}
+<style>
+    .badge-status {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        border-radius: 12px;
+        text-transform: capitalize;
+    }
+</style>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white text-center">
+        <h2 class="mb-0">
+            <i class="fas fa-tasks"></i> Projets Soumis et Non Validés
+        </h2>
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple" class="table table-striped table-hover w-100">
+            <thead class="table-dark">
+                <tr>
+                    <th>Titre</th>
+                    <th>Localisation</th>
+                    <th>Budget</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for projet in projets %}
+                <tr>
+                    <!-- Titre -->
+                    <td>{{ projet.title }}</td>
+
+                    <!-- Localisation -->
+                    <td>{{ projet.location }}</td>
+
+                    <!-- Budget -->
+                    <td>{{ projet.goal|floatformat:2 }} {{ projet.get_currency_display }}</td>
+
+                    <!-- Statut -->
+                    <td>
+                        <span class="badge badge-status
+                            {% if projet.status == 'submited' %}bg-secondary
+                            {% elif projet.status == 'ongoing' %}bg-warning text-dark
+                            {% elif projet.status == 'completed' %}bg-primary
+                            {% elif projet.status == 'rejected' %}bg-danger
+                            {% elif projet.status == 'accepted' %}bg-success
+                            {% elif projet.status == 'analysing' %}bg-info
+                            {% else %}bg-light text-dark
+                            {% endif %}">
+                            {{ projet.get_status_display }}
+                        </span>
+                    </td>
+
+                    <!-- Actions -->
+                    <td style="white-space: nowrap;">
+                        <a href="{% url 'project_cabinet_details' projet.uid %}" 
+                           class="btn btn-primary btn-sm me-1" title="Voir les détails">
+                            <i class="fas fa-info-circle"></i> Détails
+                        </a>
+                        <a href="{% url 'reformulate_project' projet.uid %}" 
+                           class="btn btn-primary btn-sm me-1" title="Reformuler le projet">
+                            <i class="fas fa-edit"></i> Reformuler
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}

@@ -8,9 +8,7 @@ def send_success_submision_project_mail(user):
         subject = "Succes de soumission de projet"
         html_message = render_to_string("app/mailing/success_submission_mail.html")
 
-    
-
-        # Envoi de l'email
+    # Envoi de l'email
         send_mail(
             subject=subject,
             message="Succes de soumission de projet",
@@ -19,6 +17,16 @@ def send_success_submision_project_mail(user):
             fail_silently=True,
             html_message=html_message, 
         )
-        
-        
-        
+
+#mail de rejet de projet
+def send_report_mail_on_project(user, subject,html_path):
+        html_message = render_to_string(html_path)
+        # Envoi de l'email
+        send_mail(
+            subject=subject,
+            message=subject,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email],
+            fail_silently=True,
+            html_message=html_message, 
+        )

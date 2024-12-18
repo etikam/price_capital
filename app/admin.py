@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PorteurProject, ProjectCategory, Project
+from .models import PorteurProject, ProjectCategory, Project, ValidatedProject
 
 # Enregistrement du modèle PorteurProject
 @admin.register(PorteurProject)
@@ -16,7 +16,7 @@ class ProjectCategoryAdmin(admin.ModelAdmin):
 # Enregistrement du modèle Project
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'goal', 'current_funding', 'status', 'created_at')
+    list_display = ('uid','title', 'category', 'goal',  'status', 'created_at')
     list_filter = ('category', 'status')
     search_fields = ('title', 'location')
     readonly_fields = ('progress', 'converted_budget')
@@ -29,3 +29,45 @@ class ProjectAdmin(admin.ModelAdmin):
 
     progress.short_description = 'Progression du financement'
     converted_budget.short_description = 'Budget converti (GNF)'
+    
+
+@admin.register(ValidatedProject)
+class ValidatedProjectAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "project",
+        "category",
+        "goal",
+        "current_funding",
+        "location",
+        "currency",
+        "is_approved",
+        "approved_at",
+    )
+    list_filter = ("is_approved", "category", "currency", "approved_at")
+    search_fields = ("title", "project__title", "category__name", "location")
+    readonly_fields = ("created_at", "updated_at", "approved_at")
+    ordering = ("-created_at",)
+    fieldsets = (
+        ("Informations générales", {
+            "fields": ("project", "title", "category", "context", "summary", "problem_statement")
+        }),
+        ("Objectifs et Livrables", {
+            "fields": ("general_objective", "specific_objectives", "deliverables")
+        }),
+        ("Détails supplémentaires", {
+            "fields": ("target_audience", "key_partners", "additional_details")
+        }),
+        ("Budget et Localisation", {
+            "fields": ("goal", "current_funding", "currency", "location")
+        }),
+        ("Documents et Images", {
+            "fields": ("documents", "image")
+        }),
+        ("Validation", {
+            "fields": ("is_approved", "approved_at", "reformulated_by")
+        }),
+        ("Audit", {
+            "fields": ("created_at", "updated_at")
+        }),
+    )

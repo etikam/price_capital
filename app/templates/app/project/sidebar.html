@@ -1,0 +1,32 @@
+<div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <a class="nav-link" href="{% url 'cabinet-home' %}">
+                    <div class="sb-nav-link-icon">
+                        <i class="fas fa-house-user fa-2x"></i>
+                    </div>Salon
+                </a>
+                
+                <div class="sb-sidenav-menu-heading">Projets</div>
+                
+                <a class="nav-link" href="{% url 'cabinet-incoming' %}">
+                    <div class="sb-nav-link-icon">
+                        <i class="fas fa-spinner fa-2x"></i>
+                    </div>En Reformulation
+                </a>
+                <a class="nav-link" href="{% url 'cabinet-validated' %}">
+                    <div class="sb-nav-link-icon">
+                        <i class="fas fa-check fa-2x"></i>
+                    </div>Validés
+                </a>
+
+                {% comment %} <a class="nav-link" href="{% url 'cabinet-rejected' %}">
+                    <div class="sb-nav-link-icon">
+                        <i class="fas fa-check-dou fa-2x"></i>
+                    </div>Rejetés
+                </a> {% endcomment %}
+            </div>
+        </div>
+    </nav>
+</div>

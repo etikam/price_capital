@@ -1,0 +1,126 @@
+{% extends 'app/project/salon.html' %}
+
+{% block content %}
+<style>
+    .status-alert {
+        border-radius: 12px;
+        padding: 5px 10px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        display: inline-block;
+        color: white;
+        text-align: center;
+    }
+
+    .status-submited {
+        background-color: #6c757d;
+        /* Grey */
+    }
+
+    .status-reformulated {
+        background-color: rgb(26, 3, 83);
+        /* Yellow */
+    }    
+    .status-published {
+        background-color: rgb(6, 210, 3);
+        /* Yellow */
+    }
+
+    .status-ongoing {
+        background-color: #007bff;
+        /* Blue */
+    }
+
+    .status-completed {
+        background-color: #28a745;
+        /* Green */
+    }
+
+    .status-rejected {
+        background-color: #dc3545;
+        /* Red */
+    }
+
+    .status-accepted {
+        background-color: #17a2b8;
+        /* Cyan */
+    }
+</style>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <i class="fas fa-table me-1"></i>
+        Liste des Projets Soumis
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple" class="table w-100 table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th style="width: fit-content;">#</th>
+                    <th>Titre</th>
+                    <th>Localisation</th>
+                    <th>Budget</th>
+                    <th>Statut</th>
+                    <th>Publier</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for projet in projets %}
+                <tr>
+                    <!-- Index -->
+                    <td>{{ forloop.counter }}</td>
+
+                    <!-- Titre -->
+                    <td>{{ projet.title }}</td>
+
+                    <!-- Localisation -->
+                    <td>{{ projet.location }}</td>
+
+                    <!-- Budget -->
+                    <td>{{ projet.goal|floatformat:2 }} {{ projet.get_currency_display }}</td>
+
+                    <!-- Statut -->
+                    <td>
+                        <span class="status-alert 
+                            {% if projet.status == 'submited' %}status-submited
+                            {% elif projet.status == 'ongoing' %}status-ongoing
+                            {% elif projet.status == 'reformulated' %}status-reformulated
+                            {% elif projet.status == 'completed' %}status-completed
+                            {% elif projet.status == 'rejected' %}status-rejected
+                            {% elif projet.status == 'accepted' %}status-accepted
+                            {% elif projet.status == 'published' %}status-published
+                            {% endif %}">
+                            {{ projet.get_status_display }}
+                        </span>
+                    </td>
+
+                    <!-- Case à cocher pour Publier -->
+                    <td class="text-center">
+                        <form method="post" action="{% url 'cabinet-publishp-roject' projet.uid %}">
+                            {% csrf_token %}
+                            <input type="checkbox" name="is_published" {% if projet.validated_project.is_approved%}checked{% endif %}>
+                            <button class="btn btn-success btn-sm mx-1" type="submit">
+                                Enregistrer
+                            </button>
+                        </form>
+                    </td>
+
+                    <!-- Boutons d'actions -->
+                    <td>
+
+                        <a class="btn btn-primary btn-sm mx-1" href="{% url 'reformulate_project' projet.uid %}">
+                            Reformuler
+                        </a>
+
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}
+
+
+
