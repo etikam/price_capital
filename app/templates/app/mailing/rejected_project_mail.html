@@ -6,15 +6,17 @@
     <title>Rejet de projet</title>
 </head>
 <body>
-    <h2>Bonjour Cher-e client-e,</h2>
-    <p>Ce mail vous est parvenu de <strong>Price Capital</strong>.</p>
-    <p> :</p>
+    <h2>Bonjour {{ Nom }},</h2>
+    <p>Nous avons le regret de vous informer que votre projet, intitulé <strong>{{ Titre_du_projet }}</strong>, n’a pas été retenu.</p>
+    
+    {% if raison %}
+        <p>Cette décision repose sur la raison suivante : <strong>{{ raison }}</strong>.</p>
+    {% else %}
+        <p>Malheureusement, nous ne pouvons pas donner de raison spécifique pour cette décision.</p>
+    {% endif %}
+    
+    <p>Nous vous remercions pour votre investissement et restons à votre disposition pour échanger si besoin.</p>
 
-    <p>
-         Nous avons le regret de vous annoncé que votre projet a été rejeté par notre cabinet de reformulation.
-         retentez votre chance en soumettant le projet avec plus de précision
-    </p>
-
-    <p>Merci,<br>Prices Capital</p>
+    <p>Merci,<br>Price Capital</p>
 </body>
 </html>

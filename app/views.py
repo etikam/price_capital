@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from app.forms import ProjectSubmissionForm
 from app.forms import PorteurProjectForm
 from django.contrib import messages
-from app.models import PorteurProject, Project, ValidatedProject
+from app.models import PorteurProject, Project, ValidatedProject, ProjectCategory
 from django.contrib.auth.decorators import login_required
 from app.utils.mailing import send_success_submision_project_mail
 from django.core.paginator import Paginator
@@ -10,15 +10,25 @@ from django.core.paginator import Paginator
 
 
 def index(request):
-    projects = ValidatedProject.objects.filter(is_approved=True)  # Récupérer tous les projets (ou appliquer un filtre selon vos besoins)
-    paginator = Paginator(projects, 6)  
-    page_number = request.GET.get('page')  
-    page_obj = paginator.get_page(page_number)
+    # Filtrer uniquement les projets approuvés
+    projects = ValidatedProject.objects.filter(is_approved=True)
     
+    # Récupérer les catégories et les régions depuis la base de données
+    categories = ProjectCategory.objects.all()
+    regions = projects.values_list('location', flat=True).distinct()
+
+    # Pagination
+    paginator = Paginator(projects, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        "page_obj":page_obj
+        "page_obj": page_obj,
+        "categories": categories,
+        "regions": regions,
     }
     return render(request, "app/home/index.html", context)
+
 
 
 @login_required(login_url="auth:login")
@@ -116,5 +126,16 @@ def rejected(request):
 
     context = {}
     return render(request,'app/project/rejected.html', context)
+
+
+
+def detail_project(request,id):
+    project = get_object_or_404(ValidatedProject,id=id)
+    
+    context = {
+        'validate_project':project
+    }
+    
+    return render(request,"app/home/details_project.html",context)
 
 

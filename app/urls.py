@@ -1,6 +1,6 @@
 from django.urls import path
 from app import views, project_editing_view
-from app.project_editing_view import reformulate_project
+
 name="app"
 urlpatterns = [
     path('', views.index, name="home"),
@@ -13,7 +13,8 @@ urlpatterns = [
     path('project/cabinet/accepte/<uid>/', project_editing_view.accepte_project, name="cabinet-accepte-project"),
     path('project/cabinet/reject/<uid>/', project_editing_view.reject_project, name="cabinet-reject-project"),
     path('project/cabinet/publish/<uid>/', project_editing_view.publish_project, name="cabinet-publishp-roject"),
-    path("project/<uuid:uid>/reformulate/", reformulate_project, name="reformulate_project"),
-
+    path("project/<uuid:uid>/reformulate/", project_editing_view.reformulate_project, name="reformulate_project"),
+    path("project/detail/<int:id>/",views.detail_project, name="detail-project"),
+    path("add-category/",project_editing_view.add_category, name="add_category"),
 
 ]

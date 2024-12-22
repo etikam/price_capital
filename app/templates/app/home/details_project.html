@@ -1,0 +1,99 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow">
+        <div class="card-header">
+            <h4 class="display-4">Détails du Projet Validé</h4>
+            <h5>{{ validate_project.title }}</h5>
+        </div>
+
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="projectTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">Détails du Projet</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="projectTabContent">
+                <!-- Détails du Projet -->
+                <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+                    <form>
+                        <section>
+                            <h3 class="text-primary">A propos du projet</h3>
+                            <div class="mb-3">
+                                <label for="title" class="form-label"><strong>Titre :</strong></label>
+                                <input type="text" id="title" class="form-control" value="{{ validate_project.title }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="category" class="form-label"><strong>Catégorie :</strong></label>
+                                <input type="text" id="category" class="form-control" value="{{ validate_project.category }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="goal" class="form-label"><strong>Objectif :</strong></label>
+                                <input type="text" id="goal" class="form-control" value="{{ validate_project.goal }} {{ validate_project.currency }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="location" class="form-label"><strong>Localisation :</strong></label>
+                                <input type="text" id="location" class="form-control" value="{{ validate_project.location }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="context" class="form-label"><strong>Contexte :</strong></label>
+                                <textarea id="context" class="form-control" rows="3" readonly>{{ validate_project.context }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="summary" class="form-label"><strong>Résumé :</strong></label>
+                                <textarea id="summary" class="form-control" rows="3" readonly>{{ validate_project.summary }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="problem_statement" class="form-label"><strong>Problématique :</strong></label>
+                                <textarea id="problem_statement" class="form-control" rows="3" readonly>{{ validate_project.problem_statement }}</textarea>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-primary">Détails du porteur de projet</h3>
+                            <div class="mb-3">
+                                <label for="owner_name" class="form-label"><strong>Nom :</strong></label>
+                                <input type="text" id="owner_name" class="form-control" value="{{ validate_project.project.owner.first_name }} {{ validate_project.project.owner.last_name }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="owner_phone" class="form-label"><strong>Téléphone :</strong></label>
+                                <input type="text" id="owner_phone" class="form-control" value="{{ validate_project.project.owner.phone }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="owner_address" class="form-label"><strong>Adresse :</strong></label>
+                                <input type="text" id="owner_address" class="form-control" value="{{ validate_project.project.owner.adress }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="owner_birthday" class="form-label"><strong>Date de naissance :</strong></label>
+                                <input type="text" id="owner_birthday" class="form-control" value="{{ validate_project.project.owner.birthday|date }}" readonly>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-primary">Documents du projet</h3>
+                            {% if validate_project.documents %}
+                            <div class="mb-3">
+                                <label for="documents" class="form-label"><strong>Documents associés :</strong></label>
+                                {% for document in validate_project.documents.all %}
+                                    <div class="document-item">
+                                        <a href="{{ document.url }}" target="_blank" class="btn btn-link">{{ document.name|default:"Document" }}</a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                         
+                        </section>
+                    </form>
+                </div>
+
+         
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

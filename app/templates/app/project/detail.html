@@ -55,7 +55,7 @@
 
     .project-details .btn {
         padding: 10px 20px;
-       
+
     }
 
     .project-details .btn:hover {
@@ -118,7 +118,7 @@
 
             <div class="form-group">
                 <label for="birthday">Date de naissance</label>
-                <input type="text" id="birthday" class="form-control" value="{{ project.owner.birthday|date}}"> 
+                <input type="text" id="birthday" class="form-control" value="{{ project.owner.birthday|date}}">
             </div>
 
             <!-- Affichage de la photo -->
@@ -146,7 +146,8 @@
                     </a>
                     {% endif %}
                     {% if project.business_plan %}
-                    <a href="{{ project.business_plan.url }}" class="text-primary fs-5 bg" target="_blank" style="text-decoration: none;">
+                    <a href="{{ project.business_plan.url }}" class="text-primary fs-5 bg" target="_blank"
+                        style="text-decoration: none;">
                         <i class="fas fa-file-pdf  fa-3x"></i> Business Plan
                     </a>
                     {% endif %}
@@ -155,11 +156,44 @@
 
             <!-- Boutons d'action -->
             <div class="action-buttons">
-                <a href="{% url 'cabinet-accepte-project' project.uid %}" class="btn btn-success"><i class="fas fa-check"></i> Accepté</a>
-                <a href="{% url 'cabinet-reject-project' project.uid %}" class="btn btn-danger"><i class="fas fa-times"></i> Rejeter</a>
-                <a href="{% url 'cabinet-incoming' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Retour à la liste</a>
+                <a href="{% url 'cabinet-accepte-project' project.uid %}" class="btn btn-success"><i
+                        class="fas fa-check"></i> Accepté</a>
+                <!-- <a href="{% url 'cabinet-reject-project' project.uid %}" class="btn btn-danger"><i -->
+                        <!-- class="fas fa-times"></i> Rejeter</a> -->
+                        <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                            <i class="fas fa-times"></i> Demander plus d'info
+                        </a>
+                        
+                <a href="{% url 'cabinet-incoming' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i>
+                    Retour à la liste</a>
             </div>
         </form>
     </div>
 </div>
+
+
+<!-- Modal pour saisir la raison du rejet -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectModalLabel">Motif du rejet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulaire pour saisir la raison -->
+                <form id="rejectForm" method="POST" action="{% url 'cabinet-reject-project' project.uid %}">
+                    {% csrf_token %}
+                    <textarea id="rejectReason" name="reason" class="form-control" rows="4" placeholder="Expliquez pourquoi vous rejetez ce projet..." required></textarea>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn btn-danger" form="rejectForm">Envoyer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}

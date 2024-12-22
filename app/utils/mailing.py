@@ -19,8 +19,8 @@ def send_success_submision_project_mail(user):
         )
 
 #mail de rejet de projet
-def send_report_mail_on_project(user, subject,html_path):
-        html_message = render_to_string(html_path)
+def send_report_mail_on_project(user, subject,html_path,context):
+        html_message = render_to_string(html_path,context)
         # Envoi de l'email
         send_mail(
             subject=subject,

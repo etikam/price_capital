@@ -6,6 +6,61 @@
     <h1 class="display-5 mb-4">Découvrez Nos Projets Soumis</h1>
 </div>
 
+
+<style>
+    /* Pagination générale */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pagination .page-link {
+        border-radius: 50px;
+        padding: 10px 20px;
+        font-size: 16px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #6c757d;
+    }
+
+    /* Style des images des projets */
+    .service-img img {
+        width: 100%;  /* L'image s'ajuste à la largeur de son conteneur */
+        height: 200px; /* Hauteur fixe de 200px */
+        object-fit: cover; /* Conserver le rapport d'aspect sans déformation */
+    }
+
+    /* Media Query pour écrans moyens */
+    @media (max-width: 992px) {
+        .pagination .page-link {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+    }
+
+    /* Media Query pour petits écrans */
+    @media (max-width: 576px) {
+        .pagination .page-link {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+    }
+</style>
+
+
+
+
 {% include 'app/home/_partials/project_filters.html' %}
 
 <div class="container-fluid service pb-5">
@@ -13,63 +68,133 @@
         <div class="row g-4">
             {% for project in page_obj %}
             <div class="col-md-6 col-lg-4 wow fadeInUp project-item" data-wow-delay="0.2s"
-                data-category="{{ project.category }}" data-budget="{{ project.budget }}"
-                data-status="{{ project.status }}">
+                data-category="{{ project.category.id }}" 
+                data-region="{{ project.location }}" 
+                data-budget="{{ project.goal }}" 
+                data-location="{{ project.location }}">
                 <div class="service-item">
                     <div class="service-img">
-                        <img src="{% static 'img/service-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                        {% if project.image %}
+                           <a href="{{project.image.url}}" target="_blank"> <img src="{{project.image.url}}" class="img-fluid rounded-top w-100" alt="Image" /> </a>
+                        {% else %}
+                           <a href="{% static 'img/service-1.jpg' %}", target="_blank"> <img src="{% static 'img/service-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" /></a>
+                        {% endif %}
                     </div>
                     <div class="rounded-bottom p-4">
                         <a href="#" class="h4 d-inline-block mb-4">{{ project.title }}</a>
-                        <p class="mb-4">{{ project.summary|slice:":200" }}{% if project.summary|length > 200 %}...{% endif %}</p>
-
-
+                        <p class="mb-4">{{ project.summary|slice:":150" }}{% if project.summary|length > 150 %}...{% endif %}</p>
+        
                         <!-- Barre de Progression -->
                         <div class="progress mb-3">
                             <div class="progress-bar" role="progressbar" style="width: {{ project.progress }}%"
-                                aria-valuenow="{{ project.current_funding }}" aria-valuemin="0"
-                                aria-valuemax="{{ project.goal }}">
+                                aria-valuenow="{{ project.current_funding }}" aria-valuemin="0" aria-valuemax="{{ project.goal }}">
                                 {{ project.progress }}% Financé
                             </div>
                         </div>
-
-
-
-
-                        <p class="text-center">{{ project.funds_collected }} / {{ project.goal }} GNF collectés</p>
-
-                        <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Voir Détails</a>
+        
+                        <p class="text-center">{{ project.current_funding|floatformat:2 }} / {{ project.goal|floatformat:2 }} GNF collectés</p>
+                        <a class="btn btn-primary rounded-pill py-2 px-4 text-center" href="{% url 'detail-project' project.id %}">
+                            Voir Plus
+                        </a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+        
     </div>
 </div>
 
-<!-- Pagination -->
+
+
 <div class="d-flex justify-content-center mt-4">
-    <div class="pagination">
-        <span class="page-item">
+    <nav aria-label="Pagination" class="pagination-container">
+        <ul class="pagination pagination-lg justify-content-center">
             {% if page_obj.has_previous %}
-            <a class="page-link" href="?page=1">&laquo; Première</a>
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédente</a>
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="Première">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Précédente">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
             {% endif %}
-        </span>
-        <span class="page-item">
+
             {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
-            <a class="page-link active" href="?page={{ num }}">{{ num }}</a>
-            {% else %}
-            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
             {% endif %}
             {% endfor %}
-        </span>
-        <span class="page-item">
+
             {% if page_obj.has_next %}
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivante</a>
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Dernière &raquo;</a>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Suivante">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Dernière">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;&raquo;</span>
+            </li>
             {% endif %}
-        </span>
-    </div>
+        </ul>
+    </nav>
 </div>
+
+
+<script>
+    document.getElementById("filter-btn").addEventListener("click", function () {
+        const category = document.getElementById("category").value;
+        const region = document.getElementById("region").value;
+        const budget = document.getElementById("budget").value;
+        const location = document.getElementById("location").value.toLowerCase();
+    
+        // Sélectionner tous les projets
+        const projects = document.querySelectorAll(".project-item");
+    
+        projects.forEach((project) => {
+            const projectCategory = project.getAttribute("data-category");
+            const projectRegion = project.getAttribute("data-region");
+            const projectBudget = parseFloat(project.getAttribute("data-budget"));
+            const projectLocation = project.getAttribute("data-location").toLowerCase();
+    
+            // Conditions de filtrage
+            const matchesCategory = category === "" || projectCategory === category;
+            const matchesRegion = region === "" || projectRegion === region;
+            const matchesBudget =
+                budget === "" ||
+                (budget === "low" && projectBudget < 10000000) ||
+                (budget === "medium" && projectBudget >= 10000000 && projectBudget <= 50000000) ||
+                (budget === "high" && projectBudget > 50000000);
+            const matchesLocation = location === "" || projectLocation.includes(location);
+    
+            // Affichage/Masquage des projets
+            if (matchesCategory && matchesRegion && matchesBudget && matchesLocation) {
+                project.style.display = "block";
+            } else {
+                project.style.display = "none";
+            }
+        });
+    });
+    
+</script>

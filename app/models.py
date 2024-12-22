@@ -25,11 +25,11 @@ class Project(models.Model):
     STATUS_CHOICES = [
         ("submited", "Soumis"),     #quand le projet est soumis (uniquement pour les soumetteurs )
         ("ongoing", "En cours"),  #quand la collecte des fond sur le projet a debuté
-        ("reformulated", "Reformulé"),  #quand la reformulation du  projet est terminée
-        ("completed", "Terminé"),   #quand le projet est réalisé
-        ("published", "Publié"),   #quand le projet est publié
-        ("rejected", "Rejeté"),     #quand le projet est rejeté (pour quelque raison que ce soit) avant meme d'être reformulé
-        ("accepted", "Accepté"),    #quand le projet est accepté
+        ("reformulated", "Reformulé ❕"),  #quand la reformulation du  projet est terminée
+        ("completed", "Terminé ✔️"),   #quand le projet est réalisé
+        ("published", "Publié 👍"),   #quand le projet est publié
+        ("rejected", "En attente de plus d'informations ❌"),     #quand le projet est rejeté (pour quelque raison que ce soit) avant meme d'être reformulé
+        ("accepted", "Accepté ✅"),    #quand le projet est accepté
     ]
 
     CURRENCY_CHOICES = [
@@ -165,6 +165,12 @@ class ValidatedProject(models.Model):
         ("EUR", "EUR - Euro"),
         ("XOF", "XOF - Franc CFA"),
     ]
+    # uid = models.UUIDField(
+    # default=uuid.uuid4,
+    # editable=False,
+    # unique=True,
+    # verbose_name="Identifiant unique",
+    #     )
     project = models.OneToOneField(
         "Project", on_delete=models.CASCADE, related_name="validated_project", verbose_name="Projet soumis"
     )

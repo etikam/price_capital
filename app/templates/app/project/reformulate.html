@@ -8,13 +8,13 @@
         </div>
         <div class="card-body">
             <!-- Onglets pour basculer entre les détails initiaux et le formulaire -->
-            <ul class="nav nav-tabs" id="projectTab" role="tablist">
-                <li class="btn btn-outline-primary" role="presentation">
+            <ul class="nav nav-tabs mb-4" id="projectTab" role="tablist">
+                <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="reformulate-tab" data-bs-toggle="tab"
                         data-bs-target="#reformulate" type="button" role="tab" aria-controls="reformulate"
                         aria-selected="true">Reformulation</button>
                 </li>
-                <li class="btn btn-outline-primary" role="presentation">
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="initial-tab" data-bs-toggle="tab" data-bs-target="#initial"
                         type="button" role="tab" aria-controls="initial" aria-selected="false">Détails Initiaux</button>
                 </li>
@@ -22,60 +22,46 @@
 
             <div class="tab-content" id="projectTabContent">
                 <!-- Formulaire de Reformulation -->
-                <div class="tab-pane fade show active" id="reformulate" role="tabpanel"
-                    aria-labelledby="reformulate-tab">
-                    <form method="post" enctype="multipart/form-data" class="mt-4">
+                <div class="tab-pane fade show active" id="reformulate" role="tabpanel" aria-labelledby="reformulate-tab">
+                    <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         <h5 class="text-secondary mb-3">Informations du Projet</h5>
-
                         <div class="row">
+                            <div class="col-md-12 mb-3">{{ form.title.label_tag }} {{ form.title }}</div>
+                            <div class="col-md-12 mb-3">{{ form.category.label_tag }} {{ form.category }}</div>
 
-                            <div class="col-md-12 mb-3">{{ form.title.label_tag }}
-                                {{ form.title }}</div>
-
-                            <div class="col-md-12 mb-3">{{ form.category.label_tag }}
-                                {{ form.category }}</div>
-
-
-                            <div class="col-md-12 mb-3">{{ form.goal.label_tag }}
-                                {{ form.goal }}</div>
-
-                            <div class="col-md-12 mb-3">{{ form.location.label_tag }}
-                                {{ form.location }}</div>
-
-                            <div class="col-md-12 mb-3">{{ form.currency.label_tag }}
-                                {{ form.currency }}</div>
-
-                            <div class="col-md-12 mb-3">{{ form.context.label_tag }}
-                                {{ form.context }}</div>
-                            <div class="col-md-12 mb-3">{{ form.summary.label_tag }}
-                                {{ form.summary }}</div>
-                            <div class="col-md-12 mb-3">{{ form.problem_statement.label_tag }}
-                                {{ form.problem_statement }}</div>
+                            <div class="col-md-12 mb-3">
+                                <label for="category" class="form-label">{{ form.category.label }}</label>
+                                <div class="input-group">
+                                    {{ form.category }}
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="col-md-12 mb-3">{{ form.goal.label_tag }} {{ form.goal }}</div>
+                            <div class="col-md-12 mb-3">{{ form.currency.label_tag }} {{ form.currency }}</div>
+                            <div class="col-md-12 mb-3">{{ form.location.label_tag }} {{ form.location }}</div>
+                            <div class="col-md-12 mb-3">{{ form.context.label_tag }} {{ form.context }}</div>
+                            <div class="col-md-12 mb-3">{{ form.summary.label_tag }} {{ form.summary }}</div>
+                            <div class="col-md-12 mb-3">{{ form.problem_statement.label_tag }} {{ form.problem_statement }}</div>
                         </div>
 
                         <h5 class="text-secondary mt-4 mb-3">Objectifs et Livrables</h5>
                         <div class="row">
-                            <div class="col-md-12 mb-3">{{ form.general_objective.label_tag }}
-                                {{ form.general_objective }}</div>
-                            <div class="col-md-12 mb-3">{{ form.specific_objectives.label_tag }}
-                                {{ form.specific_objectives }}</div>
-                            <div class="col-md-12 mb-3">{{ form.deliverables.label_tag }}
-                                {{ form.deliverables }}</div>
+                            <div class="col-md-12 mb-3">{{ form.general_objective.label_tag }} {{ form.general_objective }}</div>
+                            <div class="col-md-12 mb-3">{{ form.specific_objectives.label_tag }} {{ form.specific_objectives }}</div>
+                            <div class="col-md-12 mb-3">{{ form.deliverables.label_tag }} {{ form.deliverables }}</div>
                         </div>
 
                         <h5 class="text-secondary mt-4 mb-3">Autres Informations</h5>
                         <div class="row">
-                            <div class="col-md-12 mb-3">{{ form.target_audience.label_tag }}
-                                {{ form.target_audience }}</div>
-                            <div class="col-md-12 mb-3">{{ form.key_partners.label_tag }}
-                                {{ form.key_partners }}</div>
-                            <div class="col-md-12 mb-3">{{ form.additional_details.label_tag }}
-                                {{ form.additional_details }}</div>
-                            <!-- <div class="col-md-12 mb-3">{{ form.image.label_tag }}
-                                {{ form.image }}</div> -->
-
-                            <div class="form-group text-center">
+                            <div class="col-md-12 mb-3">{{ form.target_audience.label_tag }} {{ form.target_audience }}</div>
+                            <div class="col-md-12 mb-3">{{ form.key_partners.label_tag }} {{ form.key_partners }}</div>
+                            <div class="col-md-12 mb-3">{{ form.additional_details.label_tag }} {{ form.additional_details }}</div>
+                            <div class="form-group text-center mb-3">
                                 <label for="photo">Photo</label>
                                 {% if form.image.value %}
                                 <div class="mt-2">
@@ -85,123 +71,75 @@
                                 {% else %}
                                 <p class="text-muted">Aucune photo disponible</p>
                                 {% endif %}
-                                {{form.image}}
+                                {{ form.image }}
                             </div>
                         </div>
 
                         <h5 class="text-secondary mt-4 mb-3">Documents</h5>
                         <div class="row">
-                            <div class="col-md-12 mb-3">{{ form.documents.label_tag }}
-                                {{ form.documents }}</div>
-                            <div class="form-check mb-3">
-                                {{ form.is_approved }}
-                                <label class="form-check-label" for="{{ form.is_approved.id_for_label }}">Le projet est
-                                    validé pour publication</label>
-                            </div>
+                            <div class="col-md-12 mb-3">{{ form.documents.label_tag }} {{ form.documents }}</div>
                         </div>
 
                         <div class="row">
                             <button type="submit" class="btn btn-success col">Enregistrer</button>
-                           
                         </div>
                     </form>
                 </div>
 
                 <!-- Détails Initiaux -->
                 <div class="tab-pane fade" id="initial" role="tabpanel" aria-labelledby="initial-tab">
-                    <form>
-                        <!-- À propos du projet -->
-                        <h3>A propos du projet</h3>
-                        <div class="form-group m-3">
-                            <label for="title">Titre</label>
-                            <input type="text" id="title" class="form-control" value="{{ project.title }}">
-                        </div>
+                    <h5 class="text-secondary mb-3">À propos du projet</h5>
+                    <p><strong>Titre :</strong> {{ project.title }}</p>
+                    <p><strong>Catégorie :</strong> {{ project.category.name }}</p>
+                    <p><strong>Budget :</strong> {{ project.goal|floatformat:2 }} {{ project.currency }}</p>
+                    <p><strong>Localisation :</strong> {{ project.location }}</p>
 
-                        <div class="form-group m-3">
-                            <label for="category">Catégorie</label>
-                            <input type="text" id="category" class="form-control" value="{{ project.category.name }}">
-                        </div>
+                    <h5 class="text-secondary mt-4 mb-3">À propos du porteur</h5>
+                    <p><strong>Prénom :</strong> {{ project.owner.first_name }}</p>
+                    <p><strong>Nom :</strong> {{ project.owner.last_name }}</p>
+                    <p><strong>Téléphone :</strong> {{ project.owner.phone }}</p>
+                    <p><strong>Adresse :</strong> {{ project.owner.adress }}</p>
+                    <p><strong>Date de naissance :</strong> {{ project.owner.birthday|date }}</p>
 
-                        <div class="form-group m-3">
-                            <label for="budget">Objectif de financement</label>
-                            <input type="text" id="budget" class="form-control"
-                                value="{{ project.goal|floatformat:2 }} {{ project.currency }}">
-                        </div>
-
-                        <div class="form-group m-3">
-                            <label for="location">Localisation</label>
-                            <input type="text" id="location" class="form-control" value="{{ project.location }}">
-                        </div>
-
-                        <!-- À propos du porteur -->
-                        <!-- À propos du porteur -->
-                        <h3>A propos du porteur</h3>
-
-                        <div class="form-group m-3">
-                            <label for="first_name">Prénom</label>
-                            <input type="text" id="first_name" class="form-control"
-                                value="{{ project.owner.first_name }}">
-                        </div>
-
-                        <div class="form-group m-3">
-                            <label for="last_name">Nom</label>
-                            <input type="text" id="last_name" class="form-control"
-                                value="{{ project.owner.last_name }}">
-                        </div>
-
-                        <div class="form-group m-3">
-                            <label for="phone">Téléphone</label>
-                            <input type="text" id="phone" class="form-control" value="{{ project.owner.phone }}">
-                        </div>
-
-                        <div class="form-group m-3">
-                            <label for="adress">Adresse</label>
-                            <textarea id="adress" class="form-control" rows="3">{{ project.owner.adress }}</textarea>
-                        </div>
-
-                        <div class="form-group m-3">
-                            <label for="birthday">Date de naissance</label>
-                            <input type="text" id="birthday" class="form-control"
-                                value="{{ project.owner.birthday|date}}">
-                        </div>
-
-                        <!-- Affichage de la photo -->
-                        <div class="form-group m-3 text-center">
-                            <label for="photo">Photo</label>
-                            {% if project.owner.photo %}
-                            <div class="mt-2">
-                                <img src="{{ project.owner.photo.url }}" alt="Photo du porteur de projet"
-                                    class="img-thumbnail" style="width: 150px; height: auto;">
-                            </div>
-                            {% else %}
-                            <p class="text-muted">Aucune photo disponible</p>
-                            {% endif %}
-                        </div>
-
-
-                        <!-- Pièces jointes -->
-                        <h3>Pièces Jointes</h3>
-                        <div class="form-group">
-                            <label>Documents du projet</label>
-                            <div>
-                                {% if project.presentation_doc %}
-                                <a href="{{ project.presentation_doc.url }}" class="btn btn-primary btn-sm mb-2"
-                                    target="_blank">
-                                    <i class="fas fa-file-pdf"></i> Document de présentation
-                                </a>
-                                {% endif %}
-                                {% if project.business_plan %}
-                                <a href="{{ project.business_plan.url }}" class="btn btn-primary btn-sm"
-                                    target="_blank">
-                                    <i class="fas fa-file-pdf"></i> Business Plan
-                                </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </form>
+                    <h5 class="text-secondary mt-4 mb-3">Pièces Jointes</h5>
+                    <div>
+                        {% if project.presentation_document %}
+                        <a href="{{ project.presentation_document.url }}" class="btn btn-primary btn-sm mb-2" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Document de présentation
+                        </a>
+                        {% endif %}
+                        {% if project.business_plan %}
+                        <a href="{{ project.business_plan.url }}" class="btn btn-primary btn-sm" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Business Plan
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal pour saisir la raison du rejet -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectModalLabel">Motif du rejet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="rejectReason" class="form-control" rows="4" placeholder="Expliquez pourquoi vous rejetez ce projet..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" id="submitRejectReason">Rejeter le projet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 {% endblock %}
+

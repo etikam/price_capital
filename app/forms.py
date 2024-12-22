@@ -105,7 +105,6 @@ class ValidatedProjectForm(forms.ModelForm):
             "goal",
             "location",
             "currency",
-            
             "context",
             "summary",
             "problem_statement",
