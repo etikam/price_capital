@@ -28,10 +28,14 @@ def reformulate_project(request, uid):
             project.save()
             
             html_path = "app/mailing/reformulated_project_mail.html"
-            subject = f"Reformulatiion du projet {project.title}"
+            subject = "Recommandation – Reformulation de votre projet"
             user = project.user
+            context = {
+                "Nom":project.owner.first_name,
+                "titre_du_projet":project.title
+            }
             #envoie du mail
-            send_report_mail_on_project(user,subject,html_path)
+            send_report_mail_on_project(user,subject,html_path,context)
             messages.success(request,f"le projet {project.title} a été reformulé avec succès")
             messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informé de l'état actuel de son projet")
             return redirect("cabinet-incoming")
@@ -86,9 +90,13 @@ def publish_project(request, uid):
             project.status = "published"  # Mettre à jour le statut du projet
             #envoie du mail
             html_path = "app/mailing/published_project_mail.html"
-            subject = f"Publication du projet {project.title}"
+            subject = "Votre projet est publié"
             user = project.user
-            send_report_mail_on_project(user,subject,html_path)
+            context = {
+                "Nom":project.owner.first_name,
+                "titre_du_projet":project.title
+            }
+            send_report_mail_on_project(user,subject,html_path,context)
             messages.success(request, f"Le projet '{project.title}' a été publié avec succès.")
             messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informé de l'état actuel de son projet")
         else:

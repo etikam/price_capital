@@ -11,7 +11,7 @@ from django.core.paginator import Paginator
 
 def index(request):
     # Filtrer uniquement les projets approuvés
-    projects = ValidatedProject.objects.filter(is_approved=True)
+    projects = ValidatedProject.objects.filter(is_approved=True).order_by("updated_at")
     
     # Récupérer les catégories et les régions depuis la base de données
     categories = ProjectCategory.objects.all()
@@ -77,7 +77,11 @@ def project_submision(request):
                 request,
                 "Votre soumission du projet a bien été effectué, veuillez consulter votre mail pour plus de détails",
             )
-            send_success_submision_project_mail(request.user)
+            con = {
+                "Nom":owner.first_name,
+                "titre_du_projet":project.title
+            }
+            send_success_submision_project_mail(request.user,context=con)
             # ici je dois encore implementer l'envoie de mail de succès pour la soumission du projet
             # Redirection ou message de succès après la soumission
             return redirect("home")

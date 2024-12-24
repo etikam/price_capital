@@ -3,10 +3,11 @@ from django.template.loader import render_to_string
 from django.conf import settings
 
 
-def send_success_submision_project_mail(user):
+def send_success_submision_project_mail(user,context):
         # Charger le sujet et le message HTML
-        subject = "Succes de soumission de projet"
-        html_message = render_to_string("app/mailing/success_submission_mail.html")
+        subject = "Accusé de réception – Projet soumis"
+        html_path = "app/mailing/success_submission_mail.html"
+        html_message = render_to_string(html_path,context)
 
     # Envoi de l'email
         send_mail(

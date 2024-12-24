@@ -28,7 +28,7 @@
                         <h5 class="text-secondary mb-3">Informations du Projet</h5>
                         <div class="row">
                             <div class="col-md-12 mb-3">{{ form.title.label_tag }} {{ form.title }}</div>
-                            <div class="col-md-12 mb-3">{{ form.category.label_tag }} {{ form.category }}</div>
+                            <!-- <div class="col-md-12 mb-3">{{ form.category.label_tag }} {{ form.category }}</div> -->
 
                             <div class="col-md-12 mb-3">
                                 <label for="category" class="form-label">{{ form.category.label }}</label>
@@ -120,26 +120,31 @@
     </div>
 </div>
 
-<!-- Modal pour saisir la raison du rejet -->
-<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+
+<!-- Modal pour ajouter une catégorie -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="rejectModalLabel">Motif du rejet</h5>
+                <h5 class="modal-title" id="addCategoryModalLabel">Ajouter une Catégorie</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <textarea id="rejectReason" class="form-control" rows="4" placeholder="Expliquez pourquoi vous rejetez ce projet..."></textarea>
+                <form id="addCategoryForm" method="post" action="{% url 'add_category' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="categoryName" class="form-label">Nom de la Catégorie</label>
+                        <input type="text" class="form-control" id="categoryName" name="name" placeholder="Entrez une catégorie" required>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-danger" id="submitRejectReason">Rejeter le projet</button>
+                <button type="submit" form="addCategoryForm" class="btn btn-primary">Ajouter</button>
             </div>
         </div>
     </div>
 </div>
-
-
 
 {% endblock %}
 

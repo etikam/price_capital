@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Publication du projet</title>
+    <title>Votre projet est publié</title>
 </head>
 <body>
-    <h2>Bonjour Cher-e client-e,</h2>
-    <p>Ce mail vous est parvenu de <strong>Price Capital</strong>.</p>
-    <p> :</p>
+    <h2>Bonjour {{ Nom }},</h2>
+    <p>Ce mail vous est parvenu de <strong>Prices Capital</strong>.</p>
 
     <p>
-         Nous avons le plaisir de vous annoncé que votre projet a été publié sur la plateforme <b>Prices Capital</b>
-         le cabinet prendra le soins de le reformuler en mettant l'accent sur les points essentiels qui attirent les investisseurs.
-         L'équipe rentrera en contact avec vous.
-        
+        Nous sommes heureux de vous informer que votre projet, intitulé <strong>{{ Titre_du_projet }}</strong>, a été publié avec succès.
+    </p>
+    
+    <p>
+        Vous pouvez le consulter à cette adresse : <a href="{{ Lien_du_projet }}">{{ Lien_du_projet }}</a>.
     </p>
 
-    <p>Restez connecté</p>
+    <p>
+        Nous vous remercions pour votre confiance et votre engagement. 
+        Notre équipe continuera à mettre l'accent sur les points essentiels de votre projet pour maximiser son attractivité auprès des investisseurs. 
+        N'hésitez pas à nous contacter pour toute question.
+    </p>
+
+    <p>Restez connecté.</p>
 
     <p>Merci,<br>Prices Capital</p>
 </body>
