@@ -1,0 +1,115 @@
+<!-- not_investor.html -->
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block hero %}
+{% endblock hero %}
+
+{% block content %}
+<style>
+    body {
+        background-color: rgb(44, 48, 52);
+    }
+    .not-investor-container {
+        margin-top: 100px; /* Ajoute de l'espace en haut pour éviter que la carte ne touche la barre de navigation */
+        margin-bottom: 50px; /* Ajoute de l'espace en bas */
+    }
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+    .card-header {
+        border-bottom: 1px solid #ddd;
+        background-color: #007bff;
+    }
+    .card-title {
+        color: #fff;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    /* Animation du texte "Attention" */
+    @keyframes dance {
+        0%, 100% { transform: translateY(0); }
+        25% { transform: translateY(-10px); }
+        50% { transform: translateY(0); }
+        75% { transform: translateY(10px); }
+    }
+    .dance-text {
+        display: inline-block;
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #ff5722; /* Couleur orange pour attirer l'attention */
+    }
+    .dance-text span {
+        display: inline-block;
+        animation: dance 1.5s infinite;
+    }
+    .dance-text span:nth-child(1) { animation-delay: 0s; }
+    .dance-text span:nth-child(2) { animation-delay: 0.1s; }
+    .dance-text span:nth-child(3) { animation-delay: 0.2s; }
+    .dance-text span:nth-child(4) { animation-delay: 0.3s; }
+    .dance-text span:nth-child(5) { animation-delay: 0.4s; }
+    .dance-text span:nth-child(6) { animation-delay: 0.5s; }
+    .dance-text span:nth-child(7) { animation-delay: 0.6s; }
+    .dance-text span:nth-child(8) { animation-delay: 0.7s; }
+
+    /* Animation du texte et du bouton */
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+        animation: fadeIn 1s ease-in-out;
+    }
+</style>
+
+<div class="container not-investor-container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title">Profil Investisseur Requis</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Texte "Attention" avec animation de danse -->
+                    <div class="dance-text">
+                        <span>A</span>
+                        <span>T</span>
+                        <span>T</span>
+                        <span>E</span>
+                        <span>N</span>
+                        <span>T</span>
+                        <span>I</span>
+                        <span>O</span>
+                        <span>N</span>
+                    </div>
+
+                    <!-- Texte avec effet de fondu -->
+                    <p class="lead fade-in">
+                        Vous n'avez pas encore de profil investisseur. Pour accéder à cette page, vous devez être un investisseur.
+                    </p>
+
+                    <!-- Bouton avec effet de fondu -->
+                    <div class="fade-in">
+                        <a href="{% url 'investor:become-investor' %}" class="btn btn-primary btn-lg">
+                            Devenir Investisseur
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock footer %}

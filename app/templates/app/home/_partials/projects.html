@@ -6,7 +6,6 @@
     <h1 class="display-5 mb-4">Découvrez Nos Projets Soumis</h1>
 </div>
 
-
 <style>
     /* Pagination générale */
     .pagination-container {
@@ -58,31 +57,37 @@
     }
 </style>
 
-
-
-
 {% include 'app/home/_partials/project_filters.html' %}
 
 <div class="container-fluid service pb-5">
     <div class="container pb-5">
         <div class="row g-4">
             {% for project in page_obj %}
-            <div class="col-md-6 col-lg-4 wow fadeInUp project-item" data-wow-delay="0.2s"
-                data-category="{{ project.category.id }}" 
-                data-region="{{ project.location }}" 
-                data-budget="{{ project.goal }}" 
-                data-location="{{ project.location }}">
+            <div class="col-md-6 col-lg-4 wow fadeInUp project-item" 
+                 data-category="{{ project.category.id }}" 
+                 data-region="{{ project.location }}" 
+                 data-budget="{{ project.goal }}" 
+                 data-type="{{ project.project_type.id }}">
                 <div class="service-item">
                     <div class="service-img">
                         {% if project.image %}
-                           <a href="{{project.image.url}}" target="_blank"> <img src="{{project.image.url}}" class="img-fluid rounded-top w-100" alt="Image" /> </a>
+                        <a href="{{ project.image.url }}" target="_blank">
+                            <img src="{{ project.image.url }}" class="img-fluid rounded-top w-100" alt="Image" />
+                        </a>
                         {% else %}
-                           <a href="{% static 'img/service-1.jpg' %}", target="_blank"> <img src="{% static 'img/service-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" /></a>
+                        <a href="{% static 'img/service-1.jpg' %}" target="_blank">
+                            <img src="{% static 'img/service-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                        </a>
                         {% endif %}
                     </div>
                     <div class="rounded-bottom p-4">
                         <a href="#" class="h4 d-inline-block mb-4">{{ project.title }}</a>
                         <p class="mb-4">{{ project.summary|slice:":150" }}{% if project.summary|length > 150 %}...{% endif %}</p>
+                        
+                        <!-- Date de publication -->
+                        <p class="text-muted">
+                            <i class="fas fa-calendar-alt"></i> Publié le : {{ project.updated_at|date:"d M Y" }}
+                        </p>
         
                         <!-- Barre de Progression -->
                         <div class="progress mb-3">
@@ -93,7 +98,7 @@
                         </div>
         
                         <p class="text-center">{{ project.current_funding|floatformat:2 }} / {{ project.goal|floatformat:2 }} GNF collectés</p>
-                        <a class="btn btn-primary rounded-pill py-2 px-4 text-center" href="{% url 'detail-project' project.id %}">
+                        <a class="btn btn-primary rounded-pill py-2 px-4 text-center" href="{% url 'detail-project' project.uid %}">
                             Voir Plus
                         </a>
                     </div>
@@ -101,11 +106,8 @@
             </div>
             {% endfor %}
         </div>
-        
     </div>
 </div>
-
-
 
 <div class="d-flex justify-content-center mt-4">
     <nav aria-label="Pagination" class="pagination-container">
@@ -161,23 +163,22 @@
     </nav>
 </div>
 
-
 <script>
     document.getElementById("filter-btn").addEventListener("click", function () {
         const category = document.getElementById("category").value;
         const region = document.getElementById("region").value;
         const budget = document.getElementById("budget").value;
-        const location = document.getElementById("location").value.toLowerCase();
-    
+        const projectType = document.getElementById("project-type").value;
+
         // Sélectionner tous les projets
         const projects = document.querySelectorAll(".project-item");
-    
+
         projects.forEach((project) => {
             const projectCategory = project.getAttribute("data-category");
             const projectRegion = project.getAttribute("data-region");
             const projectBudget = parseFloat(project.getAttribute("data-budget"));
-            const projectLocation = project.getAttribute("data-location").toLowerCase();
-    
+            const projectTypeId = project.getAttribute("data-type");
+
             // Conditions de filtrage
             const matchesCategory = category === "" || projectCategory === category;
             const matchesRegion = region === "" || projectRegion === region;
@@ -186,15 +187,14 @@
                 (budget === "low" && projectBudget < 10000000) ||
                 (budget === "medium" && projectBudget >= 10000000 && projectBudget <= 50000000) ||
                 (budget === "high" && projectBudget > 50000000);
-            const matchesLocation = location === "" || projectLocation.includes(location);
-    
+            const matchesProjectType = projectType === "" || projectTypeId === projectType;
+
             // Affichage/Masquage des projets
-            if (matchesCategory && matchesRegion && matchesBudget && matchesLocation) {
+            if (matchesCategory && matchesRegion && matchesBudget && matchesProjectType) {
                 project.style.display = "block";
             } else {
                 project.style.display = "none";
             }
         });
     });
-    
 </script>

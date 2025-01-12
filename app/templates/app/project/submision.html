@@ -29,12 +29,17 @@ Soumettre un Projet
         border-radius: 5px;
         padding: 10px;
     }
+    .help-text {
+        font-size: 0.9em;
+        color: #6c757d; /* Couleur grise pour le texte d'aide */
+        margin-top: 5px;
+    }
 </style>
 
 <div class="container py-5">
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h4 class="text-center">Soumettre un Projet</h4>
+            <h4 class="text-center text-white">Soumettre un Projet</h4>
         </div>
         <div class="card-body">
             <!-- Barre de progression -->
@@ -43,27 +48,61 @@ Soumettre un Projet
                     aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">1/3</div>
             </div>
 
-            <form id="multi-step-form" method="post" enctype="multipart/form-data" action="{% url 'project-submision' %}">
+            <form id="multi-step-form" method="post" enctype="multipart/form-data"
+                action="{% url 'project-submision' %}">
                 {% csrf_token %}
                 <div id="form-errors" class="alert alert-danger d-none" role="alert"></div>
 
                 <!-- Étape 1: Informations du projet -->
                 <div class="step" id="step-1">
                     <h5 class="text-primary">1. Informations du projet</h5>
-                    <div class="mb-3">{{ form_project.title.label_tag }}
-                        {{ form_project.title }}</div>
+                    <div class="mb-3">
+                        {{ form_project.title.label_tag }}
+                        {{ form_project.title }}
+                        {% if form_project.title.help_text %}
+                            <div class="help-text">{{ form_project.title.help_text }}</div>
+                        {% endif %}
+                    </div>
 
-                    <div class="mb-3">{{ form_project.category.label_tag }}
-                        {{ form_project.category }}</div>
+                    <div class="mb-3">
+                        {{ form_project.category.label_tag }}
+                        {{ form_project.category }}
+                        {% if form_project.category.help_text %}
+                            <div class="help-text">{{ form_project.category.help_text }}</div>
+                        {% endif %}
+                    </div>
 
-                    <div class="mb-3">{{ form_project.goal.label_tag }}
-                        {{ form_project.goal }}</div>
+                    <div class="mb-3">
+                        {{ form_project.project_type.label_tag }}
+                        {{ form_project.project_type }}
+                        {% if form_project.project_type.help_text %}
+                            <div class="help-text">{{ form_project.project_type.help_text }}</div>
+                        {% endif %}
+                    </div>
 
-                    <div class="mb-3">{{ form_project.currency.label_tag }}
-                        {{ form_project.currency }}</div>
+                    <div class="mb-3">
+                        {{ form_project.goal.label_tag }}
+                        {{ form_project.goal }}
+                        {% if form_project.goal.help_text %}
+                            <div class="help-text">{{ form_project.goal.help_text }}</div>
+                        {% endif %}
+                    </div>
 
-                    <div class="mb-3">{{ form_project.location.label_tag }}
-                        {{ form_project.location }}</div>
+                    <div class="mb-3">
+                        {{ form_project.currency.label_tag }}
+                        {{ form_project.currency }}
+                        {% if form_project.currency.help_text %}
+                            <div class="help-text">{{ form_project.currency.help_text }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_project.location.label_tag }}
+                        {{ form_project.location }}
+                        {% if form_project.location.help_text %}
+                            <div class="help-text">{{ form_project.location.help_text }}</div>
+                        {% endif %}
+                    </div>
 
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-primary next-step">Suivant</button>
@@ -73,17 +112,37 @@ Soumettre un Projet
                 <!-- Étape 2: Description du projet -->
                 <div class="step d-none" id="step-2">
                     <h5 class="text-primary">2. Description du projet</h5>
-                    <div class="mb-3">{{ form_project.description.label_tag }}
-                        {{ form_project.description }}</div>
+                    <div class="mb-3">
+                        {{ form_project.description.label_tag }}
+                        {{ form_project.description }}
+                        {% if form_project.description.help_text %}
+                            <div class="help-text">{{ form_project.description.help_text }}</div>
+                        {% endif %}
+                    </div>
 
-                    <div class="mb-3">{{ form_project.image.label_tag }}
-                        {{ form_project.image }}</div>
+                    <div class="mb-3">
+                        {{ form_project.image.label_tag }}
+                        {{ form_project.image }}
+                        {% if form_project.image.help_text %}
+                            <div class="help-text">{{ form_project.image.help_text }}</div>
+                        {% endif %}
+                    </div>
 
-                    <div class="mb-3">{{ form_project.presentation_document.label_tag }}
-                        {{ form_project.presentation_document }}</div>
+                    <div class="mb-3">
+                        {{ form_project.presentation_document.label_tag }}
+                        {{ form_project.presentation_document }}
+                        {% if form_project.presentation_document.help_text %}
+                            <div class="help-text">{{ form_project.presentation_document.help_text }}</div>
+                        {% endif %}
+                    </div>
 
-                    <div class="mb-3">{{ form_project.business_plan.label_tag }}
-                        {{ form_project.business_plan }}</div>
+                    <div class="mb-3">
+                        {{ form_project.business_plan.label_tag }}
+                        {{ form_project.business_plan }}
+                        {% if form_project.business_plan.help_text %}
+                            <div class="help-text">{{ form_project.business_plan.help_text }}</div>
+                        {% endif %}
+                    </div>
 
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-secondary prev-step">Précédent</button>
@@ -99,31 +158,49 @@ Soumettre un Projet
                     <div class="mb-3">
                         {{ form_owner.first_name.label_tag }}
                         {{ form_owner.first_name }}
+                        {% if form_owner.first_name.help_text %}
+                            <div class="help-text">{{ form_owner.first_name.help_text }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
                         {{ form_owner.last_name.label_tag }}
                         {{ form_owner.last_name }}
+                        {% if form_owner.last_name.help_text %}
+                            <div class="help-text">{{ form_owner.last_name.help_text }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
                         {{ form_owner.phone.label_tag }}
                         {{ form_owner.phone }}
+                        {% if form_owner.phone.help_text %}
+                            <div class="help-text">{{ form_owner.phone.help_text }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
                         {{ form_owner.adress.label_tag }}
                         {{ form_owner.adress }}
+                        {% if form_owner.adress.help_text %}
+                            <div class="help-text">{{ form_owner.adress.help_text }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
                         {{ form_owner.birthday.label_tag }}
                         {{ form_owner.birthday }}
+                        {% if form_owner.birthday.help_text %}
+                            <div class="help-text">{{ form_owner.birthday.help_text }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
                         {{ form_owner.photo.label_tag }}
                         {{ form_owner.photo }}
+                        {% if form_owner.photo.help_text %}
+                            <div class="help-text">{{ form_owner.photo.help_text }}</div>
+                        {% endif %}
 
                         {% if user.physical_person.photo %}
                         <img src="{{ user.physical_person.photo.url }}" alt="Photo de l'utilisateur"
@@ -144,7 +221,6 @@ Soumettre un Projet
     </div>
 </div>
 {% endblock content %}
-
 
 {% block script %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -208,9 +284,6 @@ Soumettre un Projet
                 updateProgressBar(currentStep);
             }
         });
-
-
     });
-
 </script>
 {% endblock script %}

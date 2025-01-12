@@ -77,6 +77,7 @@ class CustomUserCreationView(CreateView):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
+            context ={}
             send_activation_email(user)
 
             messages.success(

@@ -1,0 +1,160 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+<style>
+    .bg-breadcrumb{
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% url "project.image.url" %}') !important;
+    }
+</style>
+{% block content %}
+<div class="container my-5">
+    <!-- Bouton Retour -->
+    <div class="mb-3">
+        <a href="{% url 'my-space' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Retour à Mon Espace
+        </a>
+    </div>
+            <h1 class="text-center text-primary">{{project.title}}</h1>
+    <!-- Section des statistiques -->
+    <div class="row mb-4">
+        <!-- Statistique 1: Titre -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border border-outline-primary shadow-sm">
+                <div class="card-body text-primary text-center">
+                    <i class="fas fa-folder-open fa-3x mb-3"></i>
+                    <h5 class="card-title"></h5>
+                    <h2 class="card-text">{{ project.title }}</h2>
+                </div>
+            </div>
+        </div>
+        <!-- Statistique 2: Objectif -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border border-outline-success shadow-sm">
+                <div class="card-body text-success text-center">
+                    <i class="fas fa-coins fa-3x mb-3"></i>
+                    <h5 class="card-title">Budget</h5>
+                    <h2 class="card-text">{{ project.goal|floatformat:2 }} {{project.currency}}</h2>
+                </div>
+            </div>
+        </div>
+        <!-- Statistique 3: Progression -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border border-outline-warning shadow-sm">
+                <div class="card-body text-warning text-center">
+                    <i class="fas fa-chart-line fa-3x mb-3"></i>
+                    <h5 class="card-title">Dejà Recoltés</h5>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ project.progress }}%;"
+                            aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ project.progress }}%
+                        </div>
+                    </div>
+                    <h2 class="card-title">{{project.current_funding}} {{project.currency}}</h2>
+                </div>
+            </div>
+        </div>
+        <!-- Statistique 4: Investisseurs -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border border-outline-danger shadow-sm">
+                <div class="card-body text-danger text-center">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <h5 class="card-title">Investisseurs</h5>
+                    <h2 class="card-text">{{ project.investors_count|default:0 }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="row">
+        <!-- Colonne de gauche -->
+        <div class="col-lg-4">
+            <!-- Détails du porteur -->
+            <div class="card mb-4 border-outline-primary">
+                <div class="card-header bg-light">
+                    <h4 class="text-primary"><i class="fas fa-user"></i> Porteur de Projet</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nom :</strong> {{ project.project.owner.first_name }} {{ project.owner.last_name }}</p>
+                    <p><strong>Téléphone :</strong> {{ project.project.owner.phone }}</p>
+                    <p><strong>Adresse :</strong> {{ project.project.owner.adress }}</p>
+                    <p><strong>Email :</strong> {{ project.project.user.email }}</p>
+                    <p><strong>Date de Naissance :</strong> {{ project.project.owner.birthday|date:"d M Y" }}</p>
+                    {% if project.project.owner.photo %}
+                    <img src="{{ project.project.owner.photo.url }}" class="img-thumbnail" alt="Photo du porteur de projet">
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Détails des investisseurs -->
+            <div class="card border-outline-success">
+                <div class="card-header bg-light">
+                    <h4 class="text-success"><i class="fas fa-hand-holding-usd"></i> Investisseurs</h4>
+                </div>
+                <div class="card-body">
+                    {% if investors %}
+                    <ul>
+                        {% for investor in investors %}
+                        <li>{{ investor.name }} - <strong>{{ investor.amount|floatformat:2 }} GNF</strong></li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">Aucun investisseur pour ce projet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne de droite -->
+        <div class="col-lg-8">
+            <div class="card border-outline-info">
+                <div class="card-header bg-light">
+                    <h4 class="text-info"><i class="fas fa-info-circle"></i> Détails du Projet</h4>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li><strong>Catégorie :</strong> {{ project.category.name }}</li>
+                        <li><strong>Localisation :</strong> {{ project.location }}</li>
+                        <li><strong>Statut :</strong> Publié</li>
+                        <li><strong>Date de Création :</strong> {{ project.created_at|date:"d M Y" }}</li>
+                    </ul>
+                    <p><strong>Description :</strong> {{ project.description }}</p>
+
+                    <!-- Documents -->
+                    <h5 class="mt-4"><i class="fas fa-file"></i> Documents Associé</h5>
+                    <ul>
+                        {% if project.documents %}
+                        <li>
+                            <a href="{{ project.documents.url }}" target="_blank"
+                                class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-pdf"></i> Document associé
+                            </a>
+                        </li>
+                        {% else %}
+                        <p class="text-muted">Aucun document disponible pour ce projet.</p>
+                        {% endif %}
+                    </ul>
+
+                </div>
+            </div>
+
+            <!-- Informations validées -->
+            {% if validated_project %}
+            <div class="card mt-4 border-outline-success">
+                <div class="card-header bg-light">
+                    <h4 class="text-success"><i class="fas fa-check-circle"></i>Autres Details (Du cabinet)</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Titre Reformulé :</strong> {{ validated_project.title }}</p>
+                    <p><strong>Résumé :</strong> {{ validated_project.summary }}</p>
+                    <p><strong>Contexte :</strong> {{ validated_project.context }}</p>
+                    <p><strong>Objectif Général :</strong> {{ validated_project.general_objective }}</p>
+                    <p><strong>Livrables :</strong> {{ validated_project.deliverables }}</p>
+                    <p><strong>Public Cible :</strong> {{ validated_project.target_audience }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

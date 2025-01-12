@@ -3,6 +3,7 @@ from .models import Project
 from .models import PorteurProject
 from .models import ProjectCategory
 from .models import ValidatedProject
+from .models import Contact
 from django.core.validators import FileExtensionValidator
 
 
@@ -13,6 +14,7 @@ class ProjectSubmissionForm(forms.ModelForm):
             "title",
             "description",
             "category",
+            "project_type",
             "goal",
             "location",
             "currency",
@@ -32,6 +34,7 @@ class ProjectSubmissionForm(forms.ModelForm):
                 }
             ),
             "category": forms.Select(attrs={"class": "form-select"}),
+            "project_type": forms.Select(attrs={"class": "form-select"}),
             "goal": forms.NumberInput(
                 attrs={"class": "form-control", "placeholder": "Budget estimé"}
             ),
@@ -102,6 +105,7 @@ class ValidatedProjectForm(forms.ModelForm):
         fields = [
             "title",
             "category",
+            "project_type",
             "goal",
             "location",
             "currency",
@@ -120,6 +124,7 @@ class ValidatedProjectForm(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "category": forms.Select(attrs={"class": "form-select"}),
+            "project_type": forms.Select(attrs={"class": "form-select"}),
             "goal": forms.NumberInput(
                 attrs={"class": "form-control", "placeholder": "Budget estimé"}
             ),
@@ -150,4 +155,33 @@ class ValidatedProjectForm(forms.ModelForm):
                 attrs={"rows": 3, "class": "form-control"}
             ),
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }
+
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Contact
+        fields = ['name', 'email', 'phone', 'subject', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Votre Nom'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Votre Email'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Téléphone'
+            }),
+            'subject': forms.TextInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Sujet'
+            }),
+            'message': forms.Textarea(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Votre message ici',
+                'style': 'height: 160px;'
+            }),
         }

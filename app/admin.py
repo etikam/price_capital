@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import PorteurProject, ProjectCategory, Project, ValidatedProject
+from .models import Contact, ProjectType
 
 # Enregistrement du modèle PorteurProject
 @admin.register(PorteurProject)
@@ -43,6 +44,7 @@ class ValidatedProjectAdmin(admin.ModelAdmin):
         "currency",
         "is_approved",
         "approved_at",
+        "progress"
     )
     list_filter = ("is_approved", "category", "currency", "approved_at")
     search_fields = ("title", "project__title", "category__name", "location")
@@ -71,3 +73,30 @@ class ValidatedProjectAdmin(admin.ModelAdmin):
             "fields": ("created_at", "updated_at")
         }),
     )
+
+
+
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    # Champs affichés dans la liste des contacts
+    list_display = ('name', 'email', 'phone', 'subject', 'created_at')
+    list_filter = ('created_at',)  # Filtres par date de création
+    search_fields = ('name', 'email', 'subject', 'message')  # Champs pour la recherche
+    ordering = ('-created_at',)  # Tri par défaut (les plus récents en premier)
+
+    # Affichage des détails d'un contact dans l'interface d'administration
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'email', 'phone', 'subject', 'message')
+        }),
+        ('Dates', {
+            'fields': ('created_at',),
+            'classes': ('collapse',),  # Cache les informations de date par défaut
+        }),
+    )
+    readonly_fields = ('created_at',)  # Champs en lecture seule
+
+
+@admin.register(ProjectType)
+class AdminProjectType(admin.ModelAdmin):
+    list_display = ['name']

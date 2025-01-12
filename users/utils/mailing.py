@@ -66,7 +66,7 @@ def send_activation_email(user):
             plain_message,  # Message texte brut pour fallback
             settings.EMAIL_HOST_USER,
             [user.email],
-            fail_silently=True,
+            fail_silently=False,
             html_message=html_message,  # Contenu HTML
         )
         

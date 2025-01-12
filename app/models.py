@@ -20,6 +20,12 @@ class ProjectCategory(models.Model):
     def __str__(self):
         return self.name
 
+class ProjectType(models.Model):
+    name =  models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.name
+
 
 class Project(models.Model):
     STATUS_CHOICES = [
@@ -67,6 +73,8 @@ class Project(models.Model):
         default="Description du projet",
     )
     
+    project_type = models.ForeignKey(ProjectType, on_delete=models.CASCADE, verbose_name="Type du projet", help_text="La finalité du projet")
+    
     presentation_document = models.FileField(
         upload_to="project_documents/",
         blank=True,
@@ -91,7 +99,7 @@ class Project(models.Model):
         related_name="projects",
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name="Categorie du projet",
+        verbose_name="Secteur dans lequel le projet se trouve",
     )
     goal = models.DecimalField(
         max_digits=15,
@@ -99,6 +107,7 @@ class Project(models.Model):
         help_text="Budget estimé en GNF",
         verbose_name="Objectif du projet (Budget)",
     )
+    
 
     location = models.CharField(
         max_length=255, help_text="Localisation du projet", verbose_name="Localisation"
@@ -131,12 +140,12 @@ class Project(models.Model):
         default=False, verbose_name="Validé ?", help_text="Indique si le projet est approuvé pour publication"
     )
     
-    approved_at = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name="Date d'approbation",
-        help_text="Date à laquelle le projet a été validé",
-    )
+    # approved_at = models.DateTimeField(
+    #     null=True,
+    #     blank=True,
+    #     verbose_name="Date d'approbation",
+    #     help_text="Date à laquelle le projet a été validé",
+    # )
     def __str__(self):
         return self.title
 
@@ -147,6 +156,12 @@ class Project(models.Model):
         self.budget = self.goal * self.exchange_rate
         return self.budget
 
+    @property
+    def investors_count(self):
+        # Remplacez par la logique appropriée
+        return self.investors.all().count() if hasattr(self, "investors") else 0
+    
+    
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -156,7 +171,6 @@ class Project(models.Model):
 
 #Projets reformurlés par le cabinet
 
-
 class ValidatedProject(models.Model):
 
     CURRENCY_CHOICES = [
@@ -165,12 +179,12 @@ class ValidatedProject(models.Model):
         ("EUR", "EUR - Euro"),
         ("XOF", "XOF - Franc CFA"),
     ]
-    # uid = models.UUIDField(
-    # default=uuid.uuid4,
-    # editable=False,
-    # unique=True,
-    # verbose_name="Identifiant unique",
-    #     )
+    uid = models.UUIDField(
+    default=uuid.uuid4,
+    editable=False,
+    unique=True,
+    verbose_name="Identifiant unique",
+        )
     project = models.OneToOneField(
         "Project", on_delete=models.CASCADE, related_name="validated_project", verbose_name="Projet soumis"
     )
@@ -178,6 +192,8 @@ class ValidatedProject(models.Model):
     title = models.CharField(
         max_length=255, verbose_name="Titre reformulé", help_text="Titre final du projet présenté aux investisseurs"
     )
+    
+    project_type = models.ForeignKey(ProjectType, on_delete=models.CASCADE)
     
     description = models.TextField(
     max_length=1000,
@@ -236,6 +252,7 @@ class ValidatedProject(models.Model):
         verbose_name="Objectif du projet (Budget)",
         null=True, blank=True
     )
+    
     current_funding = models.DecimalField(
         max_digits=15,
         decimal_places=2,
@@ -243,6 +260,7 @@ class ValidatedProject(models.Model):
         help_text="Montant financé en GNF",
         verbose_name="Montant financé",
     )
+    
     location = models.CharField(
         max_length=255, help_text="Localisation du projet", verbose_name="Localisation"
     )
@@ -279,7 +297,6 @@ class ValidatedProject(models.Model):
         verbose_name="Image de couverture du projet",
     )
     
-    
     is_approved = models.BooleanField(
         default=False, verbose_name="Validé ?", help_text="Indique si le projet est approuvé pour publication"
     )
@@ -302,4 +319,16 @@ class ValidatedProject(models.Model):
         """Calcule le pourcentage d'évolution du financement."""
         if not self.goal or not self.current_funding:  # Vérifie si goal ou current_funding est None ou égal à 0
             return 0
-        return min((self.current_funding / self.goal) * 100, 100)
+        return (self.current_funding / self.goal) * 100
+
+
+class Contact(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Nom")
+    email = models.EmailField(verbose_name="Email")
+    phone = models.CharField(max_length=20, verbose_name="Téléphone", blank=True, null=True)
+    subject = models.CharField(max_length=255, verbose_name="Sujet")
+    message = models.TextField(verbose_name="Message")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+
+    def __str__(self):
+        return f"Message de {self.name} - {self.subject}"

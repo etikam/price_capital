@@ -641,3 +641,4541 @@ def main():
 if __name__ == '__main__':
     main()
 
+import random
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+from app.models import Project, PorteurProject, ProjectCategory
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class Command(BaseCommand):
+    help = 'Insère 30 projets avec des données aléatoires'
+
+    def handle(self, *args, **kwargs):
+        # Récupérer l'utilisateur
+        user = User.objects.get(email="etiennedheleine2000@gmail.com")
+
+        # Récupérer les catégories disponibles
+        categories = ProjectCategory.objects.all()
+
+        # Liste des informations du porteur de projet
+        porteurs = [
+            {"first_name": "Etienne", "last_name": "Kamano", "phone": "123456789", "adress": "Conakry, Guinée", "birthday": "1990-01-01"},
+            {"first_name": "Gilbert", "last_name": "Diakité", "phone": "987654321", "adress": "Labé, Guinée", "birthday": "1992-03-15"},
+            {"first_name": "Mamadou", "last_name": "Sory", "phone": "135792468", "adress": "Kindia, Guinée", "birthday": "1988-05-22"},
+            {"first_name": "Aissatou", "last_name": "Diallo", "phone": "112233445", "adress": "Conakry, Guinée", "birthday": "1995-11-10"},
+            {"first_name": "Amadou", "last_name": "Camara", "phone": "223344556", "adress": "Kankan, Guinée", "birthday": "1985-07-25"},
+            {"first_name": "Mariam", "last_name": "Keita", "phone": "334455667", "adress": "Boké, Guinée", "birthday": "1998-02-17"},
+            {"first_name": "Ibrahime", "last_name": "Toure", "phone": "445566778", "adress": "Nzérékoré, Guinée", "birthday": "1987-04-30"},
+            {"first_name": "Sadio", "last_name": "Bah", "phone": "556677889", "adress": "Mamou, Guinée", "birthday": "1991-06-09"},
+            {"first_name": "Oumar", "last_name": "Camara", "phone": "667788990", "adress": "Faranah, Guinée", "birthday": "1989-12-19"},
+            {"first_name": "Nadia", "last_name": "Diallo", "phone": "778899001", "adress": "Conakry, Guinée", "birthday": "1994-05-13"},
+            {"first_name": "Sekou", "last_name": "Diakité", "phone": "889900112", "adress": "Labé, Guinée", "birthday": "1993-08-20"},
+            {"first_name": "Fanta", "last_name": "Sow", "phone": "990011223", "adress": "Boké, Guinée", "birthday": "1996-09-04"},
+            {"first_name": "Alhassane", "last_name": "Fofana", "phone": "101223344", "adress": "Kindia, Guinée", "birthday": "1986-11-05"},
+            {"first_name": "Fatoumata", "last_name": "Bah", "phone": "112344556", "adress": "Conakry, Guinée", "birthday": "1999-01-18"},
+            {"first_name": "Lamine", "last_name": "Koné", "phone": "223455667", "adress": "Kankan, Guinée", "birthday": "1990-03-03"},
+            {"first_name": "Moussa", "last_name": "Barry", "phone": "334566778", "adress": "Nzérékoré, Guinée", "birthday": "1984-10-15"},
+            {"first_name": "Mariama", "last_name": "Diarra", "phone": "445677889", "adress": "Mamou, Guinée", "birthday": "1997-02-12"},
+            {"first_name": "Kadiatou", "last_name": "Touré", "phone": "556788990", "adress": "Faranah, Guinée", "birthday": "1992-07-21"},
+            {"first_name": "Abdoulaye", "last_name": "Sory", "phone": "667899001", "adress": "Labé, Guinée", "birthday": "1987-06-11"},
+            {"first_name": "Saran", "last_name": "Keita", "phone": "778990112", "adress": "Conakry, Guinée", "birthday": "1994-04-28"},
+        ]
+
+
+        for i in range(30):
+            # Choisir un porteur de projet au hasard
+            owner_info = random.choice(porteurs)
+            owner = PorteurProject.objects.create(
+                first_name=owner_info["first_name"],
+                last_name=owner_info["last_name"],
+                phone=owner_info["phone"],
+                adress=owner_info["adress"],
+                birthday=owner_info["birthday"],
+                photo="path_to_photo"  # Vous pouvez spécifier un chemin de photo ici si nécessaire
+            )
+
+            # Choisir une catégorie au hasard
+            category = random.choice(categories)
+
+            # Créer un projet
+            project = Project.objects.create(
+                user=user,  # Assigner l'utilisateur à ce projet
+                owner=owner,  # Assigner le porteur de projet
+                title=f"Projet {i+1}",
+                description="Description aléatoire pour le projet.",
+                category=category,
+                goal=random.randint(50000, 1000000),  # Un budget aléatoire entre 50 000 et 1 000 000
+                location="Conakry, Guinée",  # Localisation générique
+                currency="GNF",  # Monnaie par défaut
+                status="submited",  # Statut initial
+                is_approved=False,
+                created_at=timezone.now(),
+                updated_at=timezone.now(),
+            )
+
+            # Afficher un message pour chaque projet créé
+            self.stdout.write(self.style.SUCCESS(f"Projet {i+1} créé avec succès !"))
+
+from django import template
+
+register = template.Library()
+
+@register.filter(name='times')
+def times(value, arg):
+    try:
+        return value * arg
+    except (ValueError, TypeError):
+        return ''
+
+
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+
+def send_success_submision_project_mail(user,context):
+        # Charger le sujet et le message HTML
+        subject = "Accusé de réception – Projet soumis"
+        html_path = "app/mailing/success_submission_mail.html"
+        html_message = render_to_string(html_path,context)
+
+    # Envoi de l'email
+        send_mail(
+            subject=subject,
+            message="Succes de soumission de projet",
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email],
+            fail_silently=True,
+            html_message=html_message, 
+        )
+
+
+def send_report_mail_on_project(user, subject,html_path,context):
+        html_message = render_to_string(html_path,context)
+        # Envoi de l'email
+        send_mail(
+            subject=subject,
+            message=subject,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email],
+            fail_silently=True,
+            html_message=html_message, 
+        )
+
+
+def send_report_mail_to_superusers(subject, html_path, context):
+    super_users = User.objects.filter(is_superuser=True)
+    recipient_list = [user.email for user in super_users if user.email]
+    if recipient_list:
+        html_message = render_to_string(html_path, context)
+        send_mail(
+            subject=subject,
+            message=subject,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=recipient_list,
+            fail_silently=True,
+            html_message=html_message,
+        )
+
+from django.contrib import admin
+from .models import PorteurProject, ProjectCategory, Project, ValidatedProject
+from .models import Contact
+
+# Enregistrement du modèle PorteurProject
+@admin.register(PorteurProject)
+class PorteurProjectAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'phone', 'adress', 'birthday')
+    search_fields = ('first_name', 'last_name', 'phone')
+
+# Enregistrement du modèle ProjectCategory
+@admin.register(ProjectCategory)
+class ProjectCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+# Enregistrement du modèle Project
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('uid','title', 'category', 'goal',  'status', 'created_at')
+    list_filter = ('category', 'status')
+    search_fields = ('title', 'location')
+    readonly_fields = ('progress', 'converted_budget')
+
+    def progress(self, obj):
+        return f"{obj.progress:.2f}%"
+
+    def converted_budget(self, obj):
+        return f"{obj.converted_budget:.2f} GNF"
+
+    progress.short_description = 'Progression du financement'
+    converted_budget.short_description = 'Budget converti (GNF)'
+    
+
+@admin.register(ValidatedProject)
+class ValidatedProjectAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "project",
+        "category",
+        "goal",
+        "current_funding",
+        "location",
+        "currency",
+        "is_approved",
+        "approved_at",
+        "progress"
+    )
+    list_filter = ("is_approved", "category", "currency", "approved_at")
+    search_fields = ("title", "project__title", "category__name", "location")
+    readonly_fields = ("created_at", "updated_at", "approved_at")
+    ordering = ("-created_at",)
+    fieldsets = (
+        ("Informations générales", {
+            "fields": ("project", "title", "category", "context", "summary", "problem_statement")
+        }),
+        ("Objectifs et Livrables", {
+            "fields": ("general_objective", "specific_objectives", "deliverables")
+        }),
+        ("Détails supplémentaires", {
+            "fields": ("target_audience", "key_partners", "additional_details")
+        }),
+        ("Budget et Localisation", {
+            "fields": ("goal", "current_funding", "currency", "location")
+        }),
+        ("Documents et Images", {
+            "fields": ("documents", "image")
+        }),
+        ("Validation", {
+            "fields": ("is_approved", "approved_at", "reformulated_by")
+        }),
+        ("Audit", {
+            "fields": ("created_at", "updated_at")
+        }),
+    )
+
+
+
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    # Champs affichés dans la liste des contacts
+    list_display = ('name', 'email', 'phone', 'subject', 'created_at')
+    list_filter = ('created_at',)  # Filtres par date de création
+    search_fields = ('name', 'email', 'subject', 'message')  # Champs pour la recherche
+    ordering = ('-created_at',)  # Tri par défaut (les plus récents en premier)
+
+    # Affichage des détails d'un contact dans l'interface d'administration
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'email', 'phone', 'subject', 'message')
+        }),
+        ('Dates', {
+            'fields': ('created_at',),
+            'classes': ('collapse',),  # Cache les informations de date par défaut
+        }),
+    )
+    readonly_fields = ('created_at',)  # Champs en lecture seule
+
+from django.apps import AppConfig
+
+
+class AppConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'app'
+
+from django import forms
+from .models import Project
+from .models import PorteurProject
+from .models import ProjectCategory
+from .models import ValidatedProject
+from .models import Contact
+from django.core.validators import FileExtensionValidator
+
+
+class ProjectSubmissionForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = [
+            "title",
+            "description",
+            "category",
+            "goal",
+            "location",
+            "currency",
+            "image",
+            "presentation_document",
+            "business_plan",
+        ]
+        widgets = {
+            "title": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Titre du projet"}
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Description du projet",
+                    "rows": 4,
+                }
+            ),
+            "category": forms.Select(attrs={"class": "form-select"}),
+            "goal": forms.NumberInput(
+                attrs={"class": "form-control", "placeholder": "Budget estimé"}
+            ),
+            "location": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Localisation (Pays où le projet sera réalisé) ",
+                }
+            ),
+            "currency": forms.Select(attrs={"class": "form-select"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "presentation_document": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": ".pdf,.docx,.ppt,.pptx",
+                    "placeholder": "Télécharger le document de présentation",
+                }
+            ),
+            "business_plan": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": ".pdf,.docx,.ppt,.pptx",
+                    "placeholder": "Télécharger le Business Plan",
+                }
+            ),
+        }
+
+
+class PorteurProjectForm(forms.ModelForm):
+    class Meta:
+        model = PorteurProject
+        fields = ["first_name", "last_name", "phone", "adress", "birthday", "photo"]
+
+        widgets = {
+            "first_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Prénom"}
+            ),
+            "last_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Nom"}
+            ),
+            "phone": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Numéro de téléphone"}
+            ),
+            "adress": forms.Textarea(
+                attrs={"class": "form-control", "placeholder": "Adresse", "rows": 4}
+            ),
+            "birthday": forms.DateInput(
+                attrs={"class": "form-control", "type": "date"}
+            ),
+            "photo": forms.ClearableFileInput(attrs={"class": "form-control-file"}),
+        }
+
+
+class ProjectCategoryForm(forms.ModelForm):
+    class Meta:
+        model = ProjectCategory
+        fields = ["name"]
+        widgets = {
+            "name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Nom de la catégorie"}
+            )
+        }
+
+
+class ValidatedProjectForm(forms.ModelForm):
+    class Meta:
+        model = ValidatedProject
+        fields = [
+            "title",
+            "category",
+            "goal",
+            "location",
+            "currency",
+            "context",
+            "summary",
+            "problem_statement",
+            "general_objective",
+            "specific_objectives",
+            "deliverables",
+            "target_audience",
+            "key_partners",
+            "image",
+            "additional_details",
+            "documents",
+        ]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-select"}),
+            "goal": forms.NumberInput(
+                attrs={"class": "form-control", "placeholder": "Budget estimé"}
+            ),
+            "location": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Localisation (Pays où le projet sera réalisé) ",
+                }
+            ),
+            "currency": forms.Select(attrs={"class": "form-select"}),
+            "context": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+            "summary": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "problem_statement": forms.Textarea(
+                attrs={"rows": 4, "class": "form-control"}
+            ),
+            "general_objective": forms.Textarea(
+                attrs={"rows": 3, "class": "form-control"}
+            ),
+            "specific_objectives": forms.Textarea(
+                attrs={"rows": 4, "class": "form-control"}
+            ),
+            "deliverables": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "target_audience": forms.Textarea(
+                attrs={"rows": 3, "class": "form-control"}
+            ),
+            "key_partners": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "additional_details": forms.Textarea(
+                attrs={"rows": 3, "class": "form-control"}
+            ),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }
+
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Contact
+        fields = ['name', 'email', 'phone', 'subject', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Votre Nom'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Votre Email'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Téléphone'
+            }),
+            'subject': forms.TextInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Sujet'
+            }),
+            'message': forms.Textarea(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Votre message ici',
+                'style': 'height: 160px;'
+            }),
+        }
+
+from django.db import models
+from django.conf import settings
+from django.core.validators import FileExtensionValidator
+import uuid
+
+
+# porteur de projet, au cas où un utilisateur peut soumettre un projet avec d'autre informations
+class PorteurProject(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=15)
+    adress = models.TextField()
+    birthday = models.DateField()
+    photo = models.ImageField(upload_to="img_porteur")
+
+
+class ProjectCategory(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class Project(models.Model):
+    STATUS_CHOICES = [
+        ("submited", "Soumis"),     #quand le projet est soumis (uniquement pour les soumetteurs )
+        ("ongoing", "En cours"),  #quand la collecte des fond sur le projet a debuté
+        ("reformulated", "Reformulé ❕"),  #quand la reformulation du  projet est terminée
+        ("completed", "Terminé ✔️"),   #quand le projet est réalisé
+        ("published", "Publié 👍"),   #quand le projet est publié
+        ("rejected", "En attente de plus d'informations ❌"),     #quand le projet est rejeté (pour quelque raison que ce soit) avant meme d'être reformulé
+        ("accepted", "Accepté ✅"),    #quand le projet est accepté
+    ]
+
+    CURRENCY_CHOICES = [
+        ("GNF", "GNF - Franc guinéen"),
+        ("USD", "USD - Dollar américain"),
+        ("EUR", "EUR - Euro"),
+        ("XOF", "XOF - Franc CFA"),
+    ]
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="projects",
+        verbose_name="Utilisateur",
+    )
+    
+    owner = models.ForeignKey(
+        "PorteurProject",
+        related_name="projects",
+        on_delete=models.CASCADE,
+        verbose_name="Porteur de projet",
+    )
+    
+    uid = models.UUIDField(
+    default=uuid.uuid4,
+    editable=False,
+    unique=True,
+    verbose_name="Identifiant unique",
+        )
+    
+    title = models.CharField(max_length=255, verbose_name="Titre du projet")
+    description = models.TextField(
+        max_length=1000,
+        verbose_name="Description du projet",
+        default="Description du projet",
+    )
+    
+    presentation_document = models.FileField(
+        upload_to="project_documents/",
+        blank=True,
+        null=True,
+        verbose_name="Document de présentation",
+        validators=[
+            FileExtensionValidator(allowed_extensions=["pdf", "docx", "ppt", "pptx"])
+        ],
+    )
+    
+    business_plan = models.FileField(
+        upload_to="project_documents/",
+        blank=True,
+        null=True,
+        verbose_name="Business Plan",
+        validators=[
+            FileExtensionValidator(allowed_extensions=["pdf", "docx", "ppt", "pptx"])
+        ],
+    )
+    category = models.ForeignKey(
+        "ProjectCategory",
+        related_name="projects",
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Categorie du projet",
+    )
+    goal = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        help_text="Budget estimé en GNF",
+        verbose_name="Objectif du projet (Budget)",
+    )
+
+    location = models.CharField(
+        max_length=255, help_text="Localisation du projet", verbose_name="Localisation"
+    )
+    currency = models.CharField(
+        max_length=3,
+        choices=CURRENCY_CHOICES,
+        default="GNF",
+        verbose_name="Monnaie",
+        help_text="Sélectionnez la monnaie pour le budget",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="submited",
+        verbose_name="Statut du projet",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Date de création"
+    )
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de mise à jour")
+    image = models.ImageField(
+        upload_to="project_images/",
+        blank=True,
+        null=True,
+        verbose_name="Image du projet",
+    )
+
+    is_approved = models.BooleanField(
+        default=False, verbose_name="Validé ?", help_text="Indique si le projet est approuvé pour publication"
+    )
+    
+    # approved_at = models.DateTimeField(
+    #     null=True,
+    #     blank=True,
+    #     verbose_name="Date d'approbation",
+    #     help_text="Date à laquelle le projet a été validé",
+    # )
+    def __str__(self):
+        return self.title
+
+
+    @property
+    def converted_budget(self):
+        """Convertit le budget en monnaie locale (GNF) si une autre monnaie est utilisée."""
+        self.budget = self.goal * self.exchange_rate
+        return self.budget
+
+    @property
+    def investors_count(self):
+        # Remplacez par la logique appropriée
+        return self.investors.all().count() if hasattr(self, "investors") else 0
+    
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "owner", "title"], name="unique_project"
+            )
+        ]
+
+#Projets reformurlés par le cabinet
+
+
+class ValidatedProject(models.Model):
+
+    CURRENCY_CHOICES = [
+        ("GNF", "GNF - Franc guinéen"),
+        ("USD", "USD - Dollar américain"),
+        ("EUR", "EUR - Euro"),
+        ("XOF", "XOF - Franc CFA"),
+    ]
+    uid = models.UUIDField(
+    default=uuid.uuid4,
+    editable=False,
+    unique=True,
+    verbose_name="Identifiant unique",
+        )
+    project = models.OneToOneField(
+        "Project", on_delete=models.CASCADE, related_name="validated_project", verbose_name="Projet soumis"
+    )
+    
+    title = models.CharField(
+        max_length=255, verbose_name="Titre reformulé", help_text="Titre final du projet présenté aux investisseurs"
+    )
+    
+    description = models.TextField(
+    max_length=1000,
+    verbose_name="Description résumé",
+    default="Description du projet",
+    )
+    
+    context = models.TextField(
+        verbose_name="Contexte", help_text="Description générale du contexte du projet"
+    )
+    
+    summary = models.TextField(
+        verbose_name="Résumé", help_text="Résumé succinct du projet"
+    )
+    
+    problem_statement = models.TextField(
+        verbose_name="Problématique", help_text="Décrivez le problème que le projet vise à résoudre"
+    )
+    
+    general_objective = models.TextField(
+        verbose_name="Objectif général", help_text="Objectif principal que le projet vise à atteindre"
+    )
+    
+    specific_objectives = models.TextField(
+        verbose_name="Objectifs spécifiques", help_text="Liste des objectifs spécifiques du projet"
+    )
+    
+    deliverables = models.TextField(
+        verbose_name="Livrables", help_text="Ce que le projet produira (produits, services, résultats mesurables)"
+    )
+    
+    target_audience = models.TextField(
+        verbose_name="Public cible", help_text="Décrivez les bénéficiaires ou utilisateurs finaux"
+    )
+    
+    key_partners = models.TextField(
+        verbose_name="Partenaires clés", blank=True, null=True, help_text="Liste des partenaires du projet"
+    )
+    
+    additional_details = models.TextField(
+        verbose_name="Informations supplémentaires", blank=True, null=True, help_text="Autres détails pertinents"
+    )
+    
+    
+    category = models.ForeignKey(
+        "ProjectCategory",
+        related_name="validated_project",
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Categorie du projet",
+    )
+    goal = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        help_text="Budget estimé en GNF",
+        verbose_name="Objectif du projet (Budget)",
+        null=True, blank=True
+    )
+    
+    current_funding = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        help_text="Montant financé en GNF",
+        verbose_name="Montant financé",
+    )
+    
+    location = models.CharField(
+        max_length=255, help_text="Localisation du projet", verbose_name="Localisation"
+    )
+    currency = models.CharField(
+        max_length=3,
+        choices=CURRENCY_CHOICES,
+        default="GNF",
+        verbose_name="Monnaie",
+        help_text="Sélectionnez la monnaie pour le budget",
+    )
+
+    
+    documents = models.FileField(
+        upload_to="validated_project_docs/",
+        blank=True,
+        null=True,
+        verbose_name="Documents associés",
+        help_text="Documents validés (business plan, présentation, etc.)",
+    )
+    
+    reformulated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Validé par",
+        help_text="L'utilisateur ou l'administrateur ayant validé et reformulé le projet",
+    )
+    
+    image = models.ImageField(
+        upload_to="project_reformulated_images/",
+        blank=True,
+        null=True,
+        verbose_name="Image de couverture du projet",
+    )
+    
+    is_approved = models.BooleanField(
+        default=False, verbose_name="Validé ?", help_text="Indique si le projet est approuvé pour publication"
+    )
+    
+    approved_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date d'approbation",
+        help_text="Date à laquelle le projet a été validé",
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de mise à jour")
+
+    def __str__(self):
+        return self.title
+    
+    @property
+    def progress(self):
+        """Calcule le pourcentage d'évolution du financement."""
+        if not self.goal or not self.current_funding:  # Vérifie si goal ou current_funding est None ou égal à 0
+            return 0
+        return (self.current_funding / self.goal) * 100
+
+
+class Contact(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Nom")
+    email = models.EmailField(verbose_name="Email")
+    phone = models.CharField(max_length=20, verbose_name="Téléphone", blank=True, null=True)
+    subject = models.CharField(max_length=255, verbose_name="Sujet")
+    message = models.TextField(verbose_name="Message")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+
+    def __str__(self):
+        return f"Message de {self.name} - {self.subject}"
+
+from django.shortcuts import render, redirect, get_object_or_404
+from app.models import Project, ValidatedProject
+
+from django.utils import timezone
+from django.contrib import messages
+from .forms import ValidatedProjectForm
+from django.views.decorators.http import require_POST
+from app.utils.mailing import send_report_mail_on_project
+from .models import ProjectCategory
+
+def detail_project(request,uid):
+    project = get_object_or_404(Project, uid=uid)
+    return render(request,"app/project/detail.html", {'project':project})
+
+
+def reformulate_project(request, uid):
+    project = get_object_or_404(Project, uid=uid)
+    validated_project, created = ValidatedProject.objects.get_or_create(project=project)
+
+    if request.method == "POST":
+        form = ValidatedProjectForm(request.POST, request.FILES, instance=validated_project)
+        if form.is_valid():
+            validated_project = form.save(commit=False)
+            validated_project.reformulated_by = request.user
+            # validated_project.approved_at = timezone.now() if validated_project.is_approved else None
+            validated_project.save()
+            project.status = "reformulated"
+            project.save()
+            
+            html_path = "app/mailing/reformulated_project_mail.html"
+            subject = "Recommandation – Reformulation de votre projet"
+            user = project.user
+            context = {
+                "Nom":project.owner.first_name,
+                "titre_du_projet":project.title
+            }
+            #envoie du mail
+            send_report_mail_on_project(user,subject,html_path,context)
+            messages.success(request,f"le projet {project.title} a été reformulé avec succès")
+            messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informé de l'état actuel de son projet")
+            return redirect("cabinet-incoming")
+        else:
+            messages.error(request, f"Veuillez corriger les erreurs du formulaire. {form.errors}")
+    else:
+        form = ValidatedProjectForm(instance=validated_project)
+
+    context = {"form": form, "project": project}
+    return render(request, "app/project/reformulate.html", context)
+
+
+
+# def reject_project(request):
+#     pass
+
+
+
+def accepte_project(request, uid):
+    project = get_object_or_404(Project, uid=uid)
+    project.status = "accepted"
+    project.save()
+    
+    # Création du contexte à passer au template
+    context = {
+        'Nom': project.owner.first_name,  # Le nom de l'utilisateur (si vous avez un champ first_name dans User)
+        'Titre': project.title,  # Le titre du projet
+    }
+    
+    html_path = "app/mailing/accept_project_mail.html"
+    subject = f"Acceptation du projet {project.title}"
+    user = project.user
+
+    # Envoi du mail avec le contexte
+    send_report_mail_on_project(user, subject, html_path, context)
+
+    messages.success(request, f"Le projet {project.title} a été accepté avec succès.")
+    messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informer de l'état actuel de son projet.")
+    
+    return redirect('cabinet-incoming')
+@require_POST
+def publish_project(request, uid):
+    # Récupérer le projet et sa validation associée
+    project = get_object_or_404(Project, uid=uid)
+    validated_project = get_object_or_404(ValidatedProject, project=project)
+    # Vérifier si la case "is_published" a été cochée
+    is_published = request.POST.get("is_published") == "on"
+
+    if validated_project.is_approved != is_published:  # Vérifier si un changement est nécessaire
+        validated_project.is_approved = is_published
+        if is_published:
+            project.status = "published"  # Mettre à jour le statut du projet
+            project.approved_at = timezone.now()
+            #envoie du mail
+            html_path = "app/mailing/published_project_mail.html"
+            subject = "Votre projet est publié"
+            user = project.user
+            context = {
+                "Nom":project.owner.first_name,
+                "titre_du_projet":project.title
+            }
+            send_report_mail_on_project(user,subject,html_path,context)
+            messages.success(request, f"Le projet '{project.title}' a été publié avec succès.")
+            messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informé de l'état actuel de son projet")
+        else:
+            project.status = "reformulated"  # Rétablir un statut neutre
+            messages.warning(request, f"La publication du projet '{project.title}' a été annulée.")
+        
+        # Sauvegarder les modifications
+        validated_project.save()
+        project.save()
+    else:
+        messages.info(request, "Aucune modification n'a été effectuée.")
+
+    # Redirection vers la page des projets validés
+    return redirect("cabinet-validated")
+
+
+
+def reject_project(request, uid):
+    project = get_object_or_404(Project, uid=uid)
+
+    # Si la requête est en POST, récupérer la raison
+    if request.method == 'POST':
+        raison = request.POST.get('reason', '')
+        
+        # Mettre à jour le statut du projet à "rejeté"
+        project.status = "rejected"
+        project.save()
+
+        # Créer le contexte pour l'email
+        context = {
+            'Nom': project.owner.first_name,
+            'Titre_du_projet': project.title,
+            'raison': raison,  # Passer la raison du rejet
+        }
+
+        # Envoi du mail
+        html_path = "app/mailing/rejected_project_mail.html"
+        subject = f"Rejet du projet {project.title}"
+        user = project.user
+        
+        send_report_mail_on_project(user, subject, html_path, context)
+
+        # Message de succès pour l'interface utilisateur
+        messages.success(request, f"Le projet '{project.title}' a été rejeté avec succès.")
+        messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet.")
+
+        return redirect('cabinet-incoming')
+    
+    # Si ce n'est pas une requête POST, on redirige
+    return redirect('cabinet-incoming')
+
+
+def add_category(request):
+    if request.method == "POST":
+        category_name = request.POST.get("name")
+        if category_name:
+            category, created = ProjectCategory.objects.get_or_create(name=category_name)
+            if created:
+                messages.success(request, f"La catégorie '{category_name}' a été ajoutée avec succès.")
+            else:
+                messages.info(request, f"La catégorie '{category_name}' existe déjà.")
+        else:
+            messages.error(request, "Veuillez entrer un nom valide pour la catégorie.")
+
+        # Retourner à la page précédente avec les données du formulaire précédemment saisies
+        referer = request.META.get('HTTP_REFERER', '/')
+        return redirect(referer)
+    else:
+        return redirect("reformulate_project")
+
+from django.test import TestCase
+
+# Create your tests here.
+
+from django.urls import path
+from app import views, project_editing_view
+
+name="app"
+urlpatterns = [
+    path('', views.index, name="home"),
+    path('project/submision/',views.project_submision, name="project-submision"),
+    path('project/cabinet/home/',views.cabinet_home, name="cabinet-home"),
+    path('project/cabinet/incoming/',views.incoming, name="cabinet-incoming"),
+    path('project/cabinet/validated/',views.validated, name="cabinet-validated"),
+    # path('project/cabinet/rejected/',views.rejected, name="cabinet-rejected"),
+    path('project/cabinet/detail/<uid>/', project_editing_view.detail_project, name="project_cabinet_details"),
+    path('project/cabinet/accepte/<uid>/', project_editing_view.accepte_project, name="cabinet-accepte-project"),
+    path('project/cabinet/reject/<uid>/', project_editing_view.reject_project, name="cabinet-reject-project"),
+    path('project/cabinet/publish/<uid>/', project_editing_view.publish_project, name="cabinet-publishp-roject"),
+    path("project/<uuid:uid>/reformulate/", project_editing_view.reformulate_project, name="reformulate_project"),
+    path("project/detail/<int:id>/",views.detail_project, name="detail-project"),
+    path("add-category/",project_editing_view.add_category, name="add_category"),
+    path("mysapce/",views.user_space, name="my-space"),
+    path("myspace/detail/<int:project_id>/",views.project_detail, name="my-project-detail"),
+    path("cabinet/project/<int:project_id>/", views.cabinet_project_detail, name="cabinet-project-detail"),
+    path("contact/",views.contact_view, name="contact"),
+
+]
+
+from django.shortcuts import render, redirect, get_object_or_404
+from app.forms import ProjectSubmissionForm
+from app.forms import PorteurProjectForm
+from .forms import ContactForm
+from django.contrib import messages
+from app.models import PorteurProject, Project, ValidatedProject, ProjectCategory
+from django.contrib.auth.decorators import login_required
+from app.utils.mailing import send_success_submision_project_mail,send_report_mail_to_superusers
+from django.core.paginator import Paginator
+# Create your views here.
+from django.http import Http404
+
+
+def index(request):
+    # Filtrer uniquement les projets approuvés
+    projects = ValidatedProject.objects.filter(is_approved=True).order_by("-updated_at")
+    
+    # Récupérer les catégories et les régions depuis la base de données
+    categories = ProjectCategory.objects.all()
+    regions = projects.values_list('location', flat=True).distinct()
+
+    # Pagination
+    paginator = Paginator(projects, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "page_obj": page_obj,
+        "categories": categories,
+        "regions": regions,
+    }
+    return render(request, "app/home/index.html", context)
+
+
+@login_required(login_url="auth:login")
+def project_submision(request):
+    # Initionalisation des informations du porteur de projet par le profile de celui qui est connecté
+    initial_data = {}
+
+    if hasattr(request.user, 'physical_person') and request.user.physical_person:
+        initial_data = {
+            "first_name": request.user.physical_person.first_name,
+            "last_name": request.user.physical_person.last_name,
+            "phone": request.user.physical_person.telephone,
+            "adress": request.user.physical_person.adresse,
+            "birthday": request.user.physical_person.birthday,
+            "photo": request.user.physical_person.photo,
+        }
+    elif hasattr(request.user, 'moral_person') and request.user.moral_person:
+        initial_data = {
+            "first_name": request.user.moral_person.company_name,
+            "phone": request.user.moral_person.telephone,
+            "adress": request.user.moral_person.adresse,
+            "photo": request.user.moral_person.logo,
+            "birthday": request.user.moral_person.rccm,
+        }
+    else:
+        messages.info(request,"Vous êtes probablement un simple super admin, alors votre espace personnel c'est votre administration ")
+    
+    if request.method == "POST":
+        # Récupération des données soumises par l'utilisateur
+        form_project = ProjectSubmissionForm(request.POST, request.FILES)
+        form_owner = PorteurProjectForm(request.POST, initial=initial_data)
+
+        # Validation des deux formulaires
+        if form_project.is_valid() and form_owner.is_valid():
+
+            if PorteurProject.objects.filter(**form_owner.cleaned_data).exists():
+                owner = PorteurProject.objects.filter(**form_owner.cleaned_data)[0]
+            else:
+                owner = form_owner.save()
+                
+            project = form_project.save(commit=False)
+            project.owner = owner  # Lier le projet au porteur de projet
+            project.user = (
+                request.user
+            )  # Associer l'utilisateur connecté à l'instance du projet
+            project.save()
+
+            messages.success(
+                request,
+                "Votre soumission du projet a bien été effectué, veuillez consulter votre mail pour plus de détails",
+            )
+            con = {
+                "Nom":owner.first_name,
+                "titre_du_projet":project.title
+            }
+            send_success_submision_project_mail(request.user,context=con)
+            # ici je dois encore implementer l'envoie de mail de succès pour la soumission du projet
+            # Redirection ou message de succès après la soumission
+            return redirect("home")
+        else:
+            messages.error(
+                request,
+                f"Il y'a une erreur lors de la soumission de votre projet, veuillez respecter les normes des champs\n {form_owner.errors}\n ",
+            )
+    else:
+        # Affichage des formulaires pour la première fois
+        form_project = ProjectSubmissionForm()
+        form_owner = PorteurProjectForm(initial=initial_data)
+
+    context = {
+        "form_project": form_project,
+        "form_owner": form_owner,
+    }
+    return render(request, "app/project/submision.html", context)
+
+def cabinet_home(request):
+    context = {}
+    return render(request,"app/project/salon.html",context)
+
+
+def incoming(request):
+    # Filtrer les projets soumis ou en cours de validation
+    projets = Project.objects.filter(status__in=["submited","accepted","rejected"]).order_by("-updated_at")
+    # projets = Project.objects.filter(status="submited")
+    context = {
+        'projets': projets,
+    }
+    return render(request, 'app/project/incoming.html', context)
+
+
+def validated(request):
+    # Filtrer les projets dont le status n'est ni "submited" ni "rejected"
+    projets = Project.objects.exclude(status__in=["submited", "rejected","accepted"]).order_by("-updated_at")
+
+    context = {
+        "projets": projets,
+    }
+    return render(request,'app/project/validated.html', context)
+
+
+def detail_project(request,id):
+    project = get_object_or_404(ValidatedProject,id=id)
+    context = {
+        'validate_project':project
+    }
+    
+    return render(request,"app/home/details_project.html",context)
+
+#Espace soumetteur de projet
+
+@login_required
+def user_space(request):
+    projects = Project.objects.filter(user=request.user).select_related("owner", "category").order_by("-updated_at")
+
+    # Calculs des statistiques
+    completed_projects = projects.filter(status="completed").count()
+    ongoing_projects = projects.filter(status="published").count()
+    total_investors = sum(project.investors_count for project in projects)  # À adapter selon votre modèle.
+
+    context = {
+        "projects": projects,
+        "completed_projects": completed_projects,
+        "ongoing_projects": ongoing_projects,
+        "total_investors": total_investors,
+    }
+    return render(request, "app/space/user_space_1.html", context)
+
+
+@login_required
+def project_detail(request, project_id):
+    project = get_object_or_404(Project, id=project_id, user=request.user)
+    
+    # Récupérer les autres projets de l'utilisateur
+    other_projects = Project.objects.filter(user=request.user).exclude(id=project_id).order_by("-updated_at")
+
+    context = {
+        'project': project,
+        'other_projects': other_projects,
+    }
+    return render(request, 'app/space/project_detail.html', context)
+
+
+@login_required
+def cabinet_project_detail(request, project_id):
+    # Récupérer le projet correspondant à l'ID
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Vérifier si le projet est publié
+    if project.status != "published":
+        raise Http404("Les détails du cabinet ne sont disponibles que pour les projets publiés.")
+    
+    # Récupérer les informations du projet validé
+    validated_project = ValidatedProject.objects.filter(project=project).first()
+    
+    # Passer les données au contexte
+    context = {
+        "project": validated_project,
+        "validated_project": validated_project,
+    }
+
+    return render(request, "app/space/cabinet_project_detail.html", context)
+
+
+#Nous contacter
+
+def contact_us(request):
+    
+    return render(request,"app/contact/contact.html")
+
+
+
+
+def contact_view(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            contact = form.save()
+            
+            # Envoyer un email aux super utilisateurs
+            html_path = "app/mailing/contact_notification.html"
+            subject = "Nouveau message de contact soumis"
+            context = {
+                'name': contact.name,
+                'email': contact.email,
+                'phone': contact.phone,
+                'subject': contact.subject,
+                'message': contact.message,
+            }
+            send_report_mail_to_superusers(subject, html_path, context)
+
+            messages.success(request, "Votre message a été envoyé avec succès !")
+            return redirect('contact')
+    
+    form = ContactForm()
+    print(f"=========={form}============")
+    return render(request, 'app/contact/contact.html', {'form': form})
+
+
+"""
+ASGI config for config project.
+
+It exposes the ASGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
+"""
+
+import os
+
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+
+application = get_asgi_application()
+
+"""
+Django settings for config project.
+
+Generated by 'django-admin startproject' using Django 5.1.3.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/5.1/topics/settings/
+
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/5.1/ref/settings/
+"""
+
+from pathlib import Path
+
+from django.contrib.messages import constants as messages
+import os
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+AUTH_USER_MODEL = "users.User"
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-z2iuwmqjaf=2%pt5mzqle)p$-&-066d6&y!gdiq884=$!0)kx&'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = ['192.168.1.139','localhost','127.0.0.1','192.168.181.40']
+
+
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'app',
+    'users',
+    'investors',
+
+
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'config.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'config.wsgi.application'
+
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+# Internationalization
+# https://docs.djangoproject.com/en/5.1/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Configuration CKEditor (optionnel)
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+    },
+}
+
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+#Email Sending configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'etiro2005@gmail.com'
+EMAIL_HOST_PASSWORD = 'mily hlmt vbzi ymfd'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DOMAIN_URL = "127.0.0.1:8000" #un domaine de developpement que je dois changer en production
+
+
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',  # Map Django `error` to Bootstrap `danger`
+}
+
+"""
+URL configuration for config project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.1/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path("",include('app.urls')),
+    path("auth/",include('users.urls')),
+
+]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+    )
+
+"""
+WSGI config for config project.
+
+It exposes the WSGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
+"""
+
+import os
+
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+
+application = get_wsgi_application()
+
+
+from django.contrib import admin
+
+# Register your models here.
+
+from django.apps import AppConfig
+
+
+class InvestorsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'investors'
+
+import random
+import string
+from django.db import models
+from django.conf import settings
+from app.models import ProjectCategory
+
+class Investor(models.Model):
+    def generate_investor_id():
+        """Génération d'un identifiant unique de 6 caractères (4 lettres et 2 chiffres)."""
+        letters = ''.join(random.choices(string.ascii_uppercase, k=4))
+        digits = ''.join(random.choices(string.digits, k=2))
+        return f"{letters}{digits}"
+
+    # Identifiant unique de l'investisseur
+    investor_id = models.CharField(
+        max_length=6,
+        unique=True,
+        default=generate_investor_id,
+        verbose_name="Identifiant Investisseur"
+    )
+
+    # Association avec un utilisateur existant
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="investor",
+        verbose_name="Utilisateur"
+    )
+
+    # Identité de l'investisseur (au cas où l'investisseur decide d'avoir des informations
+    # d'iinvestissement différentes de celles de son profile ordinaire)
+    first_name = models.CharField(max_length=255, verbose_name="Prénom")
+    last_name = models.CharField(max_length=255, verbose_name="Nom")
+    email = models.EmailField(verbose_name="Email", help_text="Adresse email de l'investisseur")
+    phone = models.CharField(max_length=20, verbose_name="Numéro de téléphone")
+    address = models.TextField(verbose_name="Adresse postale")
+    
+    # Informations financières
+    available_budget = models.DecimalField(
+        max_digits=15, 
+        decimal_places=2, 
+        verbose_name="Budget disponible", 
+        help_text="Montant que l'investisseur est prêt à investir (ex. 10,000 GNF)"
+    )
+    
+
+    # Préférences d'investissement
+    preferred_sectors = models.ManyToManyField(
+        ProjectCategory,
+        blank=True,
+        related_name="interested_investors",
+        verbose_name="Secteurs d'intérêt"
+    )
+
+    preferred_currency = models.CharField(
+        max_length=3,
+        choices=[
+            ("GNF", "GNF - Franc guinéen"),
+            ("USD", "USD - Dollar américain"),
+            ("EUR", "EUR - Euro"),
+        ],
+        default="GNF",
+        verbose_name="Monnaie préférée"
+    )
+    
+    minimum_investment = models.DecimalField(
+        max_digits=15, 
+        decimal_places=2, 
+        default=0,
+        verbose_name="Montant minimal d'investissement",
+        help_text="Seuil minimum que l'investisseur est prêt à investir"
+    )
+    
+    maximum_investment = models.DecimalField(
+        max_digits=15, 
+        decimal_places=2, 
+        default=0,
+        verbose_name="Montant maximal d'investissement",
+        help_text="Seuil maximum que l'investisseur est prêt à investir"
+    )
+    
+    investment_type = models.CharField(
+        max_length=50,
+        choices=[
+            ("short_term", "Projets à court terme"),
+            ("long_term", "Projets à long terme"),
+            ("innovation", "Innovation et technologie"),
+        ],
+        default="long_term",
+        verbose_name="Type de projets recherchés"
+    )
+
+    # Informations supplémentaires
+    # source_of_funds = models.CharField(
+    #     max_length=255,
+    #     blank=True,
+    #     verbose_name="Source des fonds",
+    #     help_text="Origine de vos fond fonds (ex. revenus personnels, entreprise, etc.)"
+    # )
+    # company_name = models.CharField(
+    #     max_length=255,
+    #     blank=True,
+    #     verbose_name="Nom de l'entreprise",
+    #     help_text="Si applicable, le nom de l'entité représentée par l'investisseur"
+    # )
+    expertise_domain = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Domaine d'expertise",
+        help_text="Domaine professionnel ou secteur de l'investisseur"
+    )
+    
+    investment_experience = models.CharField(
+        max_length=20,
+        choices=[
+            ("beginner", "Débutant"),
+            ("intermediate", "Intermédiaire"),
+            ("expert", "Expert"),
+        ],
+        default="beginner",
+        verbose_name="Expérience en investissement"
+    )
+
+    # Champs automatiques
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date d'inscription")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Dernière mise à jour")
+
+    def __str__(self):
+        return f"{self.investor_id} - {self.full_name}"
+
+    class Meta:
+        verbose_name = "Investisseur"
+        verbose_name_plural = "Investisseurs"
+
+from django.test import TestCase
+
+# Create your tests here.
+
+from django.shortcuts import render
+
+# Create your views here.
+
+
+from django.template import Library
+
+register = Library()
+
+
+# un filtre personnalisé pour vidé les champs invalides en maintenir les champs valide en cas de ValidationError
+def default_if_none(value):
+    return value if value else ''
+
+register.filter('default_if_none', default_if_none)
+
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+
+
+# def send_activation_email(user):
+#     subject = "Activation de votre compte"
+#     uid = urlsafe_base64_encode(force_bytes(user.id))
+#     token = default_token_generator.make_token(user)
+#     message = render_to_string(
+#         'registration/activation_email.html', {
+#             'user': user,
+#             'uid': uid,
+#             'token': token,
+#             'domain': settings.DOMAIN_URL
+#         }
+#     )
+    
+#     send_mail(
+#         subject, message,
+#         'etiennedheleine2000@gmail.com',
+#         [user.email],
+#         fail_silently=True
+#     )
+#     return True
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+from django.urls import reverse
+
+def send_activation_email(user):
+
+        # Générer les variables nécessaires
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        activation_link = f"http://{settings.DOMAIN_URL}{reverse('auth:confirm_user_activation', kwargs={'uid': uid, 'token': token})}"
+
+        # Préparer le contexte pour le template
+        context = {
+            "user": user,
+            "domain": settings.DOMAIN_URL,
+            "uid": uid,
+            "token": token,
+            "activation_link": activation_link,
+        }
+
+        # Charger le sujet et le message HTML
+        subject = "Activation de votre compte"
+        html_message = render_to_string("registration/activation_email.html", context)
+
+        # Ajouter un fallback en texte brut
+        plain_message = (
+            f"Bonjour {user.first_name},\n\n"
+            f"Veuillez cliquer sur le lien suivant pour activer votre compte : {activation_link}\n"
+        )
+
+        # Envoi de l'email
+        send_mail(
+            subject,
+            plain_message,  # Message texte brut pour fallback
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=False,
+            html_message=html_message,  # Contenu HTML
+        )
+        
+        
+        
+
+def send_password_reset_mail(user):
+        # Générer les variables nécessaires
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        reset_link = f"http://{settings.DOMAIN_URL}{reverse('auth:reset_password', kwargs={'uid': uid, 'token': token})}"
+
+        # Préparer le contexte pour le template
+        context = {
+            "user": user,
+            "domain": settings.DOMAIN_URL,
+            "uid": uid,
+            "token": token,
+            "activation_link": reset_link,
+        }
+
+        # Charger le sujet et le message HTML
+        subject = "Réinitialisation de mot de passe"
+        html_message = render_to_string("registration/reset_password_email.html", context)
+
+      
+        # Envoi de l'email
+        send_mail(
+            subject,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=True,
+            html_message=html_message,  # Contenu HTML
+        )
+        
+    
+
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .models import User, PhysicalPerson, MoralPerson
+
+
+@admin.register(User)
+class UserAdmin(UserAdmin):
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
+    )
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("email", "password1", "password2", "is_staff", "is_active"),
+        }),
+    )
+    list_display = ("email", "is_staff", "is_active", "is_superuser")
+    search_fields = ("email",)
+    ordering = ("email",)
+    
+    
+@admin.register(PhysicalPerson)
+class PhysicalPersonAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'telephone', 'user')
+
+@admin.register(MoralPerson)
+class MoralPersonAdmin(admin.ModelAdmin):
+    list_display = ('company_name', 'telephone', 'user')
+
+from django.apps import AppConfig
+
+
+class UsersConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'users'
+
+from django.contrib.auth.backends import ModelBackend
+
+from users.models import User
+
+
+class CustomAuthentication(ModelBackend):
+    def authenticate(self, request, username, password):
+        try:
+            user = User.objects.get(email=username)
+        except User.DoesNotExist:
+            return None
+        if user.check_password(password):
+            request.user = user
+            return user
+        return None
+
+from django import forms
+from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
+
+from .models import User
+from .utils.mailing import send_activation_email
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        user = authenticate(
+            self.request, username=username, password=password
+        )
+        if user is None:
+            raise ValidationError(
+                "Email ou Mot de passe incorrect."
+            )
+        if not user.is_active:
+            send_activation_email(user)
+            raise ValidationError(
+                ("Votre compte n'est pas actif, consulter votre boite "
+                    "email pour activer votre compte")
+            )
+        return self.cleaned_data
+
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True,
+        help_text="Requis. Entrez une adresse email valide."
+    )
+
+    class Meta:
+        model = User
+        fields = ('email','password1', 'password2')
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("Cette adresse email existe deja.")
+        return email
+
+from django import forms
+from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
+
+from .models import User
+from .utils.mailing import send_activation_email
+from .models import PhysicalPerson, MoralPerson
+
+class CustomAuthenticationForm(forms.Form):
+    # Remplacer 'username' par 'email' pour correspondre à votre modèle
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez votre email',
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez votre mot de passe',
+        })
+    )
+
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True,
+        help_text="Requis. Entrez une adresse email valide."
+    )
+
+    class Meta:
+        model = User
+        fields = ('email','password1', 'password2')
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("Cette adresse email existe deja.")
+        return email
+
+
+
+class PhysicalPersonForm(forms.ModelForm):
+    class Meta:
+        model = PhysicalPerson
+        fields = ['first_name', 'last_name', 'telephone', 'adresse', 'birthday', 'id_card', 'photo']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'birthday': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'id_card': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+
+    def clean_telephone(self):
+        telephone = self.cleaned_data.get('telephone')
+        if not telephone.isdigit():
+            raise ValidationError("Le numéro de téléphone doit contenir uniquement des chiffres.")
+        if len(telephone) < 8 or len(telephone) > 15:
+            raise ValidationError("Le numéro de téléphone doit contenir entre 8 et 15 chiffres.")
+        return telephone
+
+
+class MoralPersonForm(forms.ModelForm):
+    class Meta:
+        model = MoralPerson
+        fields = ['company_name', 'telephone', 'adresse', 'rccm', 'logo']
+        widgets = {
+            'company_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'rccm': forms.TextInput(attrs={'class': 'form-control'}),
+            'logo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+
+    def clean_rccm(self):
+        rccm = self.cleaned_data.get('rccm')
+        if len(rccm) < 5:
+            raise ValidationError("Le RCCM doit contenir au moins 5 caractères.")
+        return rccm
+
+from django.contrib.auth.models import BaseUserManager
+
+
+class UserManager(BaseUserManager):
+    #en creant un utilisateur, il faudrait que je n'oublie pas de passer son rol en parametrre de create_user
+    def create_user(self, email, password=None,**extra_fields):
+
+        if not email:
+            raise ValueError('L\'adresse email doit être renseignée.')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.is_active = False #je le desactive jusqu'à ce qu'il valide son mail
+        user.save(using=self._db)
+        
+    #creating profile with different roles 
+        # from .models import PhysicalPerson, MoralPerson
+        # if role == 'PHYSICAL':
+        #     PhysicalPerson.objects.create(user=user)
+        # elif role == 'MORAL':
+        #     MoralPerson.objects.create(user=user)
+        
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(email, password, **extra_fields)
+
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+from .managers import UserManager
+from django.utils import timezone
+from django.conf import settings
+
+ROLE_CHOICES = [
+        ('PHYSICAL', 'Personne Physique'),
+        ('MORAL', 'Personne Morale'),
+        ('INVESTOR', 'Investisseur'),
+        ('ADMIN', 'Administrateur'),
+    ]
+
+class User(AbstractUser):
+    first_name = None
+    last_name = None
+    username = None
+    email = models.EmailField(unique=True, max_length=255, verbose_name="email address")
+
+  
+    objects = UserManager()
+
+    EMAIL_FIELD = "email"
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return self.email
+
+
+class MoralPerson(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="moral_person")
+    company_name = models.CharField(max_length=255)
+    telephone = models.CharField(max_length=15)
+    adresse = models.TextField()
+    rccm = models.CharField(max_length=100, unique=True, blank=True, null=True) 
+    logo = models.ImageField(upload_to="company_logos/")
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='PHYSICAL')
+
+    def __str__(self):
+        return self.company_name
+
+
+class PhysicalPerson(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="physical_person")
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    telephone = models.CharField(max_length=15)
+    adresse = models.TextField()
+    birthday = models.DateField()
+    id_card = models.ImageField(upload_to="id_cards/")
+    photo = models.ImageField(upload_to="profile_photos/")
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+from django.test import TestCase
+
+# Create your tests here.
+
+import smtplib
+
+try:
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.set_debuglevel(1)  # Active les logs détaillés SMTP
+    server.local_hostname = "localhost"  # Définir un nom d'hôte valide
+    server.starttls()
+    server.login("etiro2005@gmail.com", "votre_mot_de_passe_d_application")
+    server.sendmail(
+        "etiro2005@gmail.com",  # Expéditeur
+        "etiennedheleine2000@gmail.com",  # Destinataire
+        "Subject: Test Email\n\nCeci est un test direct via smtplib."
+    )
+    server.quit()
+    print("Email envoyé avec succès via smtplib !")
+except Exception as e:
+    print(f"Erreur SMTP : {e}")
+
+from django.urls import path, include
+from users.views import login_view
+from users.views import reset_password
+
+from users.views import CustomUserCreationView
+from users.views import ActivationUserView
+from users.views import profile_view
+from users.views import LogoutView
+from users.views import complete_profile
+
+
+app_name="auth"
+
+urlpatterns = [
+    path('profile', profile_view, name='profile_user'),
+    path('login/', login_view, name='login'),
+    path('create/', CustomUserCreationView.as_view(), name='register'),
+    path('activation/<uid>/<token>', ActivationUserView.as_view(), name='confirm_user_activation'),
+    path('activation/<uid>/<token>', reset_password, name='reset_password'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('complete-profile/<uid>/', complete_profile, name='complete_profile'),
+    path('', include('django.contrib.auth.urls')),
+]
+
+
+from django.contrib.auth.views import LoginView
+from django.views.generic.edit import CreateView, View
+from django.views.generic import ListView
+from django.urls import reverse_lazy, reverse
+from django.shortcuts import redirect, render, get_object_or_404
+from django.utils.http import urlsafe_base64_decode
+from django.contrib import messages
+from django.db import transaction
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import logout
+from .forms import CustomAuthenticationForm
+from .forms import CustomUserCreationForm
+from users.models import User, PhysicalPerson, MoralPerson
+from .utils.mailing import send_activation_email, send_password_reset_mail
+from django.contrib.auth.decorators import login_required
+from .forms import (
+    PhysicalPersonForm,
+    MoralPersonForm,
+    PhysicalPersonForm,
+    MoralPersonForm,
+)
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+# class CustomLoginView(LoginView):
+#     authentication_form = CustomAuthenticationForm
+
+
+def login_view(request):
+    if request.method == "POST":
+        form = CustomAuthenticationForm(request.POST)
+        if form.is_valid():
+            clean_data = form.cleaned_data
+            user = authenticate(
+                request, email=clean_data["email"], password=clean_data["password"]
+            )
+            if user:
+                login(request, user)
+
+                messages.success(
+                    request, f"Bienvenu, Vous êtes connecté en tant que {user.email}"
+                )
+                return redirect("home")
+            else:
+                messages.error(request, "Email ou mot de passe incorrecte")
+
+        else:
+            messages.error(request, "Veuillez à saisir les informations valides.")
+    else:
+        form = CustomAuthenticationForm()
+
+    return render(request, "registration/login.html", {"form": form})
+
+
+class LogoutView(View):
+    login_url = reverse_lazy("home")
+
+    def get(self, request):
+        logout(request)
+        messages.success(
+            self.request, "Vous êtes maintenant deconnecté de la Prices Capital"
+        )
+        return redirect(self.login_url)
+
+
+class CustomUserCreationView(CreateView):
+    template_name = "registration/register.html"
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy("auth:register")
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+            context ={}
+            send_activation_email(user)
+
+            messages.success(
+                self.request,
+                (
+                    "Un lien vous a été envoyé dans votre boite mail, veuillez le consulter pour continuer l'inscription"
+                ),
+            )
+            return redirect(self.success_url)
+
+
+class ActivationUserView(View):
+    def get(self, request, uid, token):
+        try:
+            id = urlsafe_base64_decode(uid).decode()  # Décoder correctement l'UID
+            user = User.objects.get(id=id)
+        except (User.DoesNotExist, ValueError):
+            return render(request, "registration/activation_invalid.html")
+
+        if default_token_generator.check_token(user, token):
+            if not user.is_active:
+                user.is_active = True
+                user.save()
+                messages.success(
+                    request,
+                    "Votre adresse email a été vérifiée. Veuillez compléter votre profil.",
+                )
+            else:
+                messages.error(
+                    request,
+                    "Ce compte est déjà vérifié, si vous n'aviez pas terminé l'inscription avant de sortir, vous pouvez vous connecté avec vos information pour continuer l'inscription dans votre profile",
+                )
+                return redirect("home")
+
+            # Créer l'URL de redirection avec l'uid en paramètre
+            complete_profile_url = reverse("auth:complete_profile", kwargs={"uid": uid})
+            return redirect(complete_profile_url)
+
+        return render(request, "registration/activation_invalid.html")
+
+
+def profile_view(request):
+    user = request.user
+
+    # Déterminez si l'utilisateur est une personne physique ou morale
+    if hasattr(user, "physical_person"):
+        form = PhysicalPersonForm(
+            request.POST or None, request.FILES or None, instance=user.physical_person
+        )
+    elif hasattr(user, "moral_person"):
+        form = MoralPersonForm(
+            request.POST or None, request.FILES or None, instance=user.moral_person
+        )
+    else:
+        messages.error(request, "Aucun profil associé à cet utilisateur.")
+        return redirect("home")
+
+    # Si le formulaire est soumis et valide
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Votre profil a été mis à jour avec succès.")
+        return redirect("auth:profile_user")
+
+    context = {"form": form, "user": user}
+    return render(request, "registration/user_profile.html", context)
+
+
+def complete_profile(request, uid):
+    try:
+        # Décoder l'UID et récupérer l'utilisateur
+        decoded_uid = urlsafe_base64_decode(uid).decode()
+        user = User.objects.get(id=decoded_uid)
+    except (ValueError, User.DoesNotExist):
+        messages.error(request, "Utilisateur invalide ou introuvable.")
+        return redirect("home")
+
+    if PhysicalPerson.objects.filter(user=user).exists():
+        messages.info(
+            request,
+            "Vous avez deja un profile en tant que Personne physique, si vous voulez le modifier, allez dans votre profile",
+        )
+        return redirect("home")
+
+    if MoralPerson.objects.filter(user=user).exists():
+        messages.info(
+            request,
+            "Vous avez deja un profile en tant que Personne Morale, si vous voulez le modifier, allez dans votre profile",
+        )
+        return redirect("home")
+
+    # Initialisation des formulaires
+
+    physical_form, moral_form = None, None
+    if request.method == "POST":
+        role = request.POST.get("role")  # Récupérer le rôle choisi
+        if role == "PHYSICAL":
+            physical_form = PhysicalPersonForm(request.POST, request.FILES)
+            if physical_form.is_valid():
+                physical_person = physical_form.save(commit=False)
+                physical_person.user = user
+                physical_person.save()
+                messages.success(
+                    request,
+                    "Votre profil a été complété avec succès, vous pouvez maintenant vous connecter.",
+                )
+                return redirect("auth:login")
+            else:
+                messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+        elif role == "MORAL":
+            moral_form = MoralPersonForm(request.POST, request.FILES)
+            if moral_form.is_valid():
+                moral_person = moral_form.save(commit=False)
+                moral_person.user = user
+                moral_person.save()
+                messages.success(
+                    request,
+                    "Votre profil a été complété avec succès, vous pouvez maintenant vous connecter.",
+                )
+                return redirect("auth:login")
+            else:
+                messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+        else:
+            messages.error(request, "Veuillez sélectionner un type de personne valide.")
+
+    # Réinitialisation des formulaires pour GET ou en cas d'erreur POST
+    if physical_form is None:
+        physical_form = PhysicalPersonForm()
+    if moral_form is None:
+        moral_form = MoralPersonForm()
+
+    # Passer les données au contexte
+    context = {
+        "physical_form": physical_form,
+        "moral_form": moral_form,
+        "uid": uid,  # Passer l'UID pour l'action des formulaires
+    }
+    return render(request, "registration/complete_profile.html", context)
+
+
+def check_reset_passord(request):
+    if request.method == "POST":
+        user_email = request.POST.get("email")
+        if not User.objects.filter(email=user_email).exists():
+            messages.error(request, "Aucun n'est associé à cette adresse email")
+        else:
+            user = get_object_or_404(User, email=user_email)
+            send_password_reset_mail(user)
+            messages.info(
+                request,
+                "Un mail vous a été envoyé avec un lien de reinitialisation de votre mot de passe,"
+                "veuillez le consulter pour continuer l'oppération",
+            )
+
+
+def reset_password(request):
+    pass
+
+
+#!/usr/bin/env python
+"""Django's command-line utility for administrative tasks."""
+import os
+import sys
+
+
+def main():
+    """Run administrative tasks."""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed and "
+            "available on your PYTHONPATH environment variable? Did you "
+            "forget to activate a virtual environment?"
+        ) from exc
+    execute_from_command_line(sys.argv)
+
+
+if __name__ == '__main__':
+    main()
+
+import random
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+from app.models import Project, PorteurProject, ProjectCategory
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class Command(BaseCommand):
+    help = 'Insère 30 projets avec des données aléatoires'
+
+    def handle(self, *args, **kwargs):
+        # Récupérer l'utilisateur
+        user = User.objects.get(email="etiennedheleine2000@gmail.com")
+
+        # Récupérer les catégories disponibles
+        categories = ProjectCategory.objects.all()
+
+        # Liste des informations du porteur de projet
+        porteurs = [
+            {"first_name": "Etienne", "last_name": "Kamano", "phone": "123456789", "adress": "Conakry, Guinée", "birthday": "1990-01-01"},
+            {"first_name": "Gilbert", "last_name": "Diakité", "phone": "987654321", "adress": "Labé, Guinée", "birthday": "1992-03-15"},
+            {"first_name": "Mamadou", "last_name": "Sory", "phone": "135792468", "adress": "Kindia, Guinée", "birthday": "1988-05-22"},
+            {"first_name": "Aissatou", "last_name": "Diallo", "phone": "112233445", "adress": "Conakry, Guinée", "birthday": "1995-11-10"},
+            {"first_name": "Amadou", "last_name": "Camara", "phone": "223344556", "adress": "Kankan, Guinée", "birthday": "1985-07-25"},
+            {"first_name": "Mariam", "last_name": "Keita", "phone": "334455667", "adress": "Boké, Guinée", "birthday": "1998-02-17"},
+            {"first_name": "Ibrahime", "last_name": "Toure", "phone": "445566778", "adress": "Nzérékoré, Guinée", "birthday": "1987-04-30"},
+            {"first_name": "Sadio", "last_name": "Bah", "phone": "556677889", "adress": "Mamou, Guinée", "birthday": "1991-06-09"},
+            {"first_name": "Oumar", "last_name": "Camara", "phone": "667788990", "adress": "Faranah, Guinée", "birthday": "1989-12-19"},
+            {"first_name": "Nadia", "last_name": "Diallo", "phone": "778899001", "adress": "Conakry, Guinée", "birthday": "1994-05-13"},
+            {"first_name": "Sekou", "last_name": "Diakité", "phone": "889900112", "adress": "Labé, Guinée", "birthday": "1993-08-20"},
+            {"first_name": "Fanta", "last_name": "Sow", "phone": "990011223", "adress": "Boké, Guinée", "birthday": "1996-09-04"},
+            {"first_name": "Alhassane", "last_name": "Fofana", "phone": "101223344", "adress": "Kindia, Guinée", "birthday": "1986-11-05"},
+            {"first_name": "Fatoumata", "last_name": "Bah", "phone": "112344556", "adress": "Conakry, Guinée", "birthday": "1999-01-18"},
+            {"first_name": "Lamine", "last_name": "Koné", "phone": "223455667", "adress": "Kankan, Guinée", "birthday": "1990-03-03"},
+            {"first_name": "Moussa", "last_name": "Barry", "phone": "334566778", "adress": "Nzérékoré, Guinée", "birthday": "1984-10-15"},
+            {"first_name": "Mariama", "last_name": "Diarra", "phone": "445677889", "adress": "Mamou, Guinée", "birthday": "1997-02-12"},
+            {"first_name": "Kadiatou", "last_name": "Touré", "phone": "556788990", "adress": "Faranah, Guinée", "birthday": "1992-07-21"},
+            {"first_name": "Abdoulaye", "last_name": "Sory", "phone": "667899001", "adress": "Labé, Guinée", "birthday": "1987-06-11"},
+            {"first_name": "Saran", "last_name": "Keita", "phone": "778990112", "adress": "Conakry, Guinée", "birthday": "1994-04-28"},
+        ]
+
+
+        for i in range(30):
+            # Choisir un porteur de projet au hasard
+            owner_info = random.choice(porteurs)
+            owner = PorteurProject.objects.create(
+                first_name=owner_info["first_name"],
+                last_name=owner_info["last_name"],
+                phone=owner_info["phone"],
+                adress=owner_info["adress"],
+                birthday=owner_info["birthday"],
+                photo="path_to_photo"  # Vous pouvez spécifier un chemin de photo ici si nécessaire
+            )
+
+            # Choisir une catégorie au hasard
+            category = random.choice(categories)
+
+            # Créer un projet
+            project = Project.objects.create(
+                user=user,  # Assigner l'utilisateur à ce projet
+                owner=owner,  # Assigner le porteur de projet
+                title=f"Projet {i+1}",
+                description="Description aléatoire pour le projet.",
+                category=category,
+                goal=random.randint(50000, 1000000),  # Un budget aléatoire entre 50 000 et 1 000 000
+                location="Conakry, Guinée",  # Localisation générique
+                currency="GNF",  # Monnaie par défaut
+                status="submited",  # Statut initial
+                is_approved=False,
+                created_at=timezone.now(),
+                updated_at=timezone.now(),
+            )
+
+            # Afficher un message pour chaque projet créé
+            self.stdout.write(self.style.SUCCESS(f"Projet {i+1} créé avec succès !"))
+
+from django import template
+
+register = template.Library()
+
+@register.filter(name='times')
+def times(value, arg):
+    try:
+        return value * arg
+    except (ValueError, TypeError):
+        return ''
+
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+
+def send_success_submision_project_mail(user,context):
+        # Charger le sujet et le message HTML
+        subject = "Accusé de réception – Projet soumis"
+        html_path = "app/mailing/success_submission_mail.html"
+        html_message = render_to_string(html_path,context)
+
+    # Envoi de l'email
+        send_mail(
+            subject=subject,
+            message="Succes de soumission de projet",
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email],
+            fail_silently=True,
+            html_message=html_message, 
+        )
+
+
+def send_report_mail_on_project(user, subject,html_path,context):
+        html_message = render_to_string(html_path,context)
+        # Envoi de l'email
+        send_mail(
+            subject=subject,
+            message=subject,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email],
+            fail_silently=True,
+            html_message=html_message, 
+        )
+
+
+def send_report_mail_to_superusers(subject, html_path, context):
+    super_users = User.objects.filter(is_superuser=True)
+    recipient_list = [user.email for user in super_users if user.email]
+    if recipient_list:
+        html_message = render_to_string(html_path, context)
+        send_mail(
+            subject=subject,
+            message=subject,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=recipient_list,
+            fail_silently=True,
+            html_message=html_message,
+        )
+
+from django.contrib import admin
+from .models import PorteurProject, ProjectCategory, Project, ValidatedProject
+from .models import Contact
+
+# Enregistrement du modèle PorteurProject
+@admin.register(PorteurProject)
+class PorteurProjectAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'phone', 'adress', 'birthday')
+    search_fields = ('first_name', 'last_name', 'phone')
+
+# Enregistrement du modèle ProjectCategory
+@admin.register(ProjectCategory)
+class ProjectCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+# Enregistrement du modèle Project
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('uid','title', 'category', 'goal',  'status', 'created_at')
+    list_filter = ('category', 'status')
+    search_fields = ('title', 'location')
+    readonly_fields = ('progress', 'converted_budget')
+
+    def progress(self, obj):
+        return f"{obj.progress:.2f}%"
+
+    def converted_budget(self, obj):
+        return f"{obj.converted_budget:.2f} GNF"
+
+    progress.short_description = 'Progression du financement'
+    converted_budget.short_description = 'Budget converti (GNF)'
+    
+
+@admin.register(ValidatedProject)
+class ValidatedProjectAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "project",
+        "category",
+        "goal",
+        "current_funding",
+        "location",
+        "currency",
+        "is_approved",
+        "approved_at",
+        "progress"
+    )
+    list_filter = ("is_approved", "category", "currency", "approved_at")
+    search_fields = ("title", "project__title", "category__name", "location")
+    readonly_fields = ("created_at", "updated_at", "approved_at")
+    ordering = ("-created_at",)
+    fieldsets = (
+        ("Informations générales", {
+            "fields": ("project", "title", "category", "context", "summary", "problem_statement")
+        }),
+        ("Objectifs et Livrables", {
+            "fields": ("general_objective", "specific_objectives", "deliverables")
+        }),
+        ("Détails supplémentaires", {
+            "fields": ("target_audience", "key_partners", "additional_details")
+        }),
+        ("Budget et Localisation", {
+            "fields": ("goal", "current_funding", "currency", "location")
+        }),
+        ("Documents et Images", {
+            "fields": ("documents", "image")
+        }),
+        ("Validation", {
+            "fields": ("is_approved", "approved_at", "reformulated_by")
+        }),
+        ("Audit", {
+            "fields": ("created_at", "updated_at")
+        }),
+    )
+
+
+
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    # Champs affichés dans la liste des contacts
+    list_display = ('name', 'email', 'phone', 'subject', 'created_at')
+    list_filter = ('created_at',)  # Filtres par date de création
+    search_fields = ('name', 'email', 'subject', 'message')  # Champs pour la recherche
+    ordering = ('-created_at',)  # Tri par défaut (les plus récents en premier)
+
+    # Affichage des détails d'un contact dans l'interface d'administration
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'email', 'phone', 'subject', 'message')
+        }),
+        ('Dates', {
+            'fields': ('created_at',),
+            'classes': ('collapse',),  # Cache les informations de date par défaut
+        }),
+    )
+    readonly_fields = ('created_at',)  # Champs en lecture seule
+
+from django.apps import AppConfig
+
+
+class AppConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'app'
+
+from django import forms
+from .models import Project
+from .models import PorteurProject
+from .models import ProjectCategory
+from .models import ValidatedProject
+from .models import Contact
+from django.core.validators import FileExtensionValidator
+
+
+class ProjectSubmissionForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = [
+            "title",
+            "description",
+            "category",
+            "goal",
+            "location",
+            "currency",
+            "image",
+            "presentation_document",
+            "business_plan",
+        ]
+        widgets = {
+            "title": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Titre du projet"}
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Description du projet",
+                    "rows": 4,
+                }
+            ),
+            "category": forms.Select(attrs={"class": "form-select"}),
+            "goal": forms.NumberInput(
+                attrs={"class": "form-control", "placeholder": "Budget estimé"}
+            ),
+            "location": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Localisation (Pays où le projet sera réalisé) ",
+                }
+            ),
+            "currency": forms.Select(attrs={"class": "form-select"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "presentation_document": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": ".pdf,.docx,.ppt,.pptx",
+                    "placeholder": "Télécharger le document de présentation",
+                }
+            ),
+            "business_plan": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": ".pdf,.docx,.ppt,.pptx",
+                    "placeholder": "Télécharger le Business Plan",
+                }
+            ),
+        }
+
+
+class PorteurProjectForm(forms.ModelForm):
+    class Meta:
+        model = PorteurProject
+        fields = ["first_name", "last_name", "phone", "adress", "birthday", "photo"]
+
+        widgets = {
+            "first_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Prénom"}
+            ),
+            "last_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Nom"}
+            ),
+            "phone": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Numéro de téléphone"}
+            ),
+            "adress": forms.Textarea(
+                attrs={"class": "form-control", "placeholder": "Adresse", "rows": 4}
+            ),
+            "birthday": forms.DateInput(
+                attrs={"class": "form-control", "type": "date"}
+            ),
+            "photo": forms.ClearableFileInput(attrs={"class": "form-control-file"}),
+        }
+
+
+class ProjectCategoryForm(forms.ModelForm):
+    class Meta:
+        model = ProjectCategory
+        fields = ["name"]
+        widgets = {
+            "name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Nom de la catégorie"}
+            )
+        }
+
+
+class ValidatedProjectForm(forms.ModelForm):
+    class Meta:
+        model = ValidatedProject
+        fields = [
+            "title",
+            "category",
+            "goal",
+            "location",
+            "currency",
+            "context",
+            "summary",
+            "problem_statement",
+            "general_objective",
+            "specific_objectives",
+            "deliverables",
+            "target_audience",
+            "key_partners",
+            "image",
+            "additional_details",
+            "documents",
+        ]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-select"}),
+            "goal": forms.NumberInput(
+                attrs={"class": "form-control", "placeholder": "Budget estimé"}
+            ),
+            "location": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Localisation (Pays où le projet sera réalisé) ",
+                }
+            ),
+            "currency": forms.Select(attrs={"class": "form-select"}),
+            "context": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+            "summary": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "problem_statement": forms.Textarea(
+                attrs={"rows": 4, "class": "form-control"}
+            ),
+            "general_objective": forms.Textarea(
+                attrs={"rows": 3, "class": "form-control"}
+            ),
+            "specific_objectives": forms.Textarea(
+                attrs={"rows": 4, "class": "form-control"}
+            ),
+            "deliverables": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "target_audience": forms.Textarea(
+                attrs={"rows": 3, "class": "form-control"}
+            ),
+            "key_partners": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "additional_details": forms.Textarea(
+                attrs={"rows": 3, "class": "form-control"}
+            ),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }
+
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Contact
+        fields = ['name', 'email', 'phone', 'subject', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Votre Nom'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Votre Email'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Téléphone'
+            }),
+            'subject': forms.TextInput(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Sujet'
+            }),
+            'message': forms.Textarea(attrs={
+                'class': 'form-control border-0',
+                'placeholder': 'Votre message ici',
+                'style': 'height: 160px;'
+            }),
+        }
+
+from django.db import models
+from django.conf import settings
+from django.core.validators import FileExtensionValidator
+import uuid
+
+
+# porteur de projet, au cas où un utilisateur peut soumettre un projet avec d'autre informations
+class PorteurProject(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=15)
+    adress = models.TextField()
+    birthday = models.DateField()
+    photo = models.ImageField(upload_to="img_porteur")
+
+
+class ProjectCategory(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class Project(models.Model):
+    STATUS_CHOICES = [
+        ("submited", "Soumis"),     #quand le projet est soumis (uniquement pour les soumetteurs )
+        ("ongoing", "En cours"),  #quand la collecte des fond sur le projet a debuté
+        ("reformulated", "Reformulé ❕"),  #quand la reformulation du  projet est terminée
+        ("completed", "Terminé ✔️"),   #quand le projet est réalisé
+        ("published", "Publié 👍"),   #quand le projet est publié
+        ("rejected", "En attente de plus d'informations ❌"),     #quand le projet est rejeté (pour quelque raison que ce soit) avant meme d'être reformulé
+        ("accepted", "Accepté ✅"),    #quand le projet est accepté
+    ]
+
+    CURRENCY_CHOICES = [
+        ("GNF", "GNF - Franc guinéen"),
+        ("USD", "USD - Dollar américain"),
+        ("EUR", "EUR - Euro"),
+        ("XOF", "XOF - Franc CFA"),
+    ]
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="projects",
+        verbose_name="Utilisateur",
+    )
+    
+    owner = models.ForeignKey(
+        "PorteurProject",
+        related_name="projects",
+        on_delete=models.CASCADE,
+        verbose_name="Porteur de projet",
+    )
+    
+    uid = models.UUIDField(
+    default=uuid.uuid4,
+    editable=False,
+    unique=True,
+    verbose_name="Identifiant unique",
+        )
+    
+    title = models.CharField(max_length=255, verbose_name="Titre du projet")
+    description = models.TextField(
+        max_length=1000,
+        verbose_name="Description du projet",
+        default="Description du projet",
+    )
+    
+    presentation_document = models.FileField(
+        upload_to="project_documents/",
+        blank=True,
+        null=True,
+        verbose_name="Document de présentation",
+        validators=[
+            FileExtensionValidator(allowed_extensions=["pdf", "docx", "ppt", "pptx"])
+        ],
+    )
+    
+    business_plan = models.FileField(
+        upload_to="project_documents/",
+        blank=True,
+        null=True,
+        verbose_name="Business Plan",
+        validators=[
+            FileExtensionValidator(allowed_extensions=["pdf", "docx", "ppt", "pptx"])
+        ],
+    )
+    category = models.ForeignKey(
+        "ProjectCategory",
+        related_name="projects",
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Categorie du projet",
+    )
+    goal = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        help_text="Budget estimé en GNF",
+        verbose_name="Objectif du projet (Budget)",
+    )
+
+    location = models.CharField(
+        max_length=255, help_text="Localisation du projet", verbose_name="Localisation"
+    )
+    currency = models.CharField(
+        max_length=3,
+        choices=CURRENCY_CHOICES,
+        default="GNF",
+        verbose_name="Monnaie",
+        help_text="Sélectionnez la monnaie pour le budget",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="submited",
+        verbose_name="Statut du projet",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Date de création"
+    )
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de mise à jour")
+    image = models.ImageField(
+        upload_to="project_images/",
+        blank=True,
+        null=True,
+        verbose_name="Image du projet",
+    )
+
+    is_approved = models.BooleanField(
+        default=False, verbose_name="Validé ?", help_text="Indique si le projet est approuvé pour publication"
+    )
+    
+    # approved_at = models.DateTimeField(
+    #     null=True,
+    #     blank=True,
+    #     verbose_name="Date d'approbation",
+    #     help_text="Date à laquelle le projet a été validé",
+    # )
+    def __str__(self):
+        return self.title
+
+
+    @property
+    def converted_budget(self):
+        """Convertit le budget en monnaie locale (GNF) si une autre monnaie est utilisée."""
+        self.budget = self.goal * self.exchange_rate
+        return self.budget
+
+    @property
+    def investors_count(self):
+        # Remplacez par la logique appropriée
+        return self.investors.all().count() if hasattr(self, "investors") else 0
+    
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "owner", "title"], name="unique_project"
+            )
+        ]
+
+#Projets reformurlés par le cabinet
+
+
+class ValidatedProject(models.Model):
+
+    CURRENCY_CHOICES = [
+        ("GNF", "GNF - Franc guinéen"),
+        ("USD", "USD - Dollar américain"),
+        ("EUR", "EUR - Euro"),
+        ("XOF", "XOF - Franc CFA"),
+    ]
+    uid = models.UUIDField(
+    default=uuid.uuid4,
+    editable=False,
+    unique=True,
+    verbose_name="Identifiant unique",
+        )
+    project = models.OneToOneField(
+        "Project", on_delete=models.CASCADE, related_name="validated_project", verbose_name="Projet soumis"
+    )
+    
+    title = models.CharField(
+        max_length=255, verbose_name="Titre reformulé", help_text="Titre final du projet présenté aux investisseurs"
+    )
+    
+    description = models.TextField(
+    max_length=1000,
+    verbose_name="Description résumé",
+    default="Description du projet",
+    )
+    
+    context = models.TextField(
+        verbose_name="Contexte", help_text="Description générale du contexte du projet"
+    )
+    
+    summary = models.TextField(
+        verbose_name="Résumé", help_text="Résumé succinct du projet"
+    )
+    
+    problem_statement = models.TextField(
+        verbose_name="Problématique", help_text="Décrivez le problème que le projet vise à résoudre"
+    )
+    
+    general_objective = models.TextField(
+        verbose_name="Objectif général", help_text="Objectif principal que le projet vise à atteindre"
+    )
+    
+    specific_objectives = models.TextField(
+        verbose_name="Objectifs spécifiques", help_text="Liste des objectifs spécifiques du projet"
+    )
+    
+    deliverables = models.TextField(
+        verbose_name="Livrables", help_text="Ce que le projet produira (produits, services, résultats mesurables)"
+    )
+    
+    target_audience = models.TextField(
+        verbose_name="Public cible", help_text="Décrivez les bénéficiaires ou utilisateurs finaux"
+    )
+    
+    key_partners = models.TextField(
+        verbose_name="Partenaires clés", blank=True, null=True, help_text="Liste des partenaires du projet"
+    )
+    
+    additional_details = models.TextField(
+        verbose_name="Informations supplémentaires", blank=True, null=True, help_text="Autres détails pertinents"
+    )
+    
+    
+    category = models.ForeignKey(
+        "ProjectCategory",
+        related_name="validated_project",
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Categorie du projet",
+    )
+    goal = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        help_text="Budget estimé en GNF",
+        verbose_name="Objectif du projet (Budget)",
+        null=True, blank=True
+    )
+    
+    current_funding = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        help_text="Montant financé en GNF",
+        verbose_name="Montant financé",
+    )
+    
+    location = models.CharField(
+        max_length=255, help_text="Localisation du projet", verbose_name="Localisation"
+    )
+    currency = models.CharField(
+        max_length=3,
+        choices=CURRENCY_CHOICES,
+        default="GNF",
+        verbose_name="Monnaie",
+        help_text="Sélectionnez la monnaie pour le budget",
+    )
+
+    
+    documents = models.FileField(
+        upload_to="validated_project_docs/",
+        blank=True,
+        null=True,
+        verbose_name="Documents associés",
+        help_text="Documents validés (business plan, présentation, etc.)",
+    )
+    
+    reformulated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Validé par",
+        help_text="L'utilisateur ou l'administrateur ayant validé et reformulé le projet",
+    )
+    
+    image = models.ImageField(
+        upload_to="project_reformulated_images/",
+        blank=True,
+        null=True,
+        verbose_name="Image de couverture du projet",
+    )
+    
+    is_approved = models.BooleanField(
+        default=False, verbose_name="Validé ?", help_text="Indique si le projet est approuvé pour publication"
+    )
+    
+    approved_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date d'approbation",
+        help_text="Date à laquelle le projet a été validé",
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de mise à jour")
+
+    def __str__(self):
+        return self.title
+    
+    @property
+    def progress(self):
+        """Calcule le pourcentage d'évolution du financement."""
+        if not self.goal or not self.current_funding:  # Vérifie si goal ou current_funding est None ou égal à 0
+            return 0
+        return (self.current_funding / self.goal) * 100
+
+
+class Contact(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Nom")
+    email = models.EmailField(verbose_name="Email")
+    phone = models.CharField(max_length=20, verbose_name="Téléphone", blank=True, null=True)
+    subject = models.CharField(max_length=255, verbose_name="Sujet")
+    message = models.TextField(verbose_name="Message")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+
+    def __str__(self):
+        return f"Message de {self.name} - {self.subject}"
+
+from django.shortcuts import render, redirect, get_object_or_404
+from app.models import Project, ValidatedProject
+
+from django.utils import timezone
+from django.contrib import messages
+from .forms import ValidatedProjectForm
+from django.views.decorators.http import require_POST
+from app.utils.mailing import send_report_mail_on_project
+from .models import ProjectCategory
+
+def detail_project(request,uid):
+    project = get_object_or_404(Project, uid=uid)
+    return render(request,"app/project/detail.html", {'project':project})
+
+
+def reformulate_project(request, uid):
+    project = get_object_or_404(Project, uid=uid)
+    validated_project, created = ValidatedProject.objects.get_or_create(project=project)
+
+    if request.method == "POST":
+        form = ValidatedProjectForm(request.POST, request.FILES, instance=validated_project)
+        if form.is_valid():
+            validated_project = form.save(commit=False)
+            validated_project.reformulated_by = request.user
+            # validated_project.approved_at = timezone.now() if validated_project.is_approved else None
+            validated_project.save()
+            project.status = "reformulated"
+            project.save()
+            
+            html_path = "app/mailing/reformulated_project_mail.html"
+            subject = "Recommandation – Reformulation de votre projet"
+            user = project.user
+            context = {
+                "Nom":project.owner.first_name,
+                "titre_du_projet":project.title
+            }
+            #envoie du mail
+            send_report_mail_on_project(user,subject,html_path,context)
+            messages.success(request,f"le projet {project.title} a été reformulé avec succès")
+            messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informé de l'état actuel de son projet")
+            return redirect("cabinet-incoming")
+        else:
+            messages.error(request, f"Veuillez corriger les erreurs du formulaire. {form.errors}")
+    else:
+        form = ValidatedProjectForm(instance=validated_project)
+
+    context = {"form": form, "project": project}
+    return render(request, "app/project/reformulate.html", context)
+
+
+
+# def reject_project(request):
+#     pass
+
+
+
+def accepte_project(request, uid):
+    project = get_object_or_404(Project, uid=uid)
+    project.status = "accepted"
+    project.save()
+    
+    # Création du contexte à passer au template
+    context = {
+        'Nom': project.owner.first_name,  # Le nom de l'utilisateur (si vous avez un champ first_name dans User)
+        'Titre': project.title,  # Le titre du projet
+    }
+    
+    html_path = "app/mailing/accept_project_mail.html"
+    subject = f"Acceptation du projet {project.title}"
+    user = project.user
+
+    # Envoi du mail avec le contexte
+    send_report_mail_on_project(user, subject, html_path, context)
+
+    messages.success(request, f"Le projet {project.title} a été accepté avec succès.")
+    messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informer de l'état actuel de son projet.")
+    
+    return redirect('cabinet-incoming')
+@require_POST
+def publish_project(request, uid):
+    # Récupérer le projet et sa validation associée
+    project = get_object_or_404(Project, uid=uid)
+    validated_project = get_object_or_404(ValidatedProject, project=project)
+    # Vérifier si la case "is_published" a été cochée
+    is_published = request.POST.get("is_published") == "on"
+
+    if validated_project.is_approved != is_published:  # Vérifier si un changement est nécessaire
+        validated_project.is_approved = is_published
+        if is_published:
+            project.status = "published"  # Mettre à jour le statut du projet
+            project.approved_at = timezone.now()
+            #envoie du mail
+            html_path = "app/mailing/published_project_mail.html"
+            subject = "Votre projet est publié"
+            user = project.user
+            context = {
+                "Nom":project.owner.first_name,
+                "titre_du_projet":project.title
+            }
+            send_report_mail_on_project(user,subject,html_path,context)
+            messages.success(request, f"Le projet '{project.title}' a été publié avec succès.")
+            messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informé de l'état actuel de son projet")
+        else:
+            project.status = "reformulated"  # Rétablir un statut neutre
+            messages.warning(request, f"La publication du projet '{project.title}' a été annulée.")
+        
+        # Sauvegarder les modifications
+        validated_project.save()
+        project.save()
+    else:
+        messages.info(request, "Aucune modification n'a été effectuée.")
+
+    # Redirection vers la page des projets validés
+    return redirect("cabinet-validated")
+
+
+
+def reject_project(request, uid):
+    project = get_object_or_404(Project, uid=uid)
+
+    # Si la requête est en POST, récupérer la raison
+    if request.method == 'POST':
+        raison = request.POST.get('reason', '')
+        
+        # Mettre à jour le statut du projet à "rejeté"
+        project.status = "rejected"
+        project.save()
+
+        # Créer le contexte pour l'email
+        context = {
+            'Nom': project.owner.first_name,
+            'Titre_du_projet': project.title,
+            'raison': raison,  # Passer la raison du rejet
+        }
+
+        # Envoi du mail
+        html_path = "app/mailing/rejected_project_mail.html"
+        subject = f"Rejet du projet {project.title}"
+        user = project.user
+        
+        send_report_mail_on_project(user, subject, html_path, context)
+
+        # Message de succès pour l'interface utilisateur
+        messages.success(request, f"Le projet '{project.title}' a été rejeté avec succès.")
+        messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet.")
+
+        return redirect('cabinet-incoming')
+    
+    # Si ce n'est pas une requête POST, on redirige
+    return redirect('cabinet-incoming')
+
+
+def add_category(request):
+    if request.method == "POST":
+        category_name = request.POST.get("name")
+        if category_name:
+            category, created = ProjectCategory.objects.get_or_create(name=category_name)
+            if created:
+                messages.success(request, f"La catégorie '{category_name}' a été ajoutée avec succès.")
+            else:
+                messages.info(request, f"La catégorie '{category_name}' existe déjà.")
+        else:
+            messages.error(request, "Veuillez entrer un nom valide pour la catégorie.")
+
+        # Retourner à la page précédente avec les données du formulaire précédemment saisies
+        referer = request.META.get('HTTP_REFERER', '/')
+        return redirect(referer)
+    else:
+        return redirect("reformulate_project")
+
+from django.test import TestCase
+
+# Create your tests here.
+
+from django.urls import path
+from app import views, project_editing_view
+
+name="app"
+urlpatterns = [
+    path('', views.index, name="home"),
+    path('project/submision/',views.project_submision, name="project-submision"),
+    path('project/cabinet/home/',views.cabinet_home, name="cabinet-home"),
+    path('project/cabinet/incoming/',views.incoming, name="cabinet-incoming"),
+    path('project/cabinet/validated/',views.validated, name="cabinet-validated"),
+    # path('project/cabinet/rejected/',views.rejected, name="cabinet-rejected"),
+    path('project/cabinet/detail/<uid>/', project_editing_view.detail_project, name="project_cabinet_details"),
+    path('project/cabinet/accepte/<uid>/', project_editing_view.accepte_project, name="cabinet-accepte-project"),
+    path('project/cabinet/reject/<uid>/', project_editing_view.reject_project, name="cabinet-reject-project"),
+    path('project/cabinet/publish/<uid>/', project_editing_view.publish_project, name="cabinet-publishp-roject"),
+    path("project/<uuid:uid>/reformulate/", project_editing_view.reformulate_project, name="reformulate_project"),
+    path("project/detail/<int:id>/",views.detail_project, name="detail-project"),
+    path("add-category/",project_editing_view.add_category, name="add_category"),
+    path("mysapce/",views.user_space, name="my-space"),
+    path("myspace/detail/<int:project_id>/",views.project_detail, name="my-project-detail"),
+    path("cabinet/project/<int:project_id>/", views.cabinet_project_detail, name="cabinet-project-detail"),
+    path("contact/",views.contact_view, name="contact"),
+
+]
+
+from django.shortcuts import render, redirect, get_object_or_404
+from app.forms import ProjectSubmissionForm
+from app.forms import PorteurProjectForm
+from .forms import ContactForm
+from django.contrib import messages
+from app.models import PorteurProject, Project, ValidatedProject, ProjectCategory
+from django.contrib.auth.decorators import login_required
+from app.utils.mailing import send_success_submision_project_mail,send_report_mail_to_superusers
+from django.core.paginator import Paginator
+# Create your views here.
+from django.http import Http404
+
+
+def index(request):
+    # Filtrer uniquement les projets approuvés
+    projects = ValidatedProject.objects.filter(is_approved=True).order_by("-updated_at")
+    
+    # Récupérer les catégories et les régions depuis la base de données
+    categories = ProjectCategory.objects.all()
+    regions = projects.values_list('location', flat=True).distinct()
+
+    # Pagination
+    paginator = Paginator(projects, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "page_obj": page_obj,
+        "categories": categories,
+        "regions": regions,
+    }
+    return render(request, "app/home/index.html", context)
+
+
+@login_required(login_url="auth:login")
+def project_submision(request):
+    # Initionalisation des informations du porteur de projet par le profile de celui qui est connecté
+    initial_data = {}
+
+    if hasattr(request.user, 'physical_person') and request.user.physical_person:
+        initial_data = {
+            "first_name": request.user.physical_person.first_name,
+            "last_name": request.user.physical_person.last_name,
+            "phone": request.user.physical_person.telephone,
+            "adress": request.user.physical_person.adresse,
+            "birthday": request.user.physical_person.birthday,
+            "photo": request.user.physical_person.photo,
+        }
+    elif hasattr(request.user, 'moral_person') and request.user.moral_person:
+        initial_data = {
+            "first_name": request.user.moral_person.company_name,
+            "phone": request.user.moral_person.telephone,
+            "adress": request.user.moral_person.adresse,
+            "photo": request.user.moral_person.logo,
+            "birthday": request.user.moral_person.rccm,
+        }
+    else:
+        messages.info(request,"Vous êtes probablement un simple super admin, alors votre espace personnel c'est votre administration ")
+    
+    if request.method == "POST":
+        # Récupération des données soumises par l'utilisateur
+        form_project = ProjectSubmissionForm(request.POST, request.FILES)
+        form_owner = PorteurProjectForm(request.POST, initial=initial_data)
+
+        # Validation des deux formulaires
+        if form_project.is_valid() and form_owner.is_valid():
+
+            if PorteurProject.objects.filter(**form_owner.cleaned_data).exists():
+                owner = PorteurProject.objects.filter(**form_owner.cleaned_data)[0]
+            else:
+                owner = form_owner.save()
+                
+            project = form_project.save(commit=False)
+            project.owner = owner  # Lier le projet au porteur de projet
+            project.user = (
+                request.user
+            )  # Associer l'utilisateur connecté à l'instance du projet
+            project.save()
+
+            messages.success(
+                request,
+                "Votre soumission du projet a bien été effectué, veuillez consulter votre mail pour plus de détails",
+            )
+            con = {
+                "Nom":owner.first_name,
+                "titre_du_projet":project.title
+            }
+            send_success_submision_project_mail(request.user,context=con)
+            # ici je dois encore implementer l'envoie de mail de succès pour la soumission du projet
+            # Redirection ou message de succès après la soumission
+            return redirect("home")
+        else:
+            messages.error(
+                request,
+                f"Il y'a une erreur lors de la soumission de votre projet, veuillez respecter les normes des champs\n {form_owner.errors}\n ",
+            )
+    else:
+        # Affichage des formulaires pour la première fois
+        form_project = ProjectSubmissionForm()
+        form_owner = PorteurProjectForm(initial=initial_data)
+
+    context = {
+        "form_project": form_project,
+        "form_owner": form_owner,
+    }
+    return render(request, "app/project/submision.html", context)
+
+def cabinet_home(request):
+    context = {}
+    return render(request,"app/project/salon.html",context)
+
+
+def incoming(request):
+    # Filtrer les projets soumis ou en cours de validation
+    projets = Project.objects.filter(status__in=["submited","accepted","rejected"]).order_by("-updated_at")
+    # projets = Project.objects.filter(status="submited")
+    context = {
+        'projets': projets,
+    }
+    return render(request, 'app/project/incoming.html', context)
+
+
+def validated(request):
+    # Filtrer les projets dont le status n'est ni "submited" ni "rejected"
+    projets = Project.objects.exclude(status__in=["submited", "rejected","accepted"]).order_by("-updated_at")
+
+    context = {
+        "projets": projets,
+    }
+    return render(request,'app/project/validated.html', context)
+
+
+def detail_project(request,id):
+    project = get_object_or_404(ValidatedProject,id=id)
+    context = {
+        'validate_project':project
+    }
+    
+    return render(request,"app/home/details_project.html",context)
+
+#Espace soumetteur de projet
+
+@login_required
+def user_space(request):
+    projects = Project.objects.filter(user=request.user).select_related("owner", "category").order_by("-updated_at")
+
+    # Calculs des statistiques
+    completed_projects = projects.filter(status="completed").count()
+    ongoing_projects = projects.filter(status="published").count()
+    total_investors = sum(project.investors_count for project in projects)  # À adapter selon votre modèle.
+
+    context = {
+        "projects": projects,
+        "completed_projects": completed_projects,
+        "ongoing_projects": ongoing_projects,
+        "total_investors": total_investors,
+    }
+    return render(request, "app/space/user_space_1.html", context)
+
+
+@login_required
+def project_detail(request, project_id):
+    project = get_object_or_404(Project, id=project_id, user=request.user)
+    
+    # Récupérer les autres projets de l'utilisateur
+    other_projects = Project.objects.filter(user=request.user).exclude(id=project_id).order_by("-updated_at")
+
+    context = {
+        'project': project,
+        'other_projects': other_projects,
+    }
+    return render(request, 'app/space/project_detail.html', context)
+
+
+@login_required
+def cabinet_project_detail(request, project_id):
+    # Récupérer le projet correspondant à l'ID
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Vérifier si le projet est publié
+    if project.status != "published":
+        raise Http404("Les détails du cabinet ne sont disponibles que pour les projets publiés.")
+    
+    # Récupérer les informations du projet validé
+    validated_project = ValidatedProject.objects.filter(project=project).first()
+    
+    # Passer les données au contexte
+    context = {
+        "project": validated_project,
+        "validated_project": validated_project,
+    }
+
+    return render(request, "app/space/cabinet_project_detail.html", context)
+
+
+#Nous contacter
+
+def contact_us(request):
+    
+    return render(request,"app/contact/contact.html")
+
+
+
+
+def contact_view(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            contact = form.save()
+            
+            # Envoyer un email aux super utilisateurs
+            html_path = "app/mailing/contact_notification.html"
+            subject = "Nouveau message de contact soumis"
+            context = {
+                'name': contact.name,
+                'email': contact.email,
+                'phone': contact.phone,
+                'subject': contact.subject,
+                'message': contact.message,
+            }
+            send_report_mail_to_superusers(subject, html_path, context)
+
+            messages.success(request, "Votre message a été envoyé avec succès !")
+            return redirect('contact')
+    
+    form = ContactForm()
+    print(f"=========={form}============")
+    return render(request, 'app/contact/contact.html', {'form': form})
+
+
+"""
+ASGI config for config project.
+
+It exposes the ASGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
+"""
+
+import os
+
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+
+application = get_asgi_application()
+
+"""
+Django settings for config project.
+
+Generated by 'django-admin startproject' using Django 5.1.3.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/5.1/topics/settings/
+
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/5.1/ref/settings/
+"""
+
+from pathlib import Path
+
+from django.contrib.messages import constants as messages
+import os
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+AUTH_USER_MODEL = "users.User"
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-z2iuwmqjaf=2%pt5mzqle)p$-&-066d6&y!gdiq884=$!0)kx&'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = ['192.168.1.139','localhost','127.0.0.1','192.168.181.40']
+
+
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'app',
+    'users',
+    'investors',
+
+
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'config.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'config.wsgi.application'
+
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+# Internationalization
+# https://docs.djangoproject.com/en/5.1/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Configuration CKEditor (optionnel)
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+    },
+}
+
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+#Email Sending configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'etiro2005@gmail.com'
+EMAIL_HOST_PASSWORD = 'mily hlmt vbzi ymfd'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DOMAIN_URL = "127.0.0.1:8000" #un domaine de developpement que je dois changer en production
+
+
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',  # Map Django `error` to Bootstrap `danger`
+}
+
+"""
+URL configuration for config project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.1/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path("",include('app.urls')),
+    path("auth/",include('users.urls')),
+
+]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+    )
+
+"""
+WSGI config for config project.
+
+It exposes the WSGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
+"""
+
+import os
+
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+
+application = get_wsgi_application()
+
+
+from django.contrib import admin
+
+# Register your models here.
+
+from django.apps import AppConfig
+
+
+class InvestorsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'investors'
+
+import random
+import string
+from django.db import models
+from django.conf import settings
+from app.models import ProjectCategory
+
+class Investor(models.Model):
+    def generate_investor_id():
+        """Génération d'un identifiant unique de 6 caractères (4 lettres et 2 chiffres)."""
+        letters = ''.join(random.choices(string.ascii_uppercase, k=4))
+        digits = ''.join(random.choices(string.digits, k=2))
+        return f"{letters}{digits}"
+
+    # Identifiant unique de l'investisseur
+    investor_id = models.CharField(
+        max_length=6,
+        unique=True,
+        default=generate_investor_id,
+        verbose_name="Identifiant Investisseur"
+    )
+
+    # Association avec un utilisateur existant
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="investor",
+        verbose_name="Utilisateur"
+    )
+
+    # Identité de l'investisseur (au cas où l'investisseur decide d'avoir des informations
+    # d'iinvestissement différentes de celles de son profile ordinaire)
+    first_name = models.CharField(max_length=255, verbose_name="Prénom")
+    last_name = models.CharField(max_length=255, verbose_name="Nom")
+    email = models.EmailField(verbose_name="Email", help_text="Adresse email de l'investisseur")
+    phone = models.CharField(max_length=20, verbose_name="Numéro de téléphone")
+    address = models.TextField(verbose_name="Adresse postale")
+    
+    # Informations financières
+    available_budget = models.DecimalField(
+        max_digits=15, 
+        decimal_places=2, 
+        verbose_name="Budget disponible", 
+        help_text="Montant que l'investisseur est prêt à investir (ex. 10,000 GNF)"
+    )
+    
+
+    # Préférences d'investissement
+    preferred_sectors = models.ManyToManyField(
+        ProjectCategory,
+        blank=True,
+        related_name="interested_investors",
+        verbose_name="Secteurs d'intérêt"
+    )
+
+    preferred_currency = models.CharField(
+        max_length=3,
+        choices=[
+            ("GNF", "GNF - Franc guinéen"),
+            ("USD", "USD - Dollar américain"),
+            ("EUR", "EUR - Euro"),
+        ],
+        default="GNF",
+        verbose_name="Monnaie préférée"
+    )
+    
+    minimum_investment = models.DecimalField(
+        max_digits=15, 
+        decimal_places=2, 
+        default=0,
+        verbose_name="Montant minimal d'investissement",
+        help_text="Seuil minimum que l'investisseur est prêt à investir"
+    )
+    
+    maximum_investment = models.DecimalField(
+        max_digits=15, 
+        decimal_places=2, 
+        default=0,
+        verbose_name="Montant maximal d'investissement",
+        help_text="Seuil maximum que l'investisseur est prêt à investir"
+    )
+    
+    investment_type = models.CharField(
+        max_length=50,
+        choices=[
+            ("short_term", "Projets à court terme"),
+            ("long_term", "Projets à long terme"),
+            ("innovation", "Innovation et technologie"),
+        ],
+        default="long_term",
+        verbose_name="Type de projets recherchés"
+    )
+
+    # Informations supplémentaires
+    # source_of_funds = models.CharField(
+    #     max_length=255,
+    #     blank=True,
+    #     verbose_name="Source des fonds",
+    #     help_text="Origine de vos fond fonds (ex. revenus personnels, entreprise, etc.)"
+    # )
+    # company_name = models.CharField(
+    #     max_length=255,
+    #     blank=True,
+    #     verbose_name="Nom de l'entreprise",
+    #     help_text="Si applicable, le nom de l'entité représentée par l'investisseur"
+    # )
+    expertise_domain = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Domaine d'expertise",
+        help_text="Domaine professionnel ou secteur de l'investisseur"
+    )
+    
+    investment_experience = models.CharField(
+        max_length=20,
+        choices=[
+            ("beginner", "Débutant"),
+            ("intermediate", "Intermédiaire"),
+            ("expert", "Expert"),
+        ],
+        default="beginner",
+        verbose_name="Expérience en investissement"
+    )
+
+    # Champs automatiques
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date d'inscription")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Dernière mise à jour")
+
+    def __str__(self):
+        return f"{self.investor_id} - {self.full_name}"
+
+    class Meta:
+        verbose_name = "Investisseur"
+        verbose_name_plural = "Investisseurs"
+
+from django.test import TestCase
+
+# Create your tests here.
+
+from django.shortcuts import render
+
+# Create your views here.
+
+
+from django.template import Library
+
+register = Library()
+
+
+# un filtre personnalisé pour vidé les champs invalides en maintenir les champs valide en cas de ValidationError
+def default_if_none(value):
+    return value if value else ''
+
+register.filter('default_if_none', default_if_none)
+
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+
+
+# def send_activation_email(user):
+#     subject = "Activation de votre compte"
+#     uid = urlsafe_base64_encode(force_bytes(user.id))
+#     token = default_token_generator.make_token(user)
+#     message = render_to_string(
+#         'registration/activation_email.html', {
+#             'user': user,
+#             'uid': uid,
+#             'token': token,
+#             'domain': settings.DOMAIN_URL
+#         }
+#     )
+    
+#     send_mail(
+#         subject, message,
+#         'etiennedheleine2000@gmail.com',
+#         [user.email],
+#         fail_silently=True
+#     )
+#     return True
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+from django.urls import reverse
+
+def send_activation_email(user):
+
+        # Générer les variables nécessaires
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        activation_link = f"http://{settings.DOMAIN_URL}{reverse('auth:confirm_user_activation', kwargs={'uid': uid, 'token': token})}"
+
+        # Préparer le contexte pour le template
+        context = {
+            "user": user,
+            "domain": settings.DOMAIN_URL,
+            "uid": uid,
+            "token": token,
+            "activation_link": activation_link,
+        }
+
+        # Charger le sujet et le message HTML
+        subject = "Activation de votre compte"
+        html_message = render_to_string("registration/activation_email.html", context)
+
+        # Ajouter un fallback en texte brut
+        plain_message = (
+            f"Bonjour {user.first_name},\n\n"
+            f"Veuillez cliquer sur le lien suivant pour activer votre compte : {activation_link}\n"
+        )
+
+        # Envoi de l'email
+        send_mail(
+            subject,
+            plain_message,  # Message texte brut pour fallback
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=False,
+            html_message=html_message,  # Contenu HTML
+        )
+        
+        
+        
+
+def send_password_reset_mail(user):
+        # Générer les variables nécessaires
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        reset_link = f"http://{settings.DOMAIN_URL}{reverse('auth:reset_password', kwargs={'uid': uid, 'token': token})}"
+
+        # Préparer le contexte pour le template
+        context = {
+            "user": user,
+            "domain": settings.DOMAIN_URL,
+            "uid": uid,
+            "token": token,
+            "activation_link": reset_link,
+        }
+
+        # Charger le sujet et le message HTML
+        subject = "Réinitialisation de mot de passe"
+        html_message = render_to_string("registration/reset_password_email.html", context)
+
+      
+        # Envoi de l'email
+        send_mail(
+            subject,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=True,
+            html_message=html_message,  # Contenu HTML
+        )
+        
+    
+
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .models import User, PhysicalPerson, MoralPerson
+
+
+@admin.register(User)
+class UserAdmin(UserAdmin):
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
+    )
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("email", "password1", "password2", "is_staff", "is_active"),
+        }),
+    )
+    list_display = ("email", "is_staff", "is_active", "is_superuser")
+    search_fields = ("email",)
+    ordering = ("email",)
+    
+    
+@admin.register(PhysicalPerson)
+class PhysicalPersonAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'telephone', 'user')
+
+@admin.register(MoralPerson)
+class MoralPersonAdmin(admin.ModelAdmin):
+    list_display = ('company_name', 'telephone', 'user')
+
+from django.apps import AppConfig
+
+
+class UsersConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'users'
+
+from django.contrib.auth.backends import ModelBackend
+
+from users.models import User
+
+
+class CustomAuthentication(ModelBackend):
+    def authenticate(self, request, username, password):
+        try:
+            user = User.objects.get(email=username)
+        except User.DoesNotExist:
+            return None
+        if user.check_password(password):
+            request.user = user
+            return user
+        return None
+
+from django import forms
+from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
+
+from .models import User
+from .utils.mailing import send_activation_email
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        user = authenticate(
+            self.request, username=username, password=password
+        )
+        if user is None:
+            raise ValidationError(
+                "Email ou Mot de passe incorrect."
+            )
+        if not user.is_active:
+            send_activation_email(user)
+            raise ValidationError(
+                ("Votre compte n'est pas actif, consulter votre boite "
+                    "email pour activer votre compte")
+            )
+        return self.cleaned_data
+
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True,
+        help_text="Requis. Entrez une adresse email valide."
+    )
+
+    class Meta:
+        model = User
+        fields = ('email','password1', 'password2')
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("Cette adresse email existe deja.")
+        return email
+
+from django import forms
+from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
+
+from .models import User
+from .utils.mailing import send_activation_email
+from .models import PhysicalPerson, MoralPerson
+
+class CustomAuthenticationForm(forms.Form):
+    # Remplacer 'username' par 'email' pour correspondre à votre modèle
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez votre email',
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez votre mot de passe',
+        })
+    )
+
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True,
+        help_text="Requis. Entrez une adresse email valide."
+    )
+
+    class Meta:
+        model = User
+        fields = ('email','password1', 'password2')
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("Cette adresse email existe deja.")
+        return email
+
+
+
+class PhysicalPersonForm(forms.ModelForm):
+    class Meta:
+        model = PhysicalPerson
+        fields = ['first_name', 'last_name', 'telephone', 'adresse', 'birthday', 'id_card', 'photo']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'birthday': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'id_card': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+
+    def clean_telephone(self):
+        telephone = self.cleaned_data.get('telephone')
+        if not telephone.isdigit():
+            raise ValidationError("Le numéro de téléphone doit contenir uniquement des chiffres.")
+        if len(telephone) < 8 or len(telephone) > 15:
+            raise ValidationError("Le numéro de téléphone doit contenir entre 8 et 15 chiffres.")
+        return telephone
+
+
+class MoralPersonForm(forms.ModelForm):
+    class Meta:
+        model = MoralPerson
+        fields = ['company_name', 'telephone', 'adresse', 'rccm', 'logo']
+        widgets = {
+            'company_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'rccm': forms.TextInput(attrs={'class': 'form-control'}),
+            'logo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+
+    def clean_rccm(self):
+        rccm = self.cleaned_data.get('rccm')
+        if len(rccm) < 5:
+            raise ValidationError("Le RCCM doit contenir au moins 5 caractères.")
+        return rccm
+
+from django.contrib.auth.models import BaseUserManager
+
+
+class UserManager(BaseUserManager):
+    #en creant un utilisateur, il faudrait que je n'oublie pas de passer son rol en parametrre de create_user
+    def create_user(self, email, password=None,**extra_fields):
+
+        if not email:
+            raise ValueError('L\'adresse email doit être renseignée.')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.is_active = False #je le desactive jusqu'à ce qu'il valide son mail
+        user.save(using=self._db)
+        
+    #creating profile with different roles 
+        # from .models import PhysicalPerson, MoralPerson
+        # if role == 'PHYSICAL':
+        #     PhysicalPerson.objects.create(user=user)
+        # elif role == 'MORAL':
+        #     MoralPerson.objects.create(user=user)
+        
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(email, password, **extra_fields)
+
+from django.contrib.auth.models import AbstractUser
+from .managers import UserManager
+from django.utils import timezone
+from django.conf import settings
+
+ROLE_CHOICES = [
+        ('PHYSICAL', 'Personne Physique'),
+        ('MORAL', 'Personne Morale'),
+        ('INVESTOR', 'Investisseur'),
+        ('ADMIN', 'Administrateur'),
+    ]
+
+class User(AbstractUser):
+    first_name = None
+    last_name = None
+    username = None
+    email = models.EmailField(unique=True, max_length=255, verbose_name="email address")
+
+  
+    objects = UserManager()
+
+    EMAIL_FIELD = "email"
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return self.email
+
+
+class MoralPerson(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="moral_person")
+    company_name = models.CharField(max_length=255)
+    telephone = models.CharField(max_length=15)
+    adresse = models.TextField()
+    rccm = models.CharField(max_length=100, unique=True, blank=True, null=True) 
+    logo = models.ImageField(upload_to="company_logos/")
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='PHYSICAL')
+
+    def __str__(self):
+        return self.company_name
+
+
+class PhysicalPerson(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="physical_person")
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    telephone = models.CharField(max_length=15)
+    adresse = models.TextField()
+    birthday = models.DateField()
+    id_card = models.ImageField(upload_to="id_cards/")
+    photo = models.ImageField(upload_to="profile_photos/")
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+from django.test import TestCase
+
+# Create your tests here.
+
+import smtplib
+
+try:
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.set_debuglevel(1)  # Active les logs détaillés SMTP
+    server.local_hostname = "localhost"  # Définir un nom d'hôte valide
+    server.starttls()
+    server.login("etiro2005@gmail.com", "votre_mot_de_passe_d_application")
+    server.sendmail(
+        "etiro2005@gmail.com",  # Expéditeur
+        "etiennedheleine2000@gmail.com",  # Destinataire
+        "Subject: Test Email\n\nCeci est un test direct via smtplib."
+    )
+    server.quit()
+    print("Email envoyé avec succès via smtplib !")
+except Exception as e:
+    print(f"Erreur SMTP : {e}")
+
+from django.urls import path, include
+from users.views import login_view
+from users.views import reset_password
+
+from users.views import CustomUserCreationView
+from users.views import ActivationUserView
+from users.views import profile_view
+from users.views import LogoutView
+from users.views import complete_profile
+
+
+app_name="auth"
+
+urlpatterns = [
+    path('profile', profile_view, name='profile_user'),
+    path('login/', login_view, name='login'),
+    path('create/', CustomUserCreationView.as_view(), name='register'),
+    path('activation/<uid>/<token>', ActivationUserView.as_view(), name='confirm_user_activation'),
+    path('activation/<uid>/<token>', reset_password, name='reset_password'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('complete-profile/<uid>/', complete_profile, name='complete_profile'),
+    path('', include('django.contrib.auth.urls')),
+]
+
+
+from django.contrib.auth.views import LoginView
+from django.views.generic.edit import CreateView, View
+from django.views.generic import ListView
+from django.urls import reverse_lazy, reverse
+from django.shortcuts import redirect, render, get_object_or_404
+from django.utils.http import urlsafe_base64_decode
+from django.contrib import messages
+from django.db import transaction
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import logout
+from .forms import CustomAuthenticationForm
+from .forms import CustomUserCreationForm
+from users.models import User, PhysicalPerson, MoralPerson
+from .utils.mailing import send_activation_email, send_password_reset_mail
+from django.contrib.auth.decorators import login_required
+from .forms import (
+    PhysicalPersonForm,
+    MoralPersonForm,
+    PhysicalPersonForm,
+    MoralPersonForm,
+)
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+# class CustomLoginView(LoginView):
+#     authentication_form = CustomAuthenticationForm
+
+
+def login_view(request):
+    if request.method == "POST":
+        form = CustomAuthenticationForm(request.POST)
+        if form.is_valid():
+            clean_data = form.cleaned_data
+            user = authenticate(
+                request, email=clean_data["email"], password=clean_data["password"]
+            )
+            if user:
+                login(request, user)
+
+                messages.success(
+                    request, f"Bienvenu, Vous êtes connecté en tant que {user.email}"
+                )
+                return redirect("home")
+            else:
+                messages.error(request, "Email ou mot de passe incorrecte")
+
+        else:
+            messages.error(request, "Veuillez à saisir les informations valides.")
+    else:
+        form = CustomAuthenticationForm()
+
+    return render(request, "registration/login.html", {"form": form})
+
+
+class LogoutView(View):
+    login_url = reverse_lazy("home")
+
+    def get(self, request):
+        logout(request)
+        messages.success(
+            self.request, "Vous êtes maintenant deconnecté de la Prices Capital"
+        )
+        return redirect(self.login_url)
+
+
+class CustomUserCreationView(CreateView):
+    template_name = "registration/register.html"
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy("auth:register")
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+            context ={}
+            send_activation_email(user)
+
+            messages.success(
+                self.request,
+                (
+                    "Un lien vous a été envoyé dans votre boite mail, veuillez le consulter pour continuer l'inscription"
+                ),
+            )
+            return redirect(self.success_url)
+
+
+class ActivationUserView(View):
+    def get(self, request, uid, token):
+        try:
+            id = urlsafe_base64_decode(uid).decode()  # Décoder correctement l'UID
+            user = User.objects.get(id=id)
+        except (User.DoesNotExist, ValueError):
+            return render(request, "registration/activation_invalid.html")
+
+        if default_token_generator.check_token(user, token):
+            if not user.is_active:
+                user.is_active = True
+                user.save()
+                messages.success(
+                    request,
+                    "Votre adresse email a été vérifiée. Veuillez compléter votre profil.",
+                )
+            else:
+                messages.error(
+                    request,
+                    "Ce compte est déjà vérifié, si vous n'aviez pas terminé l'inscription avant de sortir, vous pouvez vous connecté avec vos information pour continuer l'inscription dans votre profile",
+                )
+                return redirect("home")
+
+            # Créer l'URL de redirection avec l'uid en paramètre
+            complete_profile_url = reverse("auth:complete_profile", kwargs={"uid": uid})
+            return redirect(complete_profile_url)
+
+        return render(request, "registration/activation_invalid.html")
+
+
+def profile_view(request):
+    user = request.user
+
+    # Déterminez si l'utilisateur est une personne physique ou morale
+    if hasattr(user, "physical_person"):
+        form = PhysicalPersonForm(
+            request.POST or None, request.FILES or None, instance=user.physical_person
+        )
+    elif hasattr(user, "moral_person"):
+        form = MoralPersonForm(
+            request.POST or None, request.FILES or None, instance=user.moral_person
+        )
+    else:
+        messages.error(request, "Aucun profil associé à cet utilisateur.")
+        return redirect("home")
+
+    # Si le formulaire est soumis et valide
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Votre profil a été mis à jour avec succès.")
+        return redirect("auth:profile_user")
+
+    context = {"form": form, "user": user}
+    return render(request, "registration/user_profile.html", context)
+
+
+def complete_profile(request, uid):
+    try:
+        # Décoder l'UID et récupérer l'utilisateur
+        decoded_uid = urlsafe_base64_decode(uid).decode()
+        user = User.objects.get(id=decoded_uid)
+    except (ValueError, User.DoesNotExist):
+        messages.error(request, "Utilisateur invalide ou introuvable.")
+        return redirect("home")
+
+    if PhysicalPerson.objects.filter(user=user).exists():
+        messages.info(
+            request,
+            "Vous avez deja un profile en tant que Personne physique, si vous voulez le modifier, allez dans votre profile",
+        )
+        return redirect("home")
+
+    if MoralPerson.objects.filter(user=user).exists():
+        messages.info(
+            request,
+            "Vous avez deja un profile en tant que Personne Morale, si vous voulez le modifier, allez dans votre profile",
+        )
+        return redirect("home")
+
+    # Initialisation des formulaires
+
+    physical_form, moral_form = None, None
+    if request.method == "POST":
+        role = request.POST.get("role")  # Récupérer le rôle choisi
+        if role == "PHYSICAL":
+            physical_form = PhysicalPersonForm(request.POST, request.FILES)
+            if physical_form.is_valid():
+                physical_person = physical_form.save(commit=False)
+                physical_person.user = user
+                physical_person.save()
+                messages.success(
+                    request,
+                    "Votre profil a été complété avec succès, vous pouvez maintenant vous connecter.",
+                )
+                return redirect("auth:login")
+            else:
+                messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+        elif role == "MORAL":
+            moral_form = MoralPersonForm(request.POST, request.FILES)
+            if moral_form.is_valid():
+                moral_person = moral_form.save(commit=False)
+                moral_person.user = user
+                moral_person.save()
+                messages.success(
+                    request,
+                    "Votre profil a été complété avec succès, vous pouvez maintenant vous connecter.",
+                )
+                return redirect("auth:login")
+            else:
+                messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+        else:
+            messages.error(request, "Veuillez sélectionner un type de personne valide.")
+
+    # Réinitialisation des formulaires pour GET ou en cas d'erreur POST
+    if physical_form is None:
+        physical_form = PhysicalPersonForm()
+    if moral_form is None:
+        moral_form = MoralPersonForm()
+
+    # Passer les données au contexte
+    context = {
+        "physical_form": physical_form,
+        "moral_form": moral_form,
+        "uid": uid,  # Passer l'UID pour l'action des formulaires
+    }
+    return render(request, "registration/complete_profile.html", context)
+
+
+def check_reset_passord(request):
+    if request.method == "POST":
+        user_email = request.POST.get("email")
+        if not User.objects.filter(email=user_email).exists():
+            messages.error(request, "Aucun n'est associé à cette adresse email")
+        else:
+            user = get_object_or_404(User, email=user_email)
+            send_password_reset_mail(user)
+            messages.info(
+                request,
+                "Un mail vous a été envoyé avec un lien de reinitialisation de votre mot de passe,"
+                "veuillez le consulter pour continuer l'oppération",
+            )
+
+
+def reset_password(request):
+    pass
+
+
+#!/usr/bin/env python
+"""Django's command-line utility for administrative tasks."""
+import os
+import sys
+
+
+def main():
+    """Run administrative tasks."""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed and "
+            "available on your PYTHONPATH environment variable? Did you "
+            "forget to activate a virtual environment?"
+        ) from exc
+    execute_from_command_line(sys.argv)
+
+
+if __name__ == '__main__':
+    main()
+

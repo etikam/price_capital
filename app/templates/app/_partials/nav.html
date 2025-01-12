@@ -3,7 +3,7 @@
 <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
     <a href="{% url 'home' %}" class="navbar-brand p-0">
         <h1 class="text-primary">
-            <img class="me-3" src="{% static 'img/logo.png'%}"></i>Prices Capital
+            <img class="me-3" src="{% static 'img/logo.png'%}" alt="Logo"> Prices Capital
         </h1>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -14,53 +14,38 @@
             <a href="{% url 'home'%}" class="nav-item nav-link active">Accueil</a>
             <a href="{% url 'project-submision' %}" class="nav-item nav-link">Soumission</a>
             <a href="#" class="nav-item nav-link">Blog</a>
-            <a href="#" class="nav-item nav-link">Investissement</a>
+            <a href="{% url 'investor:check-investor-profile' %}" class="nav-item nav-link">Investissement</a>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link" data-bs-toggle="dropdown">
                     <span class="dropdown-toggle">Nos Services</span>
                 </a>
                 <div class="dropdown-menu m-0">
-                    <a href="feature.html" class="dropdown-item">Service1</a>
-                    <a href="feature.html" class="dropdown-item">Service2</a>
-                    <a href="feature.html" class="dropdown-item">Service3</a>
+                    <a href="#" class="dropdown-item">Prices Capital</a>
+                    <a href="#" class="dropdown-item">Prices Protect</a>
+                    {% comment %} <a href="feature.html" class="dropdown-item">Service3</a> {% endcomment %}
                 </div>
             </div>
-            <a href="#" class="nav-item nav-link">Nous contacter</a>
+            <a href="{% url 'contact' %}" class="nav-item nav-link">Nous contacter</a>
         </div>
 
         {% if user.is_authenticated %}
-            <!-- Lien vers "Mon Profil" avec une image miniature ou une icône de profil par défaut -->
-            
-            
-            {% if user.moral_person %}
-            {% if user.moral_person.logo %}
-            <a href="{% url 'auth:profile_user' %}" class="nav-item nav-link" title="Mon logo">
-                        <!-- Afficher l'image du profil si elle existe -->
+            <!-- Profil de l'utilisateur connecté -->
+            <div class="nav-item dropdown d-flex align-items-center ms-3">
+                {% if user.moral_person and user.moral_person.logo %}
+                    <a href="{% url 'auth:profile_user' %}" class="nav-link d-flex align-items-center" title="Mon logo">
                         <img src="{{ user.moral_person.logo.url }}" alt="Mon Logo" class="rounded-circle" style="width: 30px; height: 30px;">
-                        {% else %}
-                        <!-- Afficher une icône d'utilisateur si l'image de profil est manquante -->
-                        <i class="fas fa-user-circle" style="font-size: 30px;"></i>
-                    {% endif %}
-                {% endif %}
-            </a>
-
-
-            {% if user.physical_person %}
-                <a href="{% url 'auth:profile_user' %}" class="nav-item nav-link" title="Mon profile">
-                    {% if user.physical_person.photo %}
-                        <!-- Afficher l'image du profil si elle existe -->
+                    </a>
+                {% elif user.physical_person and user.physical_person.photo %}
+                    <a href="{% url 'auth:profile_user' %}" class="nav-link d-flex align-items-center" title="Mon profile">
                         <img src="{{ user.physical_person.photo.url }}" alt="Profile Image" class="rounded-circle" style="width: 30px; height: 30px;">
-
-                        
-                    {% else %}
-                        <!-- Afficher une icône d'utilisateur si l'image de profil est manquante -->
+                    </a>
+                {% else %}
+                    <a href="{% url 'auth:profile_user' %}" class="nav-link d-flex align-items-center" title="Mon profil">
                         <i class="fas fa-user-circle" style="font-size: 30px;"></i>
-                    {% endif %}
-                </a>
-                <a href="{% url 'project-submision' %}" class="nav-item nav-link">Mon Espace</a>
-
-        {% endif %}
-
+                    </a>
+                {% endif %}
+                <a href="{% url 'my-space' %}" class="nav-item nav-link">Mon Espace</a>
+            </div>
 
             <!-- Déconnexion -->
             <a href="{% url 'auth:logout' %}" class="btn btn-secondary text-danger rounded-pill py-2 px-4 my-3 my-lg-0 flex-shrink-0">Déconnexion</a>
@@ -70,5 +55,3 @@
         {% endif %}
     </div>
 </nav>
-
-

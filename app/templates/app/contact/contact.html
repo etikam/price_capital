@@ -1,0 +1,90 @@
+{% extends 'app/base.html' %}
+{% block hero %}
+<div class="container-fluid position-relative p-0">
+    <!-- Header Start -->
+    <div class="container-fluid bg-breadcrumb">
+        <div class="container text-center py-5" style="max-width: 900px;">
+            <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Prennez contact avec nous</h4>
+            <ol class="breadcrumb d-flex justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+                <li class="breadcrumb-item active text-primary">Contact</li>
+            </ol>
+        </div>
+    </div>
+    <!-- Header End -->
+</div>
+{% endblock hero %}
+
+{% block content %}
+<div class="container-fluid contact py-5">
+    <div class="container py-5">
+        <div class="row g-5">
+            <!-- Formulaire de contact -->
+            <div class="col-lg-6 col-md-12">
+                <div class="bg-light p-5 rounded wow fadeInUp" data-wow-delay="0.2s">
+                    <h4 class="text-primary mb-4">Envoyez votre message</h4>
+                    <form method="post" action="{% url 'contact' %}">
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            <div class="col-lg-12">{{ form.name.label_tag }} {{ form.name }}</div>
+                            <div class="col-lg-12">{{ form.email.label_tag }} {{ form.email }}</div>
+                            <div class="col-lg-12">{{ form.phone.label_tag }} {{ form.phone }}</div>
+                            <div class="col-12">{{ form.subject.label_tag }} {{ form.subject }}</div>
+                            <div class="col-12">{{ form.message.label_tag }} {{ form.message }}</div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 py-3">Envoyer le message</button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                </div>
+            </div>
+
+            <!-- Informations de contact -->
+            <div class="col-lg-6 col-md-12">
+                <div class="bg-light rounded p-5 wow fadeInRight" data-wow-delay="0.2s">
+                    <h4 class="text-primary mb-4">Contactez-nous</h4>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="contact-add-item">
+                                <div class="contact-icon text-primary mb-3">
+                                    <i class="fas fa-map-marker-alt fa-2x"></i>
+                                </div>
+                                <h5>Adresse</h5>
+                                <p>Conakry, Matoto, Yimbaya</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="contact-add-item">
+                                <div class="contact-icon text-primary mb-3">
+                                    <i class="fas fa-envelope fa-2x"></i>
+                                </div>
+                                <h5>Email</h5>
+                                <p>pricescapital.email.com</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="contact-add-item">
+                                <div class="contact-icon text-primary mb-3">
+                                    <i class="fa fa-phone-alt fa-2x"></i>
+                                </div>
+                                <h5>Téléphone</h5>
+                                <p>(+224) 627 613 835</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="contact-add-item">
+                                <div class="contact-icon text-primary mb-3">
+                                    <i class="fab fa-firefox-browser fa-2x"></i>
+                                </div>
+                                <h5>Site Web</h5>
+                                <p>www.pricescapital.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

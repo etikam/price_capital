@@ -22,7 +22,7 @@ def reformulate_project(request, uid):
         if form.is_valid():
             validated_project = form.save(commit=False)
             validated_project.reformulated_by = request.user
-            validated_project.approved_at = timezone.now() if validated_project.is_approved else None
+            # validated_project.approved_at = timezone.now() if validated_project.is_approved else None
             validated_project.save()
             project.status = "reformulated"
             project.save()
@@ -88,6 +88,7 @@ def publish_project(request, uid):
         validated_project.is_approved = is_published
         if is_published:
             project.status = "published"  # Mettre à jour le statut du projet
+            project.approved_at = timezone.now()
             #envoie du mail
             html_path = "app/mailing/published_project_mail.html"
             subject = "Votre projet est publié"
@@ -106,7 +107,6 @@ def publish_project(request, uid):
         # Sauvegarder les modifications
         validated_project.save()
         project.save()
-       
     else:
         messages.info(request, "Aucune modification n'a été effectuée.")
 

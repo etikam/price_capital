@@ -1,0 +1,117 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block hero %}
+
+{% endblock hero %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: rgb(44, 48, 52);
+    }
+
+    .card-header {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+    .nav-tabs .nav-link {
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    .nav-tabs .nav-link.active {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .progress-bar {
+        background-color: #28a745;
+        font-weight: bold;
+    }
+</style>
+<div class="container mt-5">
+    <h2 class="text-center mb-4 text-light">Mon Espace</h2>
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="text-center text-light">Projets Soumis</h4>
+        </div>
+        <div class="card-body">
+            <!-- Onglets Bootstrap -->
+            <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+                {% for project in projects %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if forloop.first %}active{% endif %}" id="tab-{{ project.uid }}"
+                        data-bs-toggle="tab" data-bs-target="#content-{{ project.uid }}" type="button" role="tab"
+                        aria-controls="content-{{ project.uid }}" aria-selected="true">
+                        {{ project.title|slice:":10" }}{% if project.title|length > 10 %}...{% endif %}
+                    </button>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <!-- Contenu des onglets -->
+            <div class="tab-content" id="projectTabsContent">
+                {% for project in projects %}
+                <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="content-{{ project.uid }}"
+                    role="tabpanel" aria-labelledby="tab-{{ project.uid }}">
+                    <div class="mt-4">
+                        <!-- Détails du Projet -->
+                        <form action="">
+                            <h5 class="text-primary">Détails du Projet</h5>
+                            <div class="form-group">
+                                <label for="titre" class="form-control">Titre</label>
+                                <p class="form-control"></strong> {{ project.title }}</p>
+                            </div>
+                        </form>                 
+                        <p><strong>Catégorie :</strong> {{ project.category.name }}</p>
+                        <p><strong>Localisation :</strong> {{ project.location }}</p>
+                        <p><strong>Objectif de financement :</strong> {{ project.goal|floatformat:2 }} {{project.currency }}</p>
+                        <p><strong>Statut :</strong> {{ project.get_status_display }}</p>
+
+                        <!-- Détails du Porteur -->
+                        <h5 class="text-primary mt-4">Détails du Porteur</h5>
+                        <p><strong>Nom :</strong> {{ project.owner.first_name }} {{ project.owner.last_name }}</p>
+                        <p><strong>Téléphone :</strong> {{ project.owner.phone }}</p>
+                        <p><strong>Adresse :</strong> {{ project.owner.adress }}</p>
+                        <p><strong>Date de naissance :</strong> {{ project.owner.birthday|date:"d/m/Y" }}</p>
+
+                        <!-- Investisseurs -->
+                        {% with project.investment_set.all as investors %}
+                        <h5 class="text-primary mt-4">Investisseurs</h5>
+                        {% if investors %}
+                        <ul class="list-group">
+                            {% for investor in investors %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ investor.user.username }}
+                                <span class="badge bg-success">{{ investor.amount|floatformat:2 }} {{ project.currency }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">Aucun investisseur pour le moment.</p>
+                        {% endif %}
+                        {% endwith %}
+
+                        <!-- Progression -->
+                        <h5 class="text-primary mt-4">Progression</h5>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar"
+                                style="width: {{ project.validated_project.progress }}%;"
+                                aria-valuenow="{{ project.validated_project.progress }}" aria-valuemin="0"
+                                aria-valuemax="100">
+                                {{ project.validated_project.progress|floatformat:0 }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

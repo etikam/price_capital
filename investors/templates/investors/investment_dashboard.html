@@ -1,0 +1,131 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Titre et introduction -->
+    <div class="row mb-5">
+        <div class="col-md-12 text-center">
+            <h1 class="display-4">Tableau de Bord des Investissements</h1>
+            <p class="lead">
+                Bienvenue sur votre espace d'investissement. Vous pouvez gérer vos investissements ici.
+            </p>
+        </div>
+    </div>
+
+    <!-- Statistiques clés -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-coins fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Total Investi</h5>
+                    <h2 class="card-text">{{ total_invested|floatformat:2 }} GNF</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Gains Totaux</h5>
+                    <h2 class="card-text">{{ total_gains|floatformat:2 }} GNF</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-info shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-wallet fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">Solde Accumulé</h5>
+                    <h2 class="card-text">{{ total_balance|floatformat:2 }} GNF</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des investissements -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-outline-primary shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="text-primary mb-0"><i class="fas fa-list"></i> Mes Investissements</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Projet</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Montant Investi</th>
+                                    <th scope="col">Pourcentage de Participation</th>
+                                    <th scope="col">Gains</th>
+                                    <th scope="col">Progression</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for investment in investments %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ investment.project.title }}</td>
+                                    <td>
+                                        {% if investment.project.project_type == "donation" %}
+                                        <span class="badge bg-info"><i class="fas fa-gift"></i> Don</span>
+                                        {% elif investment.project.project_type == "roi" %}
+                                        <span class="badge bg-success"><i class="fas fa-chart-line"></i> Retour sur Investissement</span>
+                                        {% elif investment.project.project_type == "preorder" %}
+                                        <span class="badge bg-warning"><i class="fas fa-shopping-cart"></i> Achat Anticipé</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ investment.amount|floatformat:2 }} {{ investment.currency }}</td>
+                                    <td>{{ investment.percentage_on_goal|floatformat:2 }}%</td>
+                                    <td>{{ investment.project.expected_gains|floatformat:2 }} GNF</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" 
+                                                 role="progressbar" 
+                                                 style="width: {{ investment.progress }}%;" 
+                                                 aria-valuenow="{{ investment.progress }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                {{ investment.progress }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="#" 
+                                               class="btn btn-outline-primary btn-sm" 
+                                               title="Voir les détails du projet">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if investment.progress < 100 %}
+                                            <a href="#" 
+                                               class="btn btn-outline-success btn-sm" 
+                                               title="Continuer l'investissement">
+                                                <i class="fas fa-arrow-right"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <i class="fas fa-exclamation-circle fa-2x mb-3"></i><br>
+                                        Aucun investissement trouvé
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

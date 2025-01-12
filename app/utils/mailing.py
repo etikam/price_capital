@@ -1,6 +1,10 @@
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 
 def send_success_submision_project_mail(user,context):
@@ -19,7 +23,7 @@ def send_success_submision_project_mail(user,context):
             html_message=html_message, 
         )
 
-#mail de rejet de projet
+
 def send_report_mail_on_project(user, subject,html_path,context):
         html_message = render_to_string(html_path,context)
         # Envoi de l'email
@@ -30,4 +34,19 @@ def send_report_mail_on_project(user, subject,html_path,context):
             recipient_list=[user.email],
             fail_silently=True,
             html_message=html_message, 
+        )
+
+
+def send_report_mail_to_superusers(subject, html_path, context):
+    super_users = User.objects.filter(is_superuser=True)
+    recipient_list = [user.email for user in super_users if user.email]
+    if recipient_list:
+        html_message = render_to_string(html_path, context)
+        send_mail(
+            subject=subject,
+            message=subject,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=recipient_list,
+            fail_silently=True,
+            html_message=html_message,
         )
