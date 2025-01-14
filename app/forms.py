@@ -107,6 +107,7 @@ class ValidatedProjectForm(forms.ModelForm):
             "category",
             "project_type",
             "goal",
+            "project_type",
             "location",
             "currency",
             "context",

@@ -1,7 +1,7 @@
 import random
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from app.models import Project, PorteurProject, ProjectCategory
+from app.models import Project, PorteurProject, ProjectCategory,ProjectType
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -58,6 +58,7 @@ class Command(BaseCommand):
 
             # Créer un projet
             project = Project.objects.create(
+                project_type = ProjectType.objects.all().first(),
                 user=user,  # Assigner l'utilisateur à ce projet
                 owner=owner,  # Assigner le porteur de projet
                 title=f"Projet {i+1}",

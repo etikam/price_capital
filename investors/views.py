@@ -6,7 +6,14 @@ from django.contrib import messages
 from investors.models import Investissement
 from investors.forms import InvestissementForm
 from app.models import ValidatedProject
-
+from django.db.models import Sum, Count
+from django.utils.timezone import now
+from datetime import timedelta
+import calendar
+from django.db.models.functions import ExtractMonth  
+from .forms import InvestissementForm
+from django.utils.html import strip_tags
+from django.views.decorators.http import require_POST
 
 @login_required
 def become_investor(request):
@@ -25,23 +32,94 @@ def become_investor(request):
 
     return render(request, "investors/become_investor.html", {"form": form})
 
+from django.db.models import Sum, Count
+from django.db.models.functions import ExtractMonth, ExtractYear
+from django.utils import timezone
+from datetime import timedelta
+
 @login_required
 def investment_dashboard(request):
-    # Récupérer les investissements de l'utilisateur connecté
-    investments = Investissement.objects.filter(investor=request.user.investor)
+    # Récupérer les investissements en cours (progression < 100) de l'utilisateur connecté
+    investments = Investissement.objects.filter(
+        investor=request.user.investor,
+        progress__lt=100  # Filtre pour les investissements non terminés
+    ).order_by("-updated_at")
 
-    # Calculer les statistiques
-    total_invested = sum(investment.amount for investment in investments)
-    total_gains = 0 # sum(investment.project.expected_gains for investment in investments if investment.project)  # À adapter selon votre modèle
-    total_balance = total_invested + total_gains  # Exemple de calcul du solde
+    # Calculer les statistiques clés
+    total_invested = investments.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_gains = sum(
+        investment.percentage_on_goal * investment.gains / 100
+        for investment in investments
+    )
+    nombre_project_investi = Investissement.objects.filter(investor=request.user.investor).count() #à remedier la requette(parce qu'il faut que le payement soit fait pour que le projet soit compte comme investi)
+  
+    # Calculer les données pour les graphiques
+    six_months_ago = timezone.now() - timedelta(days=180)  # Données des 6 derniers mois
 
+    # Fréquence des investissements par mois
+    frequency_data = (
+        investments.filter(created_at__gte=six_months_ago)
+        .annotate(month=ExtractMonth('created_at'), year=ExtractYear('created_at'))
+        .values('year', 'month')
+        .annotate(count=Count('id'))
+        .order_by('year', 'month')
+    )
+
+    # Évolution des gains par mois
+    interest_data = (
+        investments.filter(created_at__gte=six_months_ago)
+        .annotate(month=ExtractMonth('created_at'), year=ExtractYear('created_at'))
+        .values('year', 'month')
+        .annotate(total_gains=Sum('gains'))
+        .order_by('year', 'month')
+    )
+
+    # Préparer les labels et les données pour les graphiques
+    frequency_labels = []
+    frequency_values = []
+    interest_labels = []
+    interest_values = []
+
+    for data in frequency_data:
+        month_name = timezone.datetime(year=data['year'], month=data['month'], day=1).strftime('%B')
+        frequency_labels.append(month_name)
+        frequency_values.append(data['count'])
+
+    for data in interest_data:
+        month_name = timezone.datetime(year=data['year'], month=data['month'], day=1).strftime('%B')
+        interest_labels.append(month_name)
+        interest_values.append(data['total_gains'] or 0)
+
+    # Gérer la soumission du formulaire d'investissement
+    if request.method == 'POST':
+        # Récupérer l'UID de l'investissement depuis le formulaire
+        investment_uid = request.POST.get('investment_uid')
+        investment = get_object_or_404(Investissement, uid=investment_uid, investor=request.user.investor)
+
+        # Traiter la soumission du formulaire
+        form = InvestissementForm(request.POST, instance=investment)
+        if form.is_valid():
+            form.save()
+            return redirect('investor:investment_dashboard')  # Rediriger vers le tableau de bord
+    else:
+        # Afficher le formulaire vide (pour la modale)
+        form = InvestissementForm()
+
+    # Contexte pour le template
     context = {
         'investments': investments,
         'total_invested': total_invested,
         'total_gains': total_gains,
-        'total_balance': total_balance,
+        'nombre_project_investi': nombre_project_investi,
+        'investment_frequency_labels': frequency_labels,
+        'investment_frequency_data': frequency_values,
+        'interest_evolution_labels': interest_labels,
+        'interest_evolution_data': interest_values,
+        'form': form,  # Ajouter le formulaire au contexte
     }
+
     return render(request, "investors/investment_dashboard.html", context)
+
 
 @login_required
 def check_investor_profile(request):
@@ -77,49 +155,61 @@ def initiate_investment(request, uid):
                 messages.success(
                     request,
                     f"Felicatation, Nous vous remercions de vouloir etre financier "
-                        "du projet {project.title}, Veuillez continuer le processuces"
+                        f"du projet {project.title}, Veuillez continuer le processuces"
                         "d'investissement dans votre espace Investissement",
             )
-            except:
-                messages.error(request,"Erreur lors de l'initialisation du processus d'investissement, veuillez reprendre ou contacter les administrateurs")
+            except Exception as e:  # Capturer l'exception spécifique
+                messages.error(
+                    request,
+                    f"Erreur lors de l'initialisation du processus d'investissement : Si le problème persiste, Veuillez contacter les Administrateur"
+                    "Veuillez réessayer ou contacter les administrateurs.")
                 return redirect("home")
     else:
         return render(request,"investors/not_investor.html")
             
     return redirect('investor:investment-dashboard')
 
+
+
+
+
 def investissement(request, uid=None):
-    # Récupérer ou initialiser l'investissement
+    # Récupérer l'investissement existant ou en créer un nouveau
     if uid:
         investissement = get_object_or_404(Investissement, uid=uid)
-    else:
-        investissement = Investissement.objects.create(
-            investor=request.user.investor,
-            project=None,  # À définir lors de l'initialisation
-        )
-        investissement.save()
 
-    step = investissement.progress
 
-    if request.method == "POST":
+    # Gérer la soumission du formulaire
+    if request.method == 'POST':
         form = InvestissementForm(request.POST, instance=investissement)
         if form.is_valid():
-            form.save()
-            investissement.progress = min(investissement.progress + 25, 100)
+            investissement = form.save()
+            investissement.progress = 50
             investissement.save()
-            messages.success(request, "Étape complétée avec succès.")
-            return redirect("investissement_form", uid=investissement.uid)
+            messages.success(request, "Investissement enregistré avec succès Veuillez continuez vers le payment pour terminé le processus d'investissement!")
         else:
-            messages.error(request, "Veuillez corriger les erreurs.")
+            
+            # Supprimer les balises HTML des erreurs
+            clean_errors = strip_tags(str(form.errors))
+            messages.error(request, f"Veuillez corriger les erreurs ci-dessous : {clean_errors}")
     else:
+        # Initialiser le formulaire
         form = InvestissementForm(instance=investissement)
 
-    return render(
-        request,
-        "investors/investement_form.html",
-        {
-            "form": form,
-            "investissement": investissement,
-            "step": step,
-        },
-    )
+    # Rendre le template avec le formulaire
+    return redirect("investor:investment-dashboard")
+
+
+
+@require_POST
+def annuler_investissement(request, uid):
+    # Récupérer l'investissement
+    investissement = get_object_or_404(Investissement, uid=uid, investor=request.user.investor)
+
+    # Annuler l'investissement (par exemple, marquer comme annulé)
+    investissement.delete()
+    # Afficher un message de succès
+    messages.success(request, "L'investissement a été annulé avec succès.")
+
+    # Rediriger vers le tableau de bord
+    return redirect("investor:investment-dashboard")

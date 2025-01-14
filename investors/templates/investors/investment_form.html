@@ -1,38 +1,30 @@
 {% extends "app/base.html" %}
 
-{% block hero %}
-    
-{% endblock hero %}
-
-<style>
-    body{
-        background-color:rgb(44, 48, 52);
-      }
-    .form-container {
-        margin-top: 80px; /* Ajoute de l'espace en haut pour éviter que le formulaire ne touche la barre de navigation */
-        margin-bottom: 40px; /* Ajoute de l'espace en bas */
-    }
-</style>
 {% block content %}
 <div class="container my-5">
-    <h2 class="text-primary">Étape {{ step }} - {{ investissement.get_progress_display }}</h2>
+    <h2 class="text-primary">Formulaire d'investissement</h2>
+    
     <form method="post">
         {% csrf_token %}
+
+        <!-- Section Investisseur et Projet -->
         <div class="row">
-            {% if step == 0 %}
-            <!-- Étape 1 : Initiation -->
-            <div class="col-md-12">
-                <div class="form-group">
-                    {{ form.project.label_tag }}
-                    {{ form.project }}
-                </div>
+            <div class="col-md-6">
                 <div class="form-group">
                     {{ form.investor.label_tag }}
                     {{ form.investor }}
                 </div>
             </div>
-            {% elif step == 25 %}
-            <!-- Étape 2 : Informations -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.project.label_tag }}
+                    {{ form.project }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Montant et Devise -->
+        <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
                     {{ form.amount.label_tag }}
@@ -45,38 +37,31 @@
                     {{ form.currency }}
                 </div>
             </div>
+        </div>
+
+        <!-- Section Anonymat -->
+        <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
                     {{ form.anonymity.label_tag }}
                     {{ form.anonymity }}
                 </div>
             </div>
-            {% elif step == 50 %}
-            <!-- Étape 3 : Validation -->
-            <div class="col-md-12">
-                <p class="text-muted">Confirmez les informations ci-dessous avant de continuer.</p>
-                <ul>
-                    <li><strong>Montant :</strong> {{ investissement.amount }}</li>
-                    <li><strong>Devise :</strong> {{ investissement.currency }}</li>
-                    <li><strong>Anonyme :</strong> {{ investissement.anonymity }}</li>
-                </ul>
-            </div>
-            {% elif step == 75 %}
-            <!-- Étape 4 : Paiement -->
-            <div class="col-md-12">
-                <p class="text-warning">L'intégration du paiement n'est pas encore activée.</p>
-                <button type="button" class="btn btn-secondary">Simuler un Paiement</button>
-            </div>
-            {% elif step == 99 %}
-            <!-- Étape 5 : Finalisation -->
-            <div class="col-md-12">
-                <p class="text-success">Votre investissement est presque terminé. Vous pouvez revoir vos informations.</p>
-            </div>
-            {% endif %}
         </div>
 
+        <!-- Section Gains attendus -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    {{ form.expected_gains.label_tag }}
+                    {{ form.expected_gains }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Bouton de soumission -->
         <div class="form-group mt-4 text-center">
-            <button type="submit" class="btn btn-primary">Suivant</button>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
         </div>
     </form>
 </div>

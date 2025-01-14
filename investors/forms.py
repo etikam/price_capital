@@ -41,18 +41,20 @@ class InvestorForm(forms.ModelForm):
 
         return cleaned_data
     
-    
-    
 
 class InvestissementForm(forms.ModelForm):
     class Meta:
         model = Investissement
-        fields = ['investor', 'project', 'anonymity', 'amount', 'currency']
+        fields = ['anonymity', 'amount', 'currency']
         widgets = {
-            'investor': forms.HiddenInput(),
-            'project': forms.HiddenInput(),
             'anonymity': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'currency': forms.Select(attrs={'class': 'form-select'}),
-           
         }
+
+    def clean_amount(self):
+        amount = self.cleaned_data['amount']  # Récupérer la valeur nettoyée du champ
+        if amount <= 0:
+            # Lever une exception de validation
+            raise ValidationError(" Désolé, mais vous ne pouvez pas investir un montant inférieur ou égal à 0.")
+        return amount  # Retourner la valeur si elle est valide

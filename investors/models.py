@@ -168,20 +168,23 @@ class Investissement(models.Model):
         null=True,
         blank=True,
         related_name="investissements",
-        verbose_name="Projet"
+        verbose_name="Projet à investir"
     )
 
-    anonymity = models.BooleanField(default=False, help_text="Investir anonymement")
+    anonymity = models.BooleanField(default=False, 
+                                    help_text="Si vous ne voulez pas être vu par le porteur de projet (s'applique pour les projets de type Don)",
+                                    verbose_name="Je Veux Rester Anonyme"
+                                    )
     # Montant de l'investissement
     amount = models.DecimalField(
         default = 0,
         max_digits=15,
         decimal_places=2,
-        verbose_name="Montant investi",
-        help_text="Montant de l'investissement (ex. 10,000 GNF)"
+        verbose_name="Montant à Investir",
+        help_text="Montant que vous voulez investir (ex. 10,000 GNF)"
     )
 
-    expected_gains = models.DecimalField(
+    gains = models.DecimalField(
         default = 0,
         max_digits=15,
         decimal_places=2,
@@ -196,23 +199,16 @@ class Investissement(models.Model):
             ("EUR", "EUR - Euro"),
         ],
         default="GNF",
-        verbose_name="Devise"
+        verbose_name="Devise D'investissement",
+        help_text="Dans quelle devise est votre montant"
     )
 
-    # Date de l'investissement
-    investment_date = models.DateField(
-        verbose_name="Date de l'investissement",
-        auto_now_add=True  # Date automatique à la création
-    )
 
      # Niveau d'avancement (en pourcentage)
     progress = models.IntegerField(
         choices=[
             (0, "Initié"),
-            (25, "Informations soumises"),
-            (50, "Validation en cours"),
-            (75, "Paiement en attente"),
-            (99, "Finalisation"),
+            (50,"Payment en cours"),
             (100, "Terminé"),
         ],
         default=0,

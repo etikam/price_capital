@@ -39,6 +39,13 @@
                                     </button>
                                 </div>
                             </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="category" class="form-label">{{ form.project_type.label }}</label>
+                                <div class="input-group">
+                                    {{ form.project_type }}
+                                </div>
+                            </div>
                             
                             
                             <div class="col-md-12 mb-3">{{ form.goal.label_tag }} {{ form.goal }}</div>
@@ -147,4 +154,6 @@
 </div>
 
 {% endblock %}
+
+
 

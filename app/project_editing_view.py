@@ -15,7 +15,7 @@ def detail_project(request,uid):
 
 def reformulate_project(request, uid):
     project = get_object_or_404(Project, uid=uid)
-    validated_project, created = ValidatedProject.objects.get_or_create(project=project)
+    validated_project = get_object_or_404(ValidatedProject,project=project)
 
     if request.method == "POST":
         form = ValidatedProjectForm(request.POST, request.FILES, instance=validated_project)
