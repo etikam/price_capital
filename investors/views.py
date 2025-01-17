@@ -243,16 +243,18 @@ class InvestmentDetailView(DetailView):
 
     def get_template_names(self):
         # Récupérer le type de projet
-        project_type = self.object.project.project.project_type  # Supposons que project_type est un champ du modèle Project
+        project_type = self.object.project.project.project_type.name  # Supposons que project_type est un champ du modèle Project
 
         # Choisir le template en fonction du type de projet
-        if project_type == 'RETOUR SUR INVESTISSEMENT':
-            return ["investors/investment_details.html"]
-        elif project_type == 'DON':
+     
+        if project_type == "DON":
+            print(f"TYPE DE PROJET {project_type}")
             return ["investors/investment_details_don.html"]
-        elif project_type == 'ACHAT ANTICIPE':
+        elif project_type == "ACHAT ANTICIPE":
             return ["investors/investment_details_achat.html"]
+            print(f"TYPE DE PROJET {project_type}")
         else:
+            print(f"TYPE DE PROJET {project_type}")
             return ["investors/investment_details.html"]  # Template par défaut
 
     def get_context_data(self, **kwargs):
@@ -264,7 +266,8 @@ class InvestmentDetailView(DetailView):
         context['days_elapsed'] = (now().date() - self.object.created_at.date()).days
 
         # Informations spécifiques au type de projet
-        if project.project.project_type == 'RETOUR_SUR_INVESTISSEMENT':
+        if project.project.project_type.name == 'RETOUR SUR INVESTISSEMENT':
+            print(f"JE RECUPERE LES INFOMATION DE L4INVESTISSEMENT")
             # Logique pour les projets de type "Retour sur Investissement"
             percentage_on_goal = Decimal(self.object.percentage_on_goal) / 100 if self.object.percentage_on_goal else Decimal(0)
             context['remaining_percentage'] = 100 - float(percentage_on_goal * 100)
@@ -277,12 +280,12 @@ class InvestmentDetailView(DetailView):
             context['gain_evolution_labels'] = [week.strftime("%d %b %Y") for week in sorted_weeks]
             context['gain_evolution_data'] = [float(gains_by_week[week]) for week in sorted_weeks]
 
-        elif project.project.project_type == 'DON':
+        elif project.project.project_type.name == 'DON':
             # Logique pour les projets de type "Don"
             context['impact_message'] = "Votre don a permis de financer X."
             context['thank_you_message'] = "Merci pour votre générosité !"
 
-        elif project.project.project_type == 'ACHAT_ANTICIPE':
+        elif project.project.project_type.name == 'ACHAT ANTICIPE':
             # Logique pour les projets de type "Achat Anticipé"
             context['product_name'] = "Nom du Produit"
             context['product_description'] = "Description du produit ou service."

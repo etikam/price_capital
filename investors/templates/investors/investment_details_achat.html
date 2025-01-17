@@ -1,0 +1,47 @@
+{% extends 'investors/investment_base.html' %}
+{% load static %}
+{% block main_content %}
+<div class="tab-pane fade show active" id="investment-details">
+  <h2 class="mb-4 text-center fs-1">
+    <i class="fas fa-info-circle"></i> Détails de l'Investissement
+  </h2>
+
+  <!-- Bouton Retour -->
+  <div class="text-start mb-4">
+    <a href="{% url 'investor:investment-dashboard' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+    </a>
+  </div>
+
+  <!-- Détails de l'Achat Anticipé -->
+  <div class="card mb-4 shadow-lg border-0">
+    <div class="card-body p-4">
+      <h3 class="mb-3 text-primary fw-bold">
+        <i class="fas fa-shopping-cart me-2"></i> Votre Achat Anticipé
+      </h3>
+      <p class="lead">Vous avez investi <strong>{{ investissement.amount|floatformat:2 }} {{ investissement.currency }}</strong> pour :</p>
+      <div class="card mb-3">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="{% static 'img/product.jpg' %}" alt="Produit" class="img-fluid rounded-start">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">{{ product_name }}</h5>
+              <p class="card-text">{{ product_description }}</p>
+              <p class="card-text"><small class="text-muted">Date de livraison prévue : {{ delivery_date }}</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4">
+        <h5>Suivi de Votre Commande</h5>
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" style="width: {{ order_progress }}%;" aria-valuenow="{{ order_progress }}" aria-valuemin="0" aria-valuemax="100">{{ order_progress }}%</div>
+        </div>
+        <p class="mt-2">Statut : {{ order_status }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
