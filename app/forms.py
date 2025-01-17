@@ -105,9 +105,7 @@ class ValidatedProjectForm(forms.ModelForm):
         fields = [
             "title",
             "category",
-            "project_type",
-            "goal",
-            "project_type",
+            "goal",      
             "location",
             "currency",
             "context",
@@ -125,7 +123,6 @@ class ValidatedProjectForm(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "category": forms.Select(attrs={"class": "form-select"}),
-            "project_type": forms.Select(attrs={"class": "form-select"}),
             "goal": forms.NumberInput(
                 attrs={"class": "form-control", "placeholder": "Budget estimé"}
             ),

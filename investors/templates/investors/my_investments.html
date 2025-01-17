@@ -1,0 +1,69 @@
+{% extends 'investors/investment_base.html' %}
+{% load static %}
+{% block main_content %}
+<div class="tab-pane fade show active" id="dashboard">
+  <h2 class="mb-4 text-center fs-1"><i class="fas fa-coins"></i> Mes Investissements</h2>
+
+  <table class="table align-middle mb-0 bg-white table-hover">
+    <thead class="bg-light">
+      <tr>
+        <th>#</th>
+        <th>Projet</th>
+        <th>Objectif du projet</th>
+        <th>Date d'Investissement</th>
+        <th>Montant Investi</th>
+        <th>Mon Pourcentage</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for investissement in object_list %}
+      <tr style="cursor: pointer;">
+        <td>{{ forloop.counter }}</td>
+        <td>
+          <div class="d-flex align-items-center">
+            {% if investissement.project.image %}
+            <img src="{{ investissement.project.image.url }}" alt="Image du projet" style="width: 45px; height: 45px" class="rounded-circle" />
+            {% else %}
+            <img src="{% static 'img/default_project.jpg' %}" alt="Image par défaut" style="width: 45px; height: 45px" class="rounded-circle" />
+            {% endif %}
+            <div class="ms-3">
+              <p class="fw-bold mb-1">{{ investissement.project.title }}</p>
+              <p class="text-muted mb-0">{{ investissement.project.category.name }}</p>
+            </div>
+          </div>
+        </td>
+        <td>{{ investissement.project.goal|floatformat:2 }} {{ investissement.project.currency }}</td>
+        <td>{{ investissement.created_at|date:"d M Y" }}</td>
+        <td>{{ investissement.amount|floatformat:2 }} {{ investissement.currency }}</td>
+        <td>{{ investissement.percentage_on_goal|floatformat:2 }}%</td>
+        <td>
+          <div class="dropdown">
+            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ investissement.uid }}" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded" aria-labelledby="dropdownMenuButton{{ investissement.uid }}">
+              <li>
+                <a class="dropdown-item" href="{% url 'detail-project' investissement.project.uid %}">
+                  <i class="fas fa-eye me-2 text-primary"></i> Détails du projet
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'investor:investissement' investissement.uid %}">
+                  <i class="fas fa-circle-info me-2 text-info"></i> Voir l'investissement
+                </a>
+              </li>
+              <li>
+                <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#confirmationModal{{ investissement.uid }}">
+                  <i class="fas fa-times-circle me-2"></i> Annuler
+                </button>
+              </li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

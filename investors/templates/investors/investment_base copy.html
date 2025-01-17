@@ -1,0 +1,215 @@
+{% load static %}
+<html lang="fr">
+  <head>
+    {% include 'app/_partials/meta_data.html' %}
+    <!-- Google Web Fonts -->
+    
+    {% block style_link %}
+    {% include 'app/_partials/styles.html' %}
+      
+    {% endblock style_link %}
+      
+
+    {% block style %}
+    <style>
+        /* Marge supérieure pour éviter que le contenu ne touche la navbar */
+        .main-content {
+            margin-top: 80px; /* Ajustez cette valeur en fonction de la hauteur de votre navbar */
+        }
+    </style>
+    {% endblock style %}
+  </head>
+
+  <body>
+    <!-- Messages Start -->
+    {% block messages %}
+    {% if messages %}
+    <div class="container mt-2">
+        <div class="row">
+            <div class="col-12">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endblock messages %}
+    <!-- Messages End -->
+
+    <!-- Topbar Start -->
+    {% block topbar %}
+    {% include 'app/_partials/topbar.html' %}
+    {% endblock topbar %}
+    <!-- Topbar End -->
+
+    <!-- Navbar & Hero Start -->
+    <div class="container-fluid position-relative p-0">
+        {% include 'app/_partials/nav.html' %}
+
+        {% block hero %}
+        {% include 'app/_partials/hero.html' %}
+        {% endblock hero %}
+    </div>
+    <!-- Navbar & Hero End -->
+
+    <!-- Contenu principal -->
+    <div class="container main-content">
+        {% block content %}
+        <div class="container-fluid contenu_dash p-0">  <!-- Ajoutez "container-fluid" et "p-0" pour supprimer le padding -->
+            <div class="row">
+                <!-- Sidebar (visible sur les écrans moyens et grands) -->
+                <div class="col-md-3 col-lg-2 sidebar d-none d-md-block bg-secondary border border-dark shadow-lg p-3 mb-5 rounded">
+                    <div class="sidebar-sticky pt-3">
+                        <!-- Logo ou Nom de l'Application -->
+                        <div class="text-center mb-4">
+                            <h4 class="text-white"><i class="fas fa-coins"></i> Mon Menu</h4>
+                        </div>
+        
+                        <!-- Onglets de Navigation -->
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active text-white" href="{% url 'investor:investment-dashboard' %}" data-toggle="tab">
+                                    <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#investments" data-toggle="tab">
+                                    <i class="fas fa-list"></i> Mes Investissements
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#recommended" data-toggle="tab">
+                                    <i class="fas fa-star"></i> Projets Recommandés
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#transactions" data-toggle="tab">
+                                    <i class="fas fa-history"></i> Historique des Transactions
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#gains" data-toggle="tab">
+                                    <i class="fas fa-chart-line"></i> Gains et Retours
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#withdrawals" data-toggle="tab">
+                                    <i class="fas fa-wallet"></i> Solde et Retraits
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#profile" data-toggle="tab">
+                                    <i class="fas fa-user"></i> Profil et Préférences
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#support" data-toggle="tab">
+                                    <i class="fas fa-question-circle"></i> Support et Aide
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+        
+                <!-- Offcanvas (pour les petits écrans) -->
+                <div class="offcanvas offcanvas-start bg-secondary shadow-lg p-3 mb-5 rounded" tabindex="-1" id="sidebarOffcanvas">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title text-white"><i class="fas fa-coins"></i> Mon Menu</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <!-- Onglets de Navigation -->
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active text-white" href="{% url 'investor:investment-dashboard' %}" data-toggle="tab">
+                                    <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#investments" data-toggle="tab">
+                                    <i class="fas fa-list"></i> Mes Investissements
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#recommended" data-toggle="tab">
+                                    <i class="fas fa-star"></i> Projets Recommandés
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#transactions" data-toggle="tab">
+                                    <i class="fas fa-history"></i> Historique des Transactions
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#gains" data-toggle="tab">
+                                    <i class="fas fa-chart-line"></i> Gains et Retours
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#withdrawals" data-toggle="tab">
+                                    <i class="fas fa-wallet"></i> Solde et Retraits
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#profile" data-toggle="tab">
+                                    <i class="fas fa-user"></i> Profil et Préférences
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#support" data-toggle="tab">
+                                    <i class="fas fa-question-circle"></i> Support et Aide
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+        
+                <!-- Section Principale -->
+                <div class="col-md-9 col-lg-10 ml-auto main-content p-0">  <!-- Ajoutez "p-0" pour supprimer le padding -->
+                    <!-- Bouton pour ouvrir l'offcanvas (visible uniquement sur les petits écrans) -->
+                    <button class="btn btn-primary d-md-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+                        <i class="fas fa-bars"></i> Menu
+                    </button>
+        
+                    <!-- Bloc pour le contenu à droite -->
+                    {% block main_content %}
+                    <!-- Le contenu à droite sera rempli par les pages qui héritent de ce template -->
+                    <h1>Ici le contenu à Droite</h1>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+
+    {% block plus %}
+    <!-- Contenu supplémentaire -->
+    {% endblock plus %}
+
+    <!-- Footer Start -->
+    {% block footer %}
+    {% include 'app/_partials/footer.html' %}
+    {% endblock footer %}
+    <!-- Footer End -->
+
+    <!-- Scripts -->
+    {% block script %}
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+    <script src="{% static 'lib/lightbox/js/lightbox.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% endblock script %}
+  </body>
+</html>

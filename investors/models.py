@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from app.models import ProjectCategory
 from app.models import ValidatedProject 
+from django.db.models import Sum
 
 class Investor(models.Model):
     def generate_investor_id():
@@ -184,12 +185,12 @@ class Investissement(models.Model):
         help_text="Montant que vous voulez investir (ex. 10,000 GNF)"
     )
 
-    gains = models.DecimalField(
-        default = 0,
-        max_digits=15,
-        decimal_places=2,
-        verbose_name="gains sur le projet",
-    )
+    # gains = models.DecimalField(
+    #     default = 0,
+    #     max_digits=15,
+    #     decimal_places=2,
+    #     verbose_name="gains sur le projet",
+    # )
     # Devise de l'investissement
     currency = models.CharField(
         max_length=3,
@@ -214,9 +215,11 @@ class Investissement(models.Model):
         default=0,
         verbose_name="Progression"
     )
+    
+    
 
     payment_done = models.BooleanField(default=False) #pour savoir si le payement est efectué ou pas
-   
+
     # Champs automatiques
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Dernière mise à jour")
@@ -231,7 +234,15 @@ class Investissement(models.Model):
             return (self.amount / self.project.goal) * 100
         return 0
     
-
+    @property
+    def gains(self):
+        """
+        Calculer les gains totaux pour cet investissement en fonction des enregistrements de gains du projet.
+        """
+        if self.percentage_on_goal:
+            total_project_gains = self.project.gain_records.aggregate(total_gains=Sum('amount'))['total_gains'] or 0
+            return total_project_gains * (self.percentage_on_goal / 100)
+        return 0
 
     def __str__(self):
         return f"Investissement #{self.id} - {self.investor.full_name} - {self.amount} {self.currency}"
@@ -240,3 +251,13 @@ class Investissement(models.Model):
         verbose_name = "Investissement"
         verbose_name_plural = "Investissements"
         unique_together = (('project', 'investor'),)
+        
+        
+#Gains/Interet sur les projet
+class GainRecord(models.Model):
+    project = models.ForeignKey(ValidatedProject, on_delete=models.CASCADE, related_name='gain_records')
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Montant du gain")
+    created_at = models.DateField(verbose_name="Date du gain")
+    
+    def __str__(self):
+        return f"{self.amount} {self.project.currency} le {self.created_at}"

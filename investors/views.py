@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import InvestorForm
 from django.contrib.auth.decorators import login_required
-from .models import Investor
+from .models import Investor, GainRecord
 from django.contrib import messages
 from investors.models import Investissement
 from investors.forms import InvestissementForm
@@ -11,9 +11,16 @@ from django.utils.timezone import now
 from datetime import timedelta
 import calendar
 from django.db.models.functions import ExtractMonth  
+from django.db.models.functions import ExtractMonth, ExtractYear
 from .forms import InvestissementForm
 from django.utils.html import strip_tags
 from django.views.decorators.http import require_POST
+from django.views.generic import ListView, DetailView
+from django.utils import timezone
+from datetime import timedelta
+from collections import defaultdict
+from decimal import Decimal
+from datetime import datetime
 
 @login_required
 def become_investor(request):
@@ -32,10 +39,6 @@ def become_investor(request):
 
     return render(request, "investors/become_investor.html", {"form": form})
 
-from django.db.models import Sum, Count
-from django.db.models.functions import ExtractMonth, ExtractYear
-from django.utils import timezone
-from datetime import timedelta
 
 @login_required
 def investment_dashboard(request):
@@ -47,12 +50,13 @@ def investment_dashboard(request):
 
     # Calculer les statistiques clés
     total_invested = investments.aggregate(Sum('amount'))['amount__sum'] or 0
-    total_gains = sum(
-        investment.percentage_on_goal * investment.gains / 100
-        for investment in investments
-    )
-    nombre_project_investi = Investissement.objects.filter(investor=request.user.investor).count() #à remedier la requette(parce qu'il faut que le payement soit fait pour que le projet soit compte comme investi)
-  
+
+    # Calculer les gains totaux en utilisant la propriété `gains`
+    total_gains = sum(investment.gains for investment in investments)
+
+    # Compter les projets investis (vous pouvez adapter cette logique si nécessaire)
+    nombre_project_investi = investments.count()
+
     # Calculer les données pour les graphiques
     six_months_ago = timezone.now() - timedelta(days=180)  # Données des 6 derniers mois
 
@@ -65,14 +69,20 @@ def investment_dashboard(request):
         .order_by('year', 'month')
     )
 
-    # Évolution des gains par mois
-    interest_data = (
-        investments.filter(created_at__gte=six_months_ago)
-        .annotate(month=ExtractMonth('created_at'), year=ExtractYear('created_at'))
-        .values('year', 'month')
-        .annotate(total_gains=Sum('gains'))
-        .order_by('year', 'month')
-    )
+    # Évolution des gains par mois (calcul manuel)
+    interest_data = []
+    for investment in investments:
+        investment_date = investment.created_at
+        if investment_date >= six_months_ago:
+            month_name = investment_date.strftime('%B')
+            found = next((data for data in interest_data if data['month'] == month_name), None)
+            if found:
+                found['total_gains'] += investment.gains
+            else:
+                interest_data.append({
+                    'month': month_name,
+                    'total_gains': investment.gains,
+                })
 
     # Préparer les labels et les données pour les graphiques
     frequency_labels = []
@@ -85,10 +95,9 @@ def investment_dashboard(request):
         frequency_labels.append(month_name)
         frequency_values.append(data['count'])
 
-    for data in interest_data:
-        month_name = timezone.datetime(year=data['year'], month=data['month'], day=1).strftime('%B')
-        interest_labels.append(month_name)
-        interest_values.append(data['total_gains'] or 0)
+    for data in sorted(interest_data, key=lambda x: x['month']):
+        interest_labels.append(data['month'])
+        interest_values.append(data['total_gains'])
 
     # Gérer la soumission du formulaire d'investissement
     if request.method == 'POST':
@@ -119,6 +128,7 @@ def investment_dashboard(request):
     }
 
     return render(request, "investors/investment_dashboard.html", context)
+
 
 
 @login_required
@@ -213,3 +223,71 @@ def annuler_investissement(request, uid):
 
     # Rediriger vers le tableau de bord
     return redirect("investor:investment-dashboard")
+
+
+
+
+
+class MyInvestmentView(ListView):
+    model = Investissement
+    template_name ="investors/my_investments.html"
+    context_object_name = "investissement"
+
+
+class InvestmentDetailView(DetailView):
+    model = Investissement
+    context_object_name = "investissement"
+    
+    slug_field = "uid"  
+    slug_url_kwarg = "uid"  
+
+    def get_template_names(self):
+        # Récupérer le type de projet
+        project_type = self.object.project.project.project_type  # Supposons que project_type est un champ du modèle Project
+
+        # Choisir le template en fonction du type de projet
+        if project_type == 'RETOUR SUR INVESTISSEMENT':
+            return ["investors/investment_details.html"]
+        elif project_type == 'DON':
+            return ["investors/investment_details_don.html"]
+        elif project_type == 'ACHAT ANTICIPE':
+            return ["investors/investment_details_achat.html"]
+        else:
+            return ["investors/investment_details.html"]  # Template par défaut
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = self.object.project
+
+        # Informations communes à tous les types de projets
+        context['project_type'] = project.project.project_type
+        context['days_elapsed'] = (now().date() - self.object.created_at.date()).days
+
+        # Informations spécifiques au type de projet
+        if project.project.project_type == 'RETOUR_SUR_INVESTISSEMENT':
+            # Logique pour les projets de type "Retour sur Investissement"
+            percentage_on_goal = Decimal(self.object.percentage_on_goal) / 100 if self.object.percentage_on_goal else Decimal(0)
+            context['remaining_percentage'] = 100 - float(percentage_on_goal * 100)
+            gain_records = GainRecord.objects.filter(project=project).order_by('created_at')
+            gains_by_week = defaultdict(Decimal)
+            for record in gain_records:
+                week_start = datetime.combine(record.created_at - timedelta(days=record.created_at.weekday()), datetime.min.time())
+                gains_by_week[week_start] += record.amount * percentage_on_goal
+            sorted_weeks = sorted(gains_by_week.keys())
+            context['gain_evolution_labels'] = [week.strftime("%d %b %Y") for week in sorted_weeks]
+            context['gain_evolution_data'] = [float(gains_by_week[week]) for week in sorted_weeks]
+
+        elif project.project.project_type == 'DON':
+            # Logique pour les projets de type "Don"
+            context['impact_message'] = "Votre don a permis de financer X."
+            context['thank_you_message'] = "Merci pour votre générosité !"
+
+        elif project.project.project_type == 'ACHAT_ANTICIPE':
+            # Logique pour les projets de type "Achat Anticipé"
+            context['product_name'] = "Nom du Produit"
+            context['product_description'] = "Description du produit ou service."
+            context['delivery_date'] = "15 Décembre 2023"
+            context['order_status'] = "En cours de production"
+            context['order_progress'] = 75  # Pourcentage de progression
+
+        return context

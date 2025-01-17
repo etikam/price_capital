@@ -1,288 +1,172 @@
-{% extends 'app/base.html' %}
+{% extends 'investors/investment_base.html' %}
 {% load static %}
+{% block main_content %}
+<div class="tab-pane fade show active" id="investment-details">
+  <h2 class="mb-4 text-center fs-1">
+    <i class="fas fa-info-circle"></i> Détails de l'Investissement
+  </h2>
 
-<style>
-    .btn-primary {
-        background-color: #007bff; /* Couleur de fond */
-        border-color: #007bff; /* Couleur de la bordure */
-        color: #fff; /* Couleur du texte */
-        padding: 10px 20px; /* Espacement interne */
-        border-radius: 5px; /* Coins arrondis */
-    }
-    
-    .btn-primary:hover {
-        background-color: #0056b3; /* Couleur de fond au survol */
-        border-color: #0056b3; /* Couleur de la bordure au survol */
-    }
+  <!-- Bouton Retour -->
+  <div class="text-start mb-4">
+    <a href="{% url 'investor:investment-dashboard' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+    </a>
+  </div>
 
-    .sidebar.menu {
-        background-color: rgba(0, 0, 1, 0.86) !important;
-    }
-
-    .offcanvas.menu {
-        background-color: rgba(0, 0, 1, 0.86) !important;
-    }
-
-    /* Ajustement de la largeur de l'offcanvas pour les petits écrans */
-    @media (max-width: 767.98px) {
-        .offcanvas {
-            width: 75% !important;
-        }
-    }
-
-    /* Ajustement de la taille des polices pour les petits écrans */
-    @media (max-width: 767.98px) {
-        .nav-link {
-            font-size: 14px;
-        }
-    }
-</style>
-
-{% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar (visible sur les écrans moyens et grands) -->
-        <div class="col-md-3 col-lg-2 bg-light sidebar d-none d-md-block menu">
-            <div class="sidebar-sticky pt-3">
-                <!-- Logo ou Nom de l'Application -->
-                <div class="text-center mb-4">
-                    <h4 class="text-primary"><i class="fas fa-coins"></i> Investisseur</h4>
-                </div>
-
-                <!-- Onglets de Navigation -->
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#dashboard" data-toggle="tab">
-                            <i class="fas fa-tachometer-alt"></i> Tableau de Bord
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#investments" data-toggle="tab">
-                            <i class="fas fa-list"></i> Mes Investissements
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#recommended" data-toggle="tab">
-                            <i class="fas fa-star"></i> Projets Recommandés
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#transactions" data-toggle="tab">
-                            <i class="fas fa-history"></i> Historique des Transactions
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#gains" data-toggle="tab">
-                            <i class="fas fa-chart-line"></i> Gains et Retours
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#withdrawals" data-toggle="tab">
-                            <i class="fas fa-wallet"></i> Solde et Retraits
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#profile" data-toggle="tab">
-                            <i class="fas fa-user"></i> Profil et Préférences
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#support" data-toggle="tab">
-                            <i class="fas fa-question-circle"></i> Support et Aide
-                        </a>
-                    </li>
-                </ul>
-            </div>
+  <!-- Actions et Solde Accumulé -->
+  <div class="row mb-4">
+    <!-- Solde Accumulé -->
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card border-warning shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-piggy-bank fa-3x text-warning mb-3"></i>
+          <h5 class="card-title">Solde Accumulé</h5>
+          <h2 class="card-text">{{ investissement.gains|floatformat:2|default:"-" }} {{ investissement.currency|default:"GNF" }}</h2>
         </div>
-
-        <!-- Offcanvas (pour les petits écrans) -->
-        <div class="offcanvas offcanvas-start menu" tabindex="-1" id="sidebarOffcanvas">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title"><i class="fas fa-coins"></i> Investisseur</h5>
-                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-                <!-- Onglets de Navigation -->
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#dashboard" data-toggle="tab">
-                            <i class="fas fa-tachometer-alt"></i> Tableau de Bord
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#investments" data-toggle="tab">
-                            <i class="fas fa-list"></i> Mes Investissements
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#recommended" data-toggle="tab">
-                            <i class="fas fa-star"></i> Projets Recommandés
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#transactions" data-toggle="tab">
-                            <i class="fas fa-history"></i> Historique des Transactions
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#gains" data-toggle="tab">
-                            <i class="fas fa-chart-line"></i> Gains et Retours
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#withdrawals" data-toggle="tab">
-                            <i class="fas fa-wallet"></i> Solde et Retraits
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#profile" data-toggle="tab">
-                            <i class="fas fa-user"></i> Profil et Préférences
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#support" data-toggle="tab">
-                            <i class="fas fa-question-circle"></i> Support et Aide
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Section Principale -->
-        <div class="col-md-9 col-lg-10 ml-auto main-content">
-            <!-- Bouton pour ouvrir l'offcanvas (visible uniquement sur les petits écrans) -->
-            <button class="btn btn-primary d-md-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
-                <i class="fas fa-bars"></i> Menu
-            </button>
-
-            <div class="tab-content">
-                <!-- Tableau de Bord -->
-                <div class="tab-pane fade show active" id="dashboard">
-                    <h2 class="mb-4"><i class="fas fa-tachometer-alt"></i> Tableau de Bord</h2>
-                    <!-- Statistiques clés -->
-                    <div class="row mb-4">
-                        <div class="col-md-4 mb-3">
-                            <div class="card border-primary shadow-sm h-100">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-coins fa-3x text-primary mb-3"></i>
-                                    <h5 class="card-title">Total Investi</h5>
-                                    <h2 class="card-text">{{ total_invested|floatformat:2 }} GNF</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card border-success shadow-sm h-100">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
-                                    <h5 class="card-title">Gains Totaux</h5>
-                                    <h2 class="card-text">{{ total_gains|floatformat:2 }} GNF</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card border-info shadow-sm h-100">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-wallet fa-3x text-info mb-3"></i>
-                                    <h5 class="card-title">Solde Accumulé</h5>
-                                    <h2 class="card-text">{{ total_balance|floatformat:2 }} GNF</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Graphiques ou autres éléments -->
-                </div>
-
-                <!-- Mes Investissements -->
-                <div class="tab-pane fade" id="investments">
-                    <h2 class="mb-4"><i class="fas fa-list"></i> Mes Investissements</h2>
-                    <!-- Tableau des investissements -->
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Projet</th>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Montant Investi</th>
-                                    <th scope="col">Pourcentage de Participation</th>
-                                    <th scope="col">Gains</th>
-                                    <th scope="col">Progression</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for investment in investments %}
-                                <tr>
-                                    <th scope="row">{{ forloop.counter }}</th>
-                                    <td>{{ investment.project.title }}</td>
-                                    <td>
-                                        {% if investment.project.project_type == "donation" %}
-                                        <span class="badge bg-info"><i class="fas fa-gift"></i> Don</span>
-                                        {% elif investment.project.project_type == "roi" %}
-                                        <span class="badge bg-success"><i class="fas fa-chart-line"></i> Retour sur Investissement</span>
-                                        {% elif investment.project.project_type == "preorder" %}
-                                        <span class="badge bg-warning"><i class="fas fa-shopping-cart"></i> Achat Anticipé</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ investment.amount|floatformat:2 }} {{ investment.currency }}</td>
-                                    <td>{{ investment.percentage_on_goal|floatformat:2 }}%</td>
-                                    <td>{{ investment.project.expected_gains|floatformat:2 }} GNF</td>
-                                    <td>
-                                        <div class="progress" style="height: 20px;">
-                                            <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" 
-                                                 role="progressbar" 
-                                                 style="width: {{ investment.progress }}%;" 
-                                                 aria-valuenow="{{ investment.progress }}" 
-                                                 aria-valuemin="0" 
-                                                 aria-valuemax="100">
-                                                {{ investment.progress }}%
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <a href="#" 
-                                               class="btn btn-outline-primary btn-sm" 
-                                               title="Voir les détails du projet">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            {% if investment.progress < 100 %}
-                                            <a href="#" 
-                                               class="btn btn-outline-success btn-sm" 
-                                               title="Continuer l'investissement">
-                                                <i class="fas fa-arrow-right"></i>
-                                            </a>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">
-                                        <i class="fas fa-exclamation-circle fa-2x mb-3"></i><br>
-                                        Aucun investissement trouvé
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Autres onglets (Projets Recommandés, Historique des Transactions, etc.) -->
-                <div class="tab-pane fade" id="recommended">
-                    <h2 class="mb-4"><i class="fas fa-star"></i> Projets Recommandés</h2>
-                    <!-- Contenu des projets recommandés -->
-                </div>
-
-                <div class="tab-pane fade" id="transactions">
-                    <h2 class="mb-4"><i class="fas fa-history"></i> Historique des Transactions</h2>
-                    <!-- Contenu de l'historique des transactions -->
-                </div>
-
-                <!-- Ajoutez les autres onglets ici -->
-            </div>
-        </div>
+      </div>
     </div>
+
+    <!-- Retirer mes Intérêts -->
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card border-danger shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-wallet fa-3x text-danger mb-3"></i>
+          <h5 class="card-title">Retirer mes Intérêts</h5>
+          <a href="#" class="btn btn-outline-danger btn-lg mt-2" aria-label="Retirer mes Intérêts">
+            <i class="fas fa-wallet"></i> Retirer
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Réinvestir -->
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card border-success shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-redo fa-3x text-success mb-3"></i>
+          <h5 class="card-title">Réinvestir</h5>
+          <a href="#" class="btn btn-outline-success btn-lg mt-2" aria-label="Réinvestir">
+            <i class="fas fa-redo"></i> Réinvestir
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Informations principales sur le projet -->
+  <div class="card mb-4 shadow-lg border-0">
+    <div class="card-body p-4">
+      <div class="row align-items-center">
+        <!-- Image du projet -->
+        <div class="col-12 col-md-3 text-center mb-4 mb-md-0">
+          <div class="bg-light rounded-circle p-3 d-inline-block">
+            {% if investissement.project.image %}
+            <img src="{{ investissement.project.image.url }}" alt="Image du projet" class="img-fluid rounded-circle" style="width: 120px; height: 120px;">
+            {% else %}
+            <img src="{% static 'img/default_project.jpg' %}" alt="Image par défaut" class="img-fluid rounded-circle" style="width: 120px; height: 120px;">
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Détails du projet -->
+        <div class="col-12 col-md-9">
+          <h3 class="mb-3 text-primary">{{ investissement.project.title }}</h3>
+          <div class="row">
+            <!-- Catégorie -->
+            <div class="col-12 col-md-6 mb-2">
+              <p class="text-muted mb-1">
+                <i class="fas fa-tag text-secondary me-2"></i>
+                <strong>Catégorie :</strong> {{ investissement.project.category.name|default:"Non défini" }}
+              </p>
+            </div>
+            <!-- Date de début -->
+            <div class="col-12 col-md-6 mb-2">
+              <p class="text-muted mb-1">
+                <i class="fas fa-calendar-check text-secondary me-2"></i>
+                <strong>Publié Depuis :</strong> {{ investissement.project.updated_at|date:"d M Y"|default:"-" }}
+              </p>
+            </div>
+            <!-- Date de fin -->
+            <div class="col-12 col-md-6 mb-2">
+              <p class="text-muted mb-1">
+                <i class="fas fa-calendar-times text-secondary me-2"></i>
+                <strong>Date de fin :</strong> {{ investissement.project.end_date|date:"d M Y"|default:"-" }}
+              </p>
+            </div>
+            <!-- Statut du projet -->
+            <div class="col-12 col-md-6 mb-2">
+              <p class="text-muted mb-1">
+                <i class="fas fa-info-circle text-secondary me-2"></i>
+                <strong>Statut :</strong> {{ investissement.project.status|default:"-" }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique d'évolution des gains -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h5 class="card-title mb-0 text-white">
+            <i class="fas fa-chart-line"></i>
+            Évolution des Gains
+          </h5>
+        </div>
+        <div class="card-body">
+          <canvas id="gainEvolutionChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Scripts pour les graphiques -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Évolution des Gains
+  const gainEvolutionCtx = document.getElementById('gainEvolutionChart').getContext('2d');
+  const gainEvolutionChart = new Chart(gainEvolutionCtx, {
+    type: 'line',
+    data: {
+      labels: {{ gain_evolution_labels|safe }}, // Semaines
+      datasets: [{
+        label: 'Gains Hebdomadaires (GNF)',
+        data: {{ gain_evolution_data|safe }}, // Montants des gains
+        borderColor: '#28a745',
+        backgroundColor: 'rgba(40, 167, 69, 0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom'
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Semaine'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Montant (GNF)'
+          },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
 {% endblock %}

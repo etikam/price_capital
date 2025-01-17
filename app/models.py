@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import FileExtensionValidator
 import uuid
-
+from django.db.models import Sum
 
 # porteur de projet, au cas où un utilisateur peut soumettre un projet avec d'autre informations
 class PorteurProject(models.Model):
@@ -175,9 +175,9 @@ class ValidatedProject(models.Model):
 
     CURRENCY_CHOICES = [
         ("GNF", "GNF - Franc guinéen"),
-        ("USD", "USD - Dollar américain"),
-        ("EUR", "EUR - Euro"),
-        ("XOF", "XOF - Franc CFA"),
+        # ("USD", "USD - Dollar américain"),
+        # ("EUR", "EUR - Euro"),
+        # ("XOF", "XOF - Franc CFA"),
     ]
     uid = models.UUIDField(
     default=uuid.uuid4,
@@ -193,7 +193,7 @@ class ValidatedProject(models.Model):
         max_length=255, verbose_name="Titre reformulé", help_text="Titre final du projet présenté aux investisseurs"
     )
     
-    project_type = models.ForeignKey(ProjectType, on_delete=models.CASCADE)
+    # project_type = models.ForeignKey(ProjectType, on_delete=models.CASCADE)
     
     description = models.TextField(
     max_length=1000,
@@ -308,6 +308,7 @@ class ValidatedProject(models.Model):
         help_text="Date à laquelle le projet a été validé",
     )
     
+   
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de mise à jour")
 
@@ -321,7 +322,16 @@ class ValidatedProject(models.Model):
             return 0
         return (self.current_funding / self.goal) * 100
 
+    @property
+    def gains(self):
+        """
+        Calculer les gains totaux pour cet Projet en fonction des enregistrements de gains du projet.
+        """
+        if self.gain_records:
+            return  self.gain_records.aggregate(total_gains=Sum('amount'))['total_gains'] or 0
+        return 0
 
+    
 class Contact(models.Model):
     name = models.CharField(max_length=255, verbose_name="Nom")
     email = models.EmailField(verbose_name="Email")

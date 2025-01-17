@@ -1,0 +1,27 @@
+{% extends 'investors/investment_base.html' %}
+{% load static %}
+{% block main_content %}
+<div class="tab-pane fade show active" id="investment-details">
+  <h2 class="mb-4 text-center fs-1">
+    <i class="fas fa-info-circle"></i> Détails de l'Investissement
+  </h2>
+
+  <!-- Bouton Retour -->
+  <div class="text-start mb-4">
+    <a href="{% url 'investor:investment-dashboard' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+    </a>
+  </div>
+
+  <!-- Impact du Don -->
+  <div class="card mb-4 shadow-lg border-0">
+    <div class="card-body p-4">
+      <h3 class="mb-3 text-primary fw-bold">
+        <i class="fas fa-hand-holding-heart me-2"></i> Impact de Votre Don
+      </h3>
+      <p class="lead">{{ impact_message }}</p>
+      <p>{{ thank_you_message }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

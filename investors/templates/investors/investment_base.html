@@ -1,260 +1,225 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
-
-
-
 {% block style_link %}
-<link href="{% static 'investors/css/style.css' %}" rel="stylesheet" />
-{{block.super}}
-{% endblock style_link %}
-    
+  <link href="{% static 'investors/css/style.css' %}" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+  <!-- MDB -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css" rel="stylesheet" />
+  {{ block.super }}
+{% endblock %}
 
 {% block style %}
-{{block.super}}
-    
-<style>
-    
+  {{ block.super }}
+
+  <style>
     body {
-        background-color:rgba(26, 26, 26, 0.82); /* Couleur de fond sombre */
-        color: #ffffff; /* Couleur du texte en blanc */
+      background-color: rgba(26, 26, 26, 0.82); /* Couleur de fond sombre */
+      color: #ffffff; /* Couleur du texte en blanc */
     }
-    .contenu_dash{
-        background-color: #fff;
+    .contenu_dash {
+      background-color: #fff;
     }
-    </style>
-{% endblock style %}
-    
+  </style>
+{% endblock %}
 
-    
 <style>
-    /* Fond sombre pour toute la page */
-
-
-    /* Styles de base pour le bouton */
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: #fff;
-        padding: 10px 20px;
-        border-radius: 5px;
-    }
-    
-    .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-    }
-
-    /* Ajustement de la largeur de l'offcanvas pour les petits écrans */
-    @media (max-width: 767.98px) {
-        .offcanvas {
-            width: 75% !important;
-            margin-left: 10px; /* Ajout d'une marge à gauche */
-        }
-
-        /* Ajout de marges pour éviter que le contenu ne touche les bords */
-        .main-content {
-            padding-left: 15px;
-            padding-right: 15px;
-            margin-top: 70px; /* Marge supérieure pour éviter la barre de navigation */
-        }
-
-        /* Ajustement de la taille des polices pour les petits écrans */
-        .nav-link {
-            font-size: 14px;
-        }
-
-        /* Ajustement des marges pour le bouton du menu */
-        .btn-primary {
-            margin: 10px;
-        }
-
-        .main-content h1 {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-    }
-
-    /* Ajustement des marges pour les écrans moyens et grands */
-    @media (min-width: 768px) {
-        .main-content {
-            padding-left: 30px;
-            padding-right: 30px;
-            margin-top: 80px; /* Marge supérieure pour éviter la barre de navigation */
-        }
-
-        .sidebar {
-            margin-left: 10px;
-            margin-right: 10px;
-        }
-
-        .sidebar-sticky {
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-    }
-
-    /* Ajustement des marges pour les très grands écrans */
-    @media (min-width: 1200px) {
-        .main-content {
-            padding-left: 50px;
-            padding-right: 50px;
-            margin-top: 90px; /* Marge supérieure pour éviter la barre de navigation */
-        }
-    }
-
-    /* Ajustement des couleurs pour la barre latérale */
-    .sidebar {
-        background-color: #2a2a2a; /* Couleur de fond sombre pour la barre latérale */
-        color: #ffffff; /* Couleur du texte en blanc */
-    }
-
-    /* Ajustement des couleurs pour l'offcanvas */
+  /* Fond sombre pour toute la page */
+  
+  /* Styles de base pour le bouton */
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  /* Ajustement de la largeur de l'offcanvas pour les petits écrans */
+  @media (max-width: 767.98px) {
     .offcanvas {
-        background-color: #2a2a2a; /* Couleur de fond sombre pour l'offcanvas */
-        color: #ffffff; /* Couleur du texte en blanc */
+      width: 75% !important;
+      margin-left: 10px; /* Ajout d'une marge à gauche */
     }
-
-    /* Ajustement des couleurs pour les liens de navigation */
+  
+    /* Ajout de marges pour éviter que le contenu ne touche les bords */
+    .main-content {
+      padding-left: 15px;
+      padding-right: 15px;
+      margin-top: 70px; /* Marge supérieure pour éviter la barre de navigation */
+    }
+  
+    /* Ajustement de la taille des polices pour les petits écrans */
     .nav-link {
-        color: #ffffff !important; /* Couleur du texte en blanc */
+      font-size: 14px;
     }
-
-    .nav-link:hover {
-        color: #007bff !important; /* Couleur du texte au survol */
+  
+    /* Ajustement des marges pour le bouton du menu */
+    .btn-primary {
+      margin: 10px;
     }
+  
+    .main-content h1 {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+  }
+  
+  /* Ajustement des marges pour les écrans moyens et grands */
+  @media (min-width: 768px) {
+    .main-content {
+      padding-left: 30px;
+      padding-right: 30px;
+      margin-top: 80px; /* Marge supérieure pour éviter la barre de navigation */
+    }
+  
+    .sidebar {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+  
+    .sidebar-sticky {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+  
+  /* Ajustement des marges pour les très grands écrans */
+  @media (min-width: 1200px) {
+    .main-content {
+      padding-left: 50px;
+      padding-right: 50px;
+      margin-top: 90px; /* Marge supérieure pour éviter la barre de navigation */
+    }
+  }
+  
+  /* Ajustement des couleurs pour la barre latérale */
+  .sidebar {
+    background-color: #2a2a2a; /* Couleur de fond sombre pour la barre latérale */
+    color: #ffffff; /* Couleur du texte en blanc */
+  }
+  
+  /* Ajustement des couleurs pour l'offcanvas */
+  .offcanvas {
+    background-color: #2a2a2a; /* Couleur de fond sombre pour l'offcanvas */
+    color: #ffffff; /* Couleur du texte en blanc */
+  }
+  
+  /* Ajustement des couleurs pour les liens de navigation */
+  .nav-link {
+    color: #ffffff !important; /* Couleur du texte en blanc */
+  }
+  
+  .nav-link:hover {
+    color: #007bff !important; /* Couleur du texte au survol */
+  }
 </style>
 
-    
 {% block hero %}
-    
-{% endblock hero %}
-    
+
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid contenu_dash">
+  <div class="container-fluid contenu_dash">
     <div class="row">
-        <!-- Sidebar (visible sur les écrans moyens et grands) -->
-        <div class="col-md-3 col-lg-2 sidebar d-none d-md-block bg-secondary border border-dark shadow-lg p-3 mb-5 rounded">
-            <div class="sidebar-sticky pt-3">
-                <!-- Logo ou Nom de l'Application -->
-                <div class="text-center mb-4">
-                    <h4 class="text-white"><i class="fas fa-coins"></i> Mon Menu</h4>
-                </div>
+      <!-- Sidebar (visible sur les écrans moyens et grands) -->
+      <div class="col-md-3 col-lg-2 sidebar d-none d-md-block bg-secondary border border-dark shadow-lg p-3 mb-5 rounded">
+        <div class="sidebar-sticky pt-3">
+          <!-- Logo ou Nom de l'Application -->
+          <div class="text-center mb-4">
+            <h4 class="text-white"><i class="fas fa-coins"></i> Mon Menu</h4>
+          </div>
 
-                <!-- Onglets de Navigation -->
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active text-white" href="{% url 'investor:investment-dashboard' %}" data-toggle="tab">
-                            <i class="fas fa-tachometer-alt"></i> Tableau de Bord
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#investments" data-toggle="tab">
-                            <i class="fas fa-list"></i> Mes Investissements
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#recommended" data-toggle="tab">
-                            <i class="fas fa-star"></i> Projets Recommandés
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#transactions" data-toggle="tab">
-                            <i class="fas fa-history"></i> Historique des Transactions
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#gains" data-toggle="tab">
-                            <i class="fas fa-chart-line"></i> Gains et Retours
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#withdrawals" data-toggle="tab">
-                            <i class="fas fa-wallet"></i> Solde et Retraits
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#profile" data-toggle="tab">
-                            <i class="fas fa-user"></i> Profil et Préférences
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#support" data-toggle="tab">
-                            <i class="fas fa-question-circle"></i> Support et Aide
-                        </a>
-                    </li>
-                </ul>
-            </div>
+          <!-- Onglets de Navigation -->
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active text-white" href="{% url 'investor:investment-dashboard' %}" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> Tableau de Bord</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="{% url 'investor:my-investments' %}" data-toggle="tab"><i class="fas fa-list"></i> Mes Investissements</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#recommended" data-toggle="tab"><i class="fas fa-star"></i> Projets Recommandés</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#transactions" data-toggle="tab"><i class="fas fa-history"></i> Historique des Transactions</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#gains" data-toggle="tab"><i class="fas fa-chart-line"></i> Gains et Retours</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#withdrawals" data-toggle="tab"><i class="fas fa-wallet"></i> Solde et Retraits</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#profile" data-toggle="tab"><i class="fas fa-user"></i> Profil et Préférences</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#support" data-toggle="tab"><i class="fas fa-question-circle"></i> Support et Aide</a>
+            </li>
+          </ul>
         </div>
+      </div>
 
-        <!-- Offcanvas (pour les petits écrans) -->
-        <div class="offcanvas offcanvas-start bg-secondary shadow-lg p-3 mb-5 rounded" tabindex="-1" id="sidebarOffcanvas">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title text-white"><i class="fas fa-coins"></i> Mon Menu</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-                <!-- Onglets de Navigation -->
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active text-white" href="{% url 'investor:investment-dashboard' %}" data-toggle="tab">
-                            <i class="fas fa-tachometer-alt"></i> Tableau de Bord
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#investments" data-toggle="tab">
-                            <i class="fas fa-list"></i> Mes Investissements
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#recommended" data-toggle="tab">
-                            <i class="fas fa-star"></i> Projets Recommandés
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#transactions" data-toggle="tab">
-                            <i class="fas fa-history"></i> Historique des Transactions
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#gains" data-toggle="tab">
-                            <i class="fas fa-chart-line"></i> Gains et Retours
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#withdrawals" data-toggle="tab">
-                            <i class="fas fa-wallet"></i> Solde et Retraits
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#profile" data-toggle="tab">
-                            <i class="fas fa-user"></i> Profil et Préférences
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#support" data-toggle="tab">
-                            <i class="fas fa-question-circle"></i> Support et Aide
-                        </a>
-                    </li>
-                </ul>
-            </div>
+      <!-- Offcanvas (pour les petits écrans) -->
+      <div class="offcanvas offcanvas-start bg-secondary shadow-lg p-3 mb-5 rounded" tabindex="-1" id="sidebarOffcanvas">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title text-white"><i class="fas fa-coins"></i> Mon Menu</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-
-        <!-- Section Principale -->
-        <div class="col-md-9 col-lg-10 ml-auto main-content">
-            <!-- Bouton pour ouvrir l'offcanvas (visible uniquement sur les petits écrans) -->
-            <button class="btn btn-primary d-md-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
-                <i class="fas fa-bars"></i> Menu
-            </button>
-
-            <!-- Bloc pour le contenu à droite -->
-            {% block main_content %}
-            <!-- Le contenu à droite sera rempli par les pages qui héritent de ce template -->
-            <h1>Ici le contenu à Droite</h1>
-            {% endblock %}
+        <div class="offcanvas-body">
+          <!-- Onglets de Navigation -->
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active text-white" href="{% url 'investor:investment-dashboard' %}" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> Tableau de Bord</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#investments" data-toggle="tab"><i class="fas fa-list"></i> Mes Investissements</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#recommended" data-toggle="tab"><i class="fas fa-star"></i> Projets Recommandés</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#transactions" data-toggle="tab"><i class="fas fa-history"></i> Historique des Transactions</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#gains" data-toggle="tab"><i class="fas fa-chart-line"></i> Gains et Retours</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#withdrawals" data-toggle="tab"><i class="fas fa-wallet"></i> Solde et Retraits</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#profile" data-toggle="tab"><i class="fas fa-user"></i> Profil et Préférences</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="#support" data-toggle="tab"><i class="fas fa-question-circle"></i> Support et Aide</a>
+            </li>
+          </ul>
         </div>
+      </div>
+
+      <!-- Section Principale -->
+      <div class="col-md-9 col-lg-10 ml-auto main-content">
+        <!-- Bouton pour ouvrir l'offcanvas (visible uniquement sur les petits écrans) -->
+        <button class="btn btn-primary d-md-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas"><i class="fas fa-bars"></i> Menu</button>
+
+        <!-- Bloc pour le contenu à droite -->
+        {% block main_content %}
+          <!-- Le contenu à droite sera rempli par les pages qui héritent de ce template -->
+          <h1>Ici le contenu à Droite</h1>
+        {% endblock %}
+      </div>
     </div>
-</div>
+  </div>
+
+  <!-- MDB -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
 {% endblock %}

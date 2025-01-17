@@ -15,37 +15,54 @@ def detail_project(request,uid):
 
 def reformulate_project(request, uid):
     project = get_object_or_404(Project, uid=uid)
-    validated_project = get_object_or_404(ValidatedProject,project=project)
+    
+    # Vérifier si un ValidatedProject existe pour ce projet
+    try:
+        validated_project = ValidatedProject.objects.get(project=project)
+    except ValidatedProject.DoesNotExist:
+        validated_project = None
+
+    # Préremplir le formulaire
+    form = ValidatedProjectForm(instance=validated_project)
 
     if request.method == "POST":
-        form = ValidatedProjectForm(request.POST, request.FILES, instance=validated_project)
+        if validated_project:
+            form = ValidatedProjectForm(request.POST, instance=validated_project)
+        else:
+            form = ValidatedProjectForm(request.POST)
+
         if form.is_valid():
             validated_project = form.save(commit=False)
+            validated_project.project = project  # Lier au projet si un nouvel objet est créé
             validated_project.reformulated_by = request.user
-            # validated_project.approved_at = timezone.now() if validated_project.is_approved else None
             validated_project.save()
+            
+            # Mettre à jour le statut du projet
             project.status = "reformulated"
             project.save()
-            
+
+            # Préparer et envoyer un mail au propriétaire du projet
             html_path = "app/mailing/reformulated_project_mail.html"
             subject = "Recommandation – Reformulation de votre projet"
             user = project.user
             context = {
-                "Nom":project.owner.first_name,
-                "titre_du_projet":project.title
+                "Nom": project.owner.first_name,
+                "titre_du_projet": project.title
             }
-            #envoie du mail
-            send_report_mail_on_project(user,subject,html_path,context)
-            messages.success(request,f"le projet {project.title} a été reformulé avec succès")
-            messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informé de l'état actuel de son projet")
+            messages.success(request, f"Le projet {project.title} a été reformulé avec succès.")
+            try:
+                send_report_mail_on_project(user, subject, html_path, context)
+                messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informer de l'état actuel de son projet.")
+            except Exception as e:
+                messages.warning(request, f"Le projet a été reformulé, mais l'envoi du mail a échoué. {str(e)}")
+            
             return redirect("cabinet-incoming")
         else:
             messages.error(request, f"Veuillez corriger les erreurs du formulaire. {form.errors}")
-    else:
-        form = ValidatedProjectForm(instance=validated_project)
 
     context = {"form": form, "project": project}
     return render(request, "app/project/reformulate.html", context)
+
 
 
 

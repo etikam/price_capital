@@ -44,7 +44,8 @@ class ValidatedProjectAdmin(admin.ModelAdmin):
         "currency",
         "is_approved",
         "approved_at",
-        "progress"
+        "progress",
+        "gains"
     )
     list_filter = ("is_approved", "category", "currency", "approved_at")
     search_fields = ("title", "project__title", "category__name", "location")
@@ -61,7 +62,7 @@ class ValidatedProjectAdmin(admin.ModelAdmin):
             "fields": ("target_audience", "key_partners", "additional_details")
         }),
         ("Budget et Localisation", {
-            "fields": ("goal", "current_funding", "currency", "location")
+            "fields": ("goal", "current_funding", "currency", "location","gains")
         }),
         ("Documents et Images", {
             "fields": ("documents", "image")
