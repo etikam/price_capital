@@ -22,7 +22,6 @@ class ProjectCategory(models.Model):
 
 class ProjectType(models.Model):
     name =  models.CharField(max_length=50)
-    
     def __str__(self):
         return self.name
 
@@ -331,7 +330,40 @@ class ValidatedProject(models.Model):
             return  self.gain_records.aggregate(total_gains=Sum('amount'))['total_gains'] or 0
         return 0
 
-    
+
+class ProductInfo(models.Model):
+    project = models.OneToOneField(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='info_produit'
+    )
+    product_name = models.CharField(max_length=255, verbose_name="Nom du Produit")
+    product_description = models.TextField(verbose_name="Description du Produit")
+    delivery_date = models.DateField(verbose_name="Date de Livraison")
+    order_status = models.CharField(
+        max_length=100,
+        choices=[
+            ('pending', 'En attente'),
+            ('in_progress', 'En cours de production'),
+            ('delivered', 'Livré')
+        ],
+        default='pending',
+        verbose_name="Statut de la Commande"
+    )
+    order_progress = models.PositiveIntegerField(
+        default=0,
+        help_text="Progression en pourcentage.",
+        verbose_name="Progression de la Commande"
+    )
+    quantity_available = models.PositiveIntegerField(verbose_name="Quantité Disponible", null=True, blank=True)
+    product_unity = models.CharField(max_length=255, verbose_name="Unité de mésure")
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Prix Unitaire")
+    media = models.ImageField(upload_to='products/', verbose_name="Image du Produit", null=True, blank=True)
+
+    def __str__(self):
+        return f"Informations sur {self.project.title}"
+
+
 class Contact(models.Model):
     name = models.CharField(max_length=255, verbose_name="Nom")
     email = models.EmailField(verbose_name="Email")

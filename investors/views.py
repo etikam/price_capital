@@ -42,7 +42,7 @@ def become_investor(request):
 
 @login_required
 def investment_dashboard(request):
-    # Récupérer les investissements en cours (progression < 100) de l'utilisateur connecté
+    # Récupérer les investissements en cours (progression < 100) de l'investisseur connecté
     investments = Investissement.objects.filter(
         investor=request.user.investor,
         progress__lt=100  # Filtre pour les investissements non terminés
@@ -50,11 +50,7 @@ def investment_dashboard(request):
 
     # Calculer les statistiques clés
     total_invested = investments.aggregate(Sum('amount'))['amount__sum'] or 0
-
-    # Calculer les gains totaux en utilisant la propriété `gains`
     total_gains = sum(investment.gains for investment in investments)
-
-    # Compter les projets investis (vous pouvez adapter cette logique si nécessaire)
     nombre_project_investi = investments.count()
 
     # Calculer les données pour les graphiques
@@ -69,20 +65,24 @@ def investment_dashboard(request):
         .order_by('year', 'month')
     )
 
-    # Évolution des gains par mois (calcul manuel)
-    interest_data = []
+    # Évolution des gains par semaine (tous les projets)
+    interest_data = {}
     for investment in investments:
-        investment_date = investment.created_at
-        if investment_date >= six_months_ago:
-            month_name = investment_date.strftime('%B')
-            found = next((data for data in interest_data if data['month'] == month_name), None)
-            if found:
-                found['total_gains'] += investment.gains
-            else:
-                interest_data.append({
-                    'month': month_name,
-                    'total_gains': investment.gains,
-                })
+        gain_records = GainRecord.objects.filter(
+            project=investment.project,
+            created_at__gte=six_months_ago
+        )
+        for record in gain_records:
+            week_number = record.created_at.isocalendar()[1]  # Numéro de la semaine
+            year = record.created_at.year
+            week_key = f"Semaine {week_number} ({year})"
+            interest_data[week_key] = interest_data.get(week_key, 0) + record.amount
+
+    # Trier les semaines par ordre chronologique
+    sorted_weeks = sorted(
+        interest_data.keys(),
+        key=lambda x: (int(x.split(' ')[-1].strip('()')), int(x.split(' ')[1]))
+    )
 
     # Préparer les labels et les données pour les graphiques
     frequency_labels = []
@@ -95,26 +95,16 @@ def investment_dashboard(request):
         frequency_labels.append(month_name)
         frequency_values.append(data['count'])
 
-    for data in sorted(interest_data, key=lambda x: x['month']):
-        interest_labels.append(data['month'])
-        interest_values.append(data['total_gains'])
-
-    # Gérer la soumission du formulaire d'investissement
-    if request.method == 'POST':
-        # Récupérer l'UID de l'investissement depuis le formulaire
-        investment_uid = request.POST.get('investment_uid')
-        investment = get_object_or_404(Investissement, uid=investment_uid, investor=request.user.investor)
-
-        # Traiter la soumission du formulaire
-        form = InvestissementForm(request.POST, instance=investment)
-        if form.is_valid():
-            form.save()
-            return redirect('investor:investment_dashboard')  # Rediriger vers le tableau de bord
+    if interest_data:
+        interest_labels = sorted_weeks
+        interest_values = [float(interest_data[week]) for week in sorted_weeks]  # Conversion en float
     else:
-        # Afficher le formulaire vide (pour la modale)
-        form = InvestissementForm()
+        interest_labels = ["Aucune donnée"]
+        interest_values = [0]
 
-    # Contexte pour le template
+    print(f"LABELS RECUPERE : {interest_labels}\n")
+    print(f"VALEUR RECUPERE : {interest_values} \n")
+
     context = {
         'investments': investments,
         'total_invested': total_invested,
@@ -124,7 +114,6 @@ def investment_dashboard(request):
         'investment_frequency_data': frequency_values,
         'interest_evolution_labels': interest_labels,
         'interest_evolution_data': interest_values,
-        'form': form,  # Ajouter le formulaire au contexte
     }
 
     return render(request, "investors/investment_dashboard.html", context)
@@ -133,7 +122,8 @@ def investment_dashboard(request):
 
 @login_required
 def check_investor_profile(request):
-    # Vérifie si l'utilisateur a un profil investisseur
+    # Vérifie si l'utilisateur a un pr
+    # ofil investisseur
     try:
         investor = Investor.objects.get(user=request.user)
         # Si oui, redirige vers la page d'investissement

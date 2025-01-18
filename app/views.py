@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from app.forms import ProjectSubmissionForm
+from app.forms import ProjectSubmissionForm, ProductInfoForm
 from app.forms import PorteurProjectForm
 from .forms import ContactForm
 from django.contrib import messages
@@ -32,10 +32,9 @@ def index(request):
     }
     return render(request, "app/home/index.html", context)
 
-
 @login_required(login_url="auth:login")
 def project_submision(request):
-    # Initionalisation des informations du porteur de projet par le profile de celui qui est connecté
+    # Initialisation des informations du porteur de projet par le profile de celui qui est connecté
     initial_data = {}
 
     if hasattr(request.user, 'physical_person') and request.user.physical_person:
@@ -56,53 +55,65 @@ def project_submision(request):
             "birthday": request.user.moral_person.rccm,
         }
     else:
-        messages.info(request,"Vous êtes probablement un simple super admin, alors votre espace personnel c'est votre administration ")
-    
+        messages.info(request, "Vous êtes probablement un simple super admin, alors votre espace personnel c'est votre administration")
+
     if request.method == "POST":
         # Récupération des données soumises par l'utilisateur
         form_project = ProjectSubmissionForm(request.POST, request.FILES)
         form_owner = PorteurProjectForm(request.POST, initial=initial_data)
+        form_product = ProductInfoForm(request.POST, request.FILES)
 
-        # Validation des deux formulaires
+        # Validation des formulaires
         if form_project.is_valid() and form_owner.is_valid():
-
+            # Enregistrement du porteur de projet
             if PorteurProject.objects.filter(**form_owner.cleaned_data).exists():
                 owner = PorteurProject.objects.filter(**form_owner.cleaned_data)[0]
             else:
                 owner = form_owner.save()
-                
+
+            # Enregistrement du projet
             project = form_project.save(commit=False)
-            project.owner = owner  # Lier le projet au porteur de projet
-            project.user = (
-                request.user
-            )  # Associer l'utilisateur connecté à l'instance du projet
+            project.owner = owner
+            project.user = request.user
             project.save()
 
+            # Si le type de projet est "ACHAT ANTICIPE", enregistrer les informations du produit
+            if project.project_type.name == "ACHAT ANTICIPE" and form_product.is_valid():
+                
+                print(f"ENREGISTREMENT DU PRODUIT")
+                product_info = form_product.save(commit=False)
+                product_info.project = project
+                product_info.save()
+            else:
+                 messages.error(
+                request,
+                f"Erreur lors de l'enregistrement du projet {form_product.errors}",
+            )
             messages.success(
                 request,
-                "Votre soumission du projet a bien été effectué, veuillez consulter votre mail pour plus de détails",
+                "Votre soumission du projet a bien été effectuée, veuillez consulter votre mail pour plus de détails",
             )
             con = {
-                "Nom":owner.first_name,
-                "titre_du_projet":project.title
+                "Nom": owner.first_name,
+                "titre_du_projet": project.title
             }
-            send_success_submision_project_mail(request.user,context=con)
-            # ici je dois encore implementer l'envoie de mail de succès pour la soumission du projet
-            # Redirection ou message de succès après la soumission
+            send_success_submision_project_mail(request.user, context=con)
             return redirect("home")
         else:
             messages.error(
                 request,
-                f"Il y'a une erreur lors de la soumission de votre projet, veuillez respecter les normes des champs\n {form_owner.errors}\n ",
+                f"Il y a une erreur lors de la soumission de votre projet, veuillez respecter les normes des champs\n {form_owner.errors}\n {form_project.errors}\n {form_product.errors if form_product else ''}",
             )
     else:
         # Affichage des formulaires pour la première fois
         form_project = ProjectSubmissionForm()
         form_owner = PorteurProjectForm(initial=initial_data)
+        form_product = ProductInfoForm()
 
     context = {
         "form_project": form_project,
         "form_owner": form_owner,
+        "form_product": form_product,
     }
     return render(request, "app/project/submision.html", context)
 

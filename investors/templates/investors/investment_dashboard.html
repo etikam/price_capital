@@ -316,41 +316,41 @@
     // Évolution des intérêts
     const interestCtx = document.getElementById('interestEvolutionChart').getContext('2d');
     const interestChart = new Chart(interestCtx, {
-      type: 'line',
-      data: {
-        labels: {{ interest_evolution_labels| safe }}, // Périodes
-        datasets: [{
-          label: 'Intérêts générés (GNF)',
-          data: {{ interest_evolution_data| safe }}, // Montants
-          borderColor: '#28a745',
-          backgroundColor: 'rgba(40, 167, 69, 0.2)',
-          fill: true,
-          tension: 0.3
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: true
-          }
+        type: 'line',
+        data: {
+            labels: {{ interest_evolution_labels|safe }},  // Les labels doivent être une liste de chaînes
+            datasets: [{
+                label: 'Intérêts générés (GNF)',
+                data: {{ interest_evolution_data|safe }},  // Les données doivent être une liste de nombres
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                fill: true,
+                tension: 0.3
+            }]
         },
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Période'
-            }
-          },
-          y: {
-            title: {
-              display: true,
-              text: 'Montant (GNF)'
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true
+                }
             },
-            beginAtZero: true
-          }
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Période'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Montant (GNF)'
+                    },
+                    beginAtZero: true
+                }
+            }
         }
-      }
     });
   </script>
 {% endblock %}

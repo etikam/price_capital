@@ -5,6 +5,7 @@ from .models import ProjectCategory
 from .models import ValidatedProject
 from .models import Contact
 from django.core.validators import FileExtensionValidator
+from .models import ProductInfo
 
 
 class ProjectSubmissionForm(forms.ModelForm):
@@ -182,4 +183,61 @@ class ContactForm(forms.ModelForm):
                 'placeholder': 'Votre message ici',
                 'style': 'height: 160px;'
             }),
+        }
+
+
+class ProductInfoForm(forms.ModelForm):
+    class Meta:
+        model = ProductInfo
+        fields = [
+            'product_name',
+            'product_description',
+            'delivery_date',
+            'quantity_available',
+            "product_unity",
+            'unit_price',
+            'media',
+        ]
+        widgets = {
+            'product_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Entrez le nom du produit',
+            }),
+            
+            'product_description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Décrivez le produit ou service.',
+            }),
+            'delivery_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
+
+            'quantity_available': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 0,
+                'placeholder': 'Quantité disponible',
+            }),
+            
+            'product_unity': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'ex:kilo,litre,bidon,sac...',
+            }),
+            'unit_price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Prix unitaire',
+            }),
+            'media': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+            }),
+        }
+        labels = {
+            'product_name': 'Nom du produit',
+            'product_description': 'Description',
+            'delivery_date': 'Date de livraison',
+            'quantity_available': 'Quantité disponible',
+            'quantity_unity': 'Unite de mesure',
+            'unit_price': 'Prix unitaire',
+            'media': 'Image du produit',
         }
