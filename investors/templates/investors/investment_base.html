@@ -154,11 +154,11 @@
               <a class="nav-link text-white" href="#transactions" data-toggle="tab"><i class="fas fa-history"></i> Historique des Transactions</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-white" href="#gains" data-toggle="tab"><i class="fas fa-chart-line"></i> Gains et Retours</a>
+              <a class="nav-link text-white" href="{% url 'investor:my-vallet'%}" data-toggle="tab"><i class="fas fa-chart-line"></i>Mon Portfeuil</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link text-white" href="#withdrawals" data-toggle="tab"><i class="fas fa-wallet"></i> Solde et Retraits</a>
-            </li>
+            {% comment %} <li class="nav-item">
+              <a class="nav-link text-white" href="#withdrawals" data-toggle="tab"><i class="fas fa-wallet"></i></a>
+            </li> {% endcomment %}
             <li class="nav-item">
               <a class="nav-link text-white" href="#profile" data-toggle="tab"><i class="fas fa-user"></i> Profil et Préférences</a>
             </li>

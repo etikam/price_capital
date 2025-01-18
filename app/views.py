@@ -3,7 +3,7 @@ from app.forms import ProjectSubmissionForm, ProductInfoForm
 from app.forms import PorteurProjectForm
 from .forms import ContactForm
 from django.contrib import messages
-from app.models import PorteurProject, Project, ValidatedProject, ProjectCategory, ProjectType
+from app.models import PorteurProject, Project, ValidatedProject, ProjectCategory, ProjectType,ValidatedProductInfo
 from django.contrib.auth.decorators import login_required
 from app.utils.mailing import send_success_submision_project_mail,send_report_mail_to_superusers
 from django.core.paginator import Paginator
@@ -14,21 +14,29 @@ from django.http import Http404
 def index(request):
     # Filtrer uniquement les projets approuvés
     projects = ValidatedProject.objects.filter(is_approved=True).order_by("-updated_at")
-    
+    products = ValidatedProductInfo.objects.filter(is_approved=True)
+
     # Récupérer les catégories et les régions depuis la base de données
     categories = ProjectCategory.objects.all()
     regions = projects.values_list('location', flat=True).distinct()
     project_types = ProjectType.objects.all().order_by('-name')
-    # Pagination
-    paginator = Paginator(projects, 6)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+
+    # Pagination pour les projets
+    paginator_projects = Paginator(projects, 6)
+    page_number_projects = request.GET.get('page_projects')
+    page_obj_projects = paginator_projects.get_page(page_number_projects)
+
+    # Pagination pour les produits
+    paginator_products = Paginator(products, 4)
+    page_number_products = request.GET.get('page_products')
+    page_obj_products = paginator_products.get_page(page_number_products)
 
     context = {
-        "page_obj": page_obj,
+        "page_obj_projects": page_obj_projects,  # Projets paginés
+        "page_obj_products": page_obj_products,  # Produits paginés
         "categories": categories,
         "regions": regions,
-        'project_types':project_types
+        "project_types": project_types,
     }
     return render(request, "app/home/index.html", context)
 
@@ -61,7 +69,6 @@ def project_submision(request):
         # Récupération des données soumises par l'utilisateur
         form_project = ProjectSubmissionForm(request.POST, request.FILES)
         form_owner = PorteurProjectForm(request.POST, initial=initial_data)
-        form_product = ProductInfoForm(request.POST, request.FILES)
 
         # Validation des formulaires
         if form_project.is_valid() and form_owner.is_valid():
@@ -78,17 +85,19 @@ def project_submision(request):
             project.save()
 
             # Si le type de projet est "ACHAT ANTICIPE", enregistrer les informations du produit
-            if project.project_type.name == "ACHAT ANTICIPE" and form_product.is_valid():
-                
-                print(f"ENREGISTREMENT DU PRODUIT")
-                product_info = form_product.save(commit=False)
-                product_info.project = project
-                product_info.save()
-            else:
-                 messages.error(
-                request,
-                f"Erreur lors de l'enregistrement du projet {form_product.errors}",
-            )
+            if project.project_type.name == "ACHAT ANTICIPE": 
+                form_product = ProductInfoForm(request.POST, request.FILES)
+                if form_product.is_valid():
+                    print(f"ENREGISTREMENT DU PRODUIT")
+                    product_info = form_product.save(commit=False)
+                    product_info.project = project
+                    product_info.save()
+                else:
+                    messages.error(
+                        request,
+                        f"Erreur lors de l'enregistrement du projet {form_product.errors}",
+                    )
+
             messages.success(
                 request,
                 "Votre soumission du projet a bien été effectuée, veuillez consulter votre mail pour plus de détails",
@@ -116,6 +125,7 @@ def project_submision(request):
         "form_product": form_product,
     }
     return render(request, "app/project/submision.html", context)
+
 
 def cabinet_home(request):
     context = {}
@@ -149,6 +159,16 @@ def detail_project(request,uid):
     }
     
     return render(request,"app/home/details_project.html",context)
+
+
+
+def detail_product(request,uid):
+    project = get_object_or_404(ValidatedProductInfo,uid=uid)
+    context = {
+        'product':project
+    }
+    
+    return render(request,"app/home/details_product.html",context)
 
 #Espace soumetteur de projet
 

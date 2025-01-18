@@ -1,0 +1,164 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow">
+        <div class="card-header text-center">
+            <h4 class="display-4">{{ product.product_name }}</h4>
+            <h3><i class="fas fa-box"></i> Prix : <span class="text-primary">{{ product.unit_price|floatformat:2 }} {{ product.currency }}</span></h3>
+            <h5><i class="fas fa-boxes"></i> Quantité Disponible : <span class="text-warning">{{ product.quantity_available }}</span></h5>
+            <p class="text-muted"><i class="fas fa-calendar-alt"></i> Produit ajouté il y a {{ product.created_at|timesince }}</p>
+        </div>
+
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="productTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true"><i class="fas fa-info-circle"></i> Détails du Produit</button>
+                </li>
+                {% if user.is_authenticated and user.investor %}
+                <li class="nav-item">
+                    <button class="nav-link" id="purchase-tab" data-bs-toggle="tab" data-bs-target="#purchase" type="button" role="tab" aria-controls="purchase" aria-selected="false"><i class="fas fa-cart-plus"></i> Acheter</button>
+                </li>
+                {% endif %}
+            </ul>
+
+            <div class="tab-content" id="productTabContent">
+                <!-- Détails du Produit -->
+                <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+                    <div class="row">
+                        <!-- Colonne de gauche -->
+                        <div class="col-lg-4">
+                            <!-- Image du Produit -->
+                            <div class="card mb-4 border-outline-primary">
+                                <div class="card-header bg-light">
+                                    <h4 class="text-primary"><i class="fas fa-image"></i> Image du Produit</h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    {% if product.media %}
+                                    <img src="{{ product.media.url }}" class="img-thumbnail w-100" alt="Image du produit">
+                                    {% else %}
+                                    <p class="text-muted">Aucune image disponible.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Détails du soumetteur -->
+                            <div class="card border-outline-success">
+                                <div class="card-header bg-light">
+                                    <h4 class="text-success"><i class="fas fa-user"></i> Soumetteur</h4>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong><i class="fas fa-user-tag"></i> Nom :</strong> {{ product.Project.owner.first_name }} {{ product.owner.last_name }}</p>
+                                    <p><strong><i class="fas fa-envelope"></i> Email :</strong> {{ product.Project.user.email }}</p>
+                                    <p><strong><i class="fas fa-phone"></i> Téléphone :</strong> {{ product.Project.owner.phone }}</p>
+                                    {% if product.Project.owner.photo %}
+                                    <div class="text-center">
+                                        <img src="{{ product.Project.owner.photo.url }}" class="img-thumbnail rounded-circle" alt="Photo du soumetteur" style="width: 120px; height: 120px;">
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Colonne de droite -->
+                        <div class="col-lg-8">
+                            <div class="card border-outline-info">
+                                <div class="card-header bg-light">
+                                    <h4 class="text-info"><i class="fas fa-info-circle"></i> Détails du Produit</h4>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li><strong><i class="fas fa-box"></i> Nom :</strong> {{ product.product_name }}</li>
+                                        <li><strong><i class="fas fa-align-left"></i> Description :</strong> {{ product.product_description }}</li>
+                                        <li><strong><i class="fas fa-calendar-alt"></i> Date de Livraison :</strong> {{ product.delivery_date|date:"d M Y" }}</li>
+                                        <li><strong><i class="fas fa-clipboard-list"></i> Statut :</strong> {{ product.order_status }}</li>
+                                        <li><strong><i class="fas fa-boxes"></i> Quantité Disponible :</strong> {{ product.quantity_available }}</li>
+                                        <li><strong><i class="fas fa-coins"></i> Prix Unitaire :</strong> {{ product.unit_price|floatformat:2 }} {{ product.currency }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Liste des acheteurs -->
+                            <div class="card mt-4 border-outline-warning">
+                                <div class="card-header bg-light">
+                                    <h4 class="text-warning"><i class="fas fa-handshake"></i> Acheteurs</h4>
+                                </div>
+                                <div class="card-body">
+                                    {% if product.buyers.exists %}
+                                    <ul>
+                                        {% for buyer in product.buyers.all %}
+                                        <li>{{ buyer.name }} - <strong>{{ buyer.quantity }} unités achetées</strong></li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    <p class="text-muted">Aucun acheteur pour ce produit.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Onglet Acheter (visible uniquement pour les investisseurs) -->
+                {% if user.is_authenticated and user.investor %}
+                <div class="tab-pane fade" id="purchase" role="tabpanel" aria-labelledby="purchase-tab">
+                    <form>
+                        <section>
+                            <h3 class="text-primary"><i class="fas fa-cart-plus"></i> Informations pour l'achat</h3>
+                            <div class="mb-3">
+                                <p><strong><i class="fas fa-box"></i> Produit :</strong> {{ product.product_name }}</p>
+                                <p><strong><i class="fas fa-coins"></i> Prix Unitaire :</strong> {{ product.unit_price|floatformat:2 }} {{ product.currency }}</p>
+                                <p><strong><i class="fas fa-boxes"></i> Quantité Disponible :</strong> {{ product.quantity_available }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label for="purchaseQuantity" class="form-label"><i class="fas fa-sort-amount-up"></i> Quantité à Acheter</label>
+                                <input type="number" id="purchaseQuantity" class="form-control" min="1" max="{{ product.quantity_available }}" placeholder="Entrez la quantité souhaitée">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="confirmPurchaseCheckbox">
+                                <label class="form-check-label" for="confirmPurchaseCheckbox">
+                                    <i class="fas fa-check"></i> Je confirme que je souhaite acheter ce produit.
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="purchaseButton" data-bs-toggle="modal" data-bs-target="#confirmationModal" disabled>
+                                <i class="fas fa-cart-plus"></i> Acheter ce produit
+                            </button>
+                        </section>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation d'achat -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel"><i class="fas fa-check-circle"></i> Confirmation d'Achat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-black">
+                En continuant, vous passerez une commande pour ce produit. 
+                Le suivi sera disponible dans votre espace client. Voulez-vous continuer ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Annuler</button>
+                <a class="btn btn-primary" href="#">Continuer</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const confirmCheckbox = document.getElementById('confirmPurchaseCheckbox');
+    const purchaseButton = document.getElementById('purchaseButton');
+
+    confirmCheckbox.addEventListener('change', function () {
+        purchaseButton.disabled = !this.checked;
+    });
+</script>
+{% endblock %}

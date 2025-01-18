@@ -9,18 +9,17 @@ from app.models import ValidatedProject
 from django.db.models import Sum, Count
 from django.utils.timezone import now
 from datetime import timedelta
-import calendar
 from django.db.models.functions import ExtractMonth  
-from django.db.models.functions import ExtractMonth, ExtractYear
-from .forms import InvestissementForm
+from django.db.models.functions import ExtractYear
 from django.utils.html import strip_tags
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView
 from django.utils import timezone
-from datetime import timedelta
 from collections import defaultdict
 from decimal import Decimal
 from datetime import datetime
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 @login_required
 def become_investor(request):
@@ -282,5 +281,36 @@ class InvestmentDetailView(DetailView):
             context['delivery_date'] = "15 Décembre 2023"
             context['order_status'] = "En cours de production"
             context['order_progress'] = 75  # Pourcentage de progression
+
+        return context
+    
+
+
+
+
+class InvestorPortfolioView(LoginRequiredMixin, TemplateView):
+    template_name = "investors/portfeuil.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Récupérer l'investisseur connecté
+        investor = self.request.user.investor
+
+        # Récupérer tous les investissements de l'investisseur
+        investments = Investissement.objects.filter(investor=investor)
+
+        # Calculer les statistiques clés
+        total_invested = investments.aggregate(Sum('amount'))['amount__sum'] or Decimal(0)
+        total_gains = sum(investment.gains for investment in investments)  # Utilise la propriété 'gains'
+        # available_balance = total_gains - total_invested  # Exemple de calcul
+
+        # Ajouter les données au contexte
+        context.update({
+            # 'investments': investments,
+            'total_invested': total_invested,
+            'total_gains': total_gains,
+            # 'available_balance': available_balance,
+            'currency': 'GNF',  # Monnaie par défaut, peut être adaptée
+        })
 
         return context

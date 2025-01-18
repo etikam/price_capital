@@ -28,8 +28,6 @@
                         <h5 class="text-secondary mb-3">Informations du Projet</h5>
                         <div class="row">
                             <div class="col-md-12 mb-3">{{ form.title.label_tag }} {{ form.title }}</div>
-                            <!-- <div class="col-md-12 mb-3">{{ form.category.label_tag }} {{ form.category }}</div> -->
-
                             <div class="col-md-12 mb-3">
                                 <label for="category" class="form-label">{{ form.category.label }}</label>
                                 <div class="input-group">
@@ -39,21 +37,32 @@
                                     </button>
                                 </div>
                             </div>
-
                             <div class="col-md-12 mb-3">
                                 <label for="category" class="form-label">{{ form.project_type.label }}</label>
                                 <div class="input-group">
                                     {{ form.project_type }}
                                 </div>
                             </div>
-                            
-                            
                             <div class="col-md-12 mb-3">{{ form.goal.label_tag }} {{ form.goal }}</div>
                             <div class="col-md-12 mb-3">{{ form.currency.label_tag }} {{ form.currency }}</div>
                             <div class="col-md-12 mb-3">{{ form.location.label_tag }} {{ form.location }}</div>
                             <div class="col-md-12 mb-3">{{ form.context.label_tag }} {{ form.context }}</div>
                             <div class="col-md-12 mb-3">{{ form.summary.label_tag }} {{ form.summary }}</div>
                             <div class="col-md-12 mb-3">{{ form.problem_statement.label_tag }} {{ form.problem_statement }}</div>
+                        </div>
+
+                        <!-- Informations sur le produit (uniquement pour ACHAT ANTICIPE) -->
+                        <div id="product-info-form" class="hidden">
+                            <h5 class="text-secondary mt-4 mb-3">Informations sur le Produit</h5>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">{{ product_form.product_name.label_tag }} {{ product_form.product_name }}</div>
+                                <div class="col-md-12 mb-3">{{ product_form.product_description.label_tag }} {{ product_form.product_description }}</div>
+                                <div class="col-md-12 mb-3">{{ product_form.delivery_date.label_tag }} {{ product_form.delivery_date }}</div>
+                                <div class="col-md-12 mb-3">{{ product_form.quantity_available.label_tag }} {{ product_form.quantity_available }}</div>
+                                <div class="col-md-12 mb-3">{{ product_form.product_unity.label_tag }} {{ product_form.product_unity }}</div>
+                                <div class="col-md-12 mb-3">{{ product_form.unit_price.label_tag }} {{ product_form.unit_price }}</div>
+                                <div class="col-md-12 mb-3">{{ product_form.media.label_tag }} {{ product_form.media }}</div>
+                            </div>
                         </div>
 
                         <h5 class="text-secondary mt-4 mb-3">Objectifs et Livrables</h5>
@@ -127,7 +136,6 @@
     </div>
 </div>
 
-
 <!-- Modal pour ajouter une catégorie -->
 <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -135,7 +143,7 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="addCategoryModalLabel">Ajouter une Catégorie</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>-
+            </div>
             <div class="modal-body">
                 <form id="addCategoryForm" method="post" action="{% url 'add_category' %}">
                     {% csrf_token %}
@@ -153,7 +161,27 @@
     </div>
 </div>
 
+<!-- JavaScript pour masquer/afficher les champs en fonction du type de projet -->
+<script>
+    $(document).ready(function () {
+        function toggleProductInfoForm() {
+            const selectedOption = $("#id_project_type option:selected");
+            const projectTypeName = selectedOption.data("name"); // Récupère le nom du type de projet
+            console.log("Nom du type de projet :", projectTypeName); // Pour déboguer
+
+            if (projectTypeName === "ACHAT ANTICIPE") {
+                $("#product-info-form").removeClass("hidden");
+            } else {
+                $("#product-info-form").addClass("hidden");
+            }
+        }
+
+        // Écouter les changements sur le champ project_type
+        $("#id_project_type").change(toggleProductInfoForm);
+
+        // Appeler la fonction au chargement de la page pour initialiser l'état
+        toggleProductInfoForm();
+    });
+</script>
+
 {% endblock %}
-
-
-

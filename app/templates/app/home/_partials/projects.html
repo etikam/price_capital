@@ -1,68 +1,16 @@
 {% load static %}
-{% load filters %}
 
 <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
     <h4 class="text-primary">Projets Soumis</h4>
     <h1 class="display-5 mb-4">Découvrez Nos Projets Soumis</h1>
 </div>
 
-<style>
-    /* Pagination générale */
-    .pagination-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .pagination .page-link {
-        border-radius: 50px;
-        padding: 10px 20px;
-        font-size: 16px;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
-    }
-
-    .pagination .page-item.disabled .page-link {
-        background-color: #f8f9fa;
-        border-color: #dee2e6;
-        color: #6c757d;
-    }
-
-    /* Style des images des projets */
-    .service-img img {
-        width: 100%;  /* L'image s'ajuste à la largeur de son conteneur */
-        height: 200px; /* Hauteur fixe de 200px */
-        object-fit: cover; /* Conserver le rapport d'aspect sans déformation */
-    }
-
-    /* Media Query pour écrans moyens */
-    @media (max-width: 992px) {
-        .pagination .page-link {
-            padding: 8px 15px;
-            font-size: 14px;
-        }
-    }
-
-    /* Media Query pour petits écrans */
-    @media (max-width: 576px) {
-        .pagination .page-link {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-    }
-</style>
-
-{% include 'app/home/_partials/project_filters.html' %}
-
+<!-- Section des Projets -->
 <div class="container-fluid service pb-5">
     <div class="container pb-5">
+        <h2 class="text-center mb-4">Projets</h2>
         <div class="row g-4">
-            {% for project in page_obj %}
+            {% for project in page_obj_projects %}
             <div class="col-md-6 col-lg-4 wow fadeInUp project-item" 
                  data-category="{{ project.category.id }}" 
                  data-region="{{ project.location }}" 
@@ -109,17 +57,18 @@
     </div>
 </div>
 
+<!-- Pagination pour les projets -->
 <div class="d-flex justify-content-center mt-4">
     <nav aria-label="Pagination" class="pagination-container">
         <ul class="pagination pagination-lg justify-content-center">
-            {% if page_obj.has_previous %}
+            {% if page_obj_projects.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1" aria-label="Première">
+                <a class="page-link" href="?page_projects=1" aria-label="Première">
                     <span aria-hidden="true">&laquo;&laquo;</span>
                 </a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Précédente">
+                <a class="page-link" href="?page_projects={{ page_obj_projects.previous_page_number }}" aria-label="Précédente">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -132,22 +81,22 @@
             </li>
             {% endif %}
 
-            {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
+            {% for num in page_obj_projects.paginator.page_range %}
+            {% if page_obj_projects.number == num %}
             <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% elif num > page_obj_projects.number|add:'-3' and num < page_obj_projects.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page_projects={{ num }}">{{ num }}</a></li>
             {% endif %}
             {% endfor %}
 
-            {% if page_obj.has_next %}
+            {% if page_obj_projects.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Suivante">
+                <a class="page-link" href="?page_projects={{ page_obj_projects.next_page_number }}" aria-label="Suivante">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Dernière">
+                <a class="page-link" href="?page_projects={{ page_obj_projects.paginator.num_pages }}" aria-label="Dernière">
                     <span aria-hidden="true">&raquo;&raquo;</span>
                 </a>
             </li>
@@ -163,38 +112,96 @@
     </nav>
 </div>
 
-<script>
-    document.getElementById("filter-btn").addEventListener("click", function () {
-        const category = document.getElementById("category").value;
-        const region = document.getElementById("region").value;
-        const budget = document.getElementById("budget").value;
-        const projectType = document.getElementById("project-type").value;
+<!-- Section des Produits -->
+<div class="container-fluid service pb-5">
+    <div class="container pb-5">
+        <h2 class="text-center mb-4">Produits</h2>
+        <div class="row g-4">
+            {% for product in page_obj_products %}
+            <div class="col-md-6 col-lg-4 wow fadeInUp product-item">
+                <div class="service-item">
+                    <div class="service-img">
+                        {% if product.media %}
+                        <a href="{{ product.media.url }}" target="_blank">
+                            <img src="{{ product.media.url }}" class="img-fluid rounded-top w-100" alt="Image" />
+                        </a>
+                        {% else %}
+                        <a href="{% static 'img/service-1.jpg' %}" target="_blank">
+                            <img src="{% static 'img/service-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="rounded-bottom p-4">
+                        <a href="#" class="h4 d-inline-block mb-4">{{ product.product_name }}</a>
+                        <p class="mb-4">{{ product.product_description|slice:":150" }}{% if product.product_description|length > 150 %}...{% endif %}</p>
+                        
+                        <!-- Informations sur le produit -->
+                        <p><strong>Prix Unitaire :</strong> {{ product.unit_price }} GNF</p>
+                        <p><strong>Quantité Disponible :</strong> {{ product.quantity_available }}</p>
+                        <p><strong>Date de Livraison :</strong> {{ product.delivery_date|date:"d M Y" }}</p>
+                        
+                        <a class="btn btn-primary rounded-pill py-2 px-4 text-center" href="{% url 'detail-product' product.uid%}">
+                            Voir Plus
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 
-        // Sélectionner tous les projets
-        const projects = document.querySelectorAll(".project-item");
+<!-- Pagination pour les produits -->
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Pagination" class="pagination-container">
+        <ul class="pagination pagination-lg justify-content-center">
+            {% if page_obj_products.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page_products=1" aria-label="Première">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page_products={{ page_obj_products.previous_page_number }}" aria-label="Précédente">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+            {% endif %}
 
-        projects.forEach((project) => {
-            const projectCategory = project.getAttribute("data-category");
-            const projectRegion = project.getAttribute("data-region");
-            const projectBudget = parseFloat(project.getAttribute("data-budget"));
-            const projectTypeId = project.getAttribute("data-type");
+            {% for num in page_obj_products.paginator.page_range %}
+            {% if page_obj_products.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj_products.number|add:'-3' and num < page_obj_products.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page_products={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
 
-            // Conditions de filtrage
-            const matchesCategory = category === "" || projectCategory === category;
-            const matchesRegion = region === "" || projectRegion === region;
-            const matchesBudget =
-                budget === "" ||
-                (budget === "low" && projectBudget < 10000000) ||
-                (budget === "medium" && projectBudget >= 10000000 && projectBudget <= 50000000) ||
-                (budget === "high" && projectBudget > 50000000);
-            const matchesProjectType = projectType === "" || projectTypeId === projectType;
-
-            // Affichage/Masquage des projets
-            if (matchesCategory && matchesRegion && matchesBudget && matchesProjectType) {
-                project.style.display = "block";
-            } else {
-                project.style.display = "none";
-            }
-        });
-    });
-</script>
+            {% if page_obj_products.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page_products={{ page_obj_products.next_page_number }}" aria-label="Suivante">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page_products={{ page_obj_products.paginator.num_pages }}" aria-label="Dernière">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;&raquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>

@@ -278,18 +278,26 @@ Soumettre un Projet
         let currentStep = 1;
         const totalSteps = 3;
 
-        // Fonction pour afficher ou masquer le formulaire ProductInfo
-        function toggleProductInfoForm() {
+        // Fonction pour afficher ou masquer les champs en fonction du type de projet
+        function toggleFieldsBasedOnProjectType() {
             const selectedOption = $("#id_project_type option:selected");
             const projectTypeName = selectedOption.data("name"); // Récupère le nom du type de projet
             console.log("Nom du type de projet :", projectTypeName); // Pour déboguer
 
-            if (projectTypeName === "ACHAT ANTICIPE") { // Utilisez la valeur exacte affichée dans le terminal
-                console.log("Affichage du formulaire ProductInfoForm"); // Pour déboguer
+            if (projectTypeName === "ACHAT ANTICIPE") {
+                // Afficher le formulaire ProductInfo et masquer les champs inutiles de l'étape 2
                 $("#product-info-form").removeClass("hidden");
+                $("#step-2 .mb-3").addClass("hidden"); // Masquer tous les champs de l'étape 2
+
+                // Réactiver les champs du formulaire ProductInfo
+                $("#product-info-form :input").prop("disabled", false);
             } else {
-                console.log("Masquage du formulaire ProductInfoForm"); // Pour déboguer
+                // Masquer le formulaire ProductInfo et afficher les champs de l'étape 2
                 $("#product-info-form").addClass("hidden");
+                $("#step-2 .mb-3").removeClass("hidden"); // Afficher tous les champs de l'étape 2
+
+                // Désactiver les champs du formulaire ProductInfo pour éviter qu'ils bloquent la soumission
+                $("#product-info-form :input").prop("disabled", true);
             }
         }
 
@@ -320,7 +328,7 @@ Soumettre un Projet
         }
 
         // Écouter les changements sur le champ project_type
-        $("#id_project_type").change(toggleProductInfoForm);
+        $("#id_project_type").change(toggleFieldsBasedOnProjectType);
 
         // Écouter les clics sur le bouton Suivant
         $(".next-step").click(function () {
@@ -333,7 +341,7 @@ Soumettre un Projet
         });
 
         // Appeler la fonction au chargement de la page pour initialiser l'état
-        toggleProductInfoForm();
+        toggleFieldsBasedOnProjectType();
     });
 </script>
 {% endblock script %}

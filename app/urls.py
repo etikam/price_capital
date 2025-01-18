@@ -15,6 +15,7 @@ urlpatterns = [
     path('project/cabinet/publish/<uuid:uid>/', project_editing_view.publish_project, name="cabinet-publishp-roject"),
     path("project/<uuid:uid>/reformulate/", project_editing_view.reformulate_project, name="reformulate_project"),
     path("project/detail/<uuid:uid>/",views.detail_project, name="detail-project"),
+    path("product/detail/<uuid:uid>/",views.detail_product, name="detail-product"),
     path("add-category/",project_editing_view.add_category, name="add_category"),
     path("mysapce/",views.user_space, name="my-space"),
     path("myspace/detail/<int:project_id>/",views.project_detail, name="my-project-detail"),

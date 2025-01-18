@@ -1,0 +1,71 @@
+{% extends 'app/project/salon.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+            <h4>Reformuler le Projet - {{ project.title }}</h4>
+        </div>
+        <div class="card-body">
+            <!-- Onglets pour basculer entre les détails initiaux et le formulaire -->
+            <ul class="nav nav-tabs mb-4" id="projectTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="initial-tab" data-bs-toggle="tab" data-bs-target="#initial"
+                        type="button" role="tab" aria-controls="initial" aria-selected="true">Détails Initiaux</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reformulate-tab" data-bs-toggle="tab" data-bs-target="#reformulate"
+                        type="button" role="tab" aria-controls="reformulate" aria-selected="false">Reformulation</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="projectTabContent">
+                <!-- Détails Initiaux -->
+                <div class="tab-pane fade show active" id="initial" role="tabpanel" aria-labelledby="initial-tab">
+                    <h5 class="text-secondary mb-3">À propos du projet</h5>
+                    <p><strong>Titre :</strong> {{ project.title }}</p>
+                    <p><strong>Catégorie :</strong> {{ project.category.name }}</p>
+                    <p><strong>Budget :</strong> {{ project.goal|floatformat:2 }} {{ project.currency }}</p>
+                    <p><strong>Localisation :</strong> {{ project.location }}</p>
+
+                    <h5 class="text-secondary mt-4 mb-3">À propos du produit</h5>
+                    {% if validated_product_info %}
+                        <p><strong>Nom du Produit :</strong> {{ validated_product_info.product_name }}</p>
+                        <p><strong>Description :</strong> {{ validated_product_info.product_description }}</p>
+                        <p><strong>Date de Livraison :</strong> {{ validated_product_info.delivery_date|date }}</p>
+                        <p><strong>Quantité Disponible :</strong> {{ validated_product_info.quantity_available }}</p>
+                        <p><strong>Prix Unitaire :</strong> {{ validated_product_info.unit_price }}</p>
+                        {% if validated_product_info.media %}
+                            <p><strong>Image du Produit :</strong></p>
+                            <img src="{{ validated_product_info.media.url }}" alt="Image du Produit" class="img-thumbnail" style="width: 150px; height: auto;">
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">Aucune information sur le produit disponible.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Formulaire de Reformulation -->
+                <div class="tab-pane fade" id="reformulate" role="tabpanel" aria-labelledby="reformulate-tab">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <h5 class="text-secondary mb-3">Informations sur le Produit</h5>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">{{ product_form.product_name.label_tag }} {{ product_form.product_name }}</div>
+                            <div class="col-md-12 mb-3">{{ product_form.product_description.label_tag }} {{ product_form.product_description }}</div>
+                            <div class="col-md-12 mb-3">{{ product_form.delivery_date.label_tag }} {{ product_form.delivery_date }}</div>
+                            <div class="col-md-12 mb-3">{{ product_form.quantity_available.label_tag }} {{ product_form.quantity_available }}</div>
+                            <div class="col-md-12 mb-3">{{ product_form.product_unity.label_tag }} {{ product_form.product_unity }}</div>
+                            <div class="col-md-12 mb-3">{{ product_form.unit_price.label_tag }} {{ product_form.unit_price }}</div>
+                            <div class="col-md-12 mb-3">{{ product_form.media.label_tag }} {{ product_form.media }}</div>
+                        </div>
+
+                        <div class="row">
+                            <button type="submit" class="btn btn-success col">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

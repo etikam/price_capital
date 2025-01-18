@@ -6,6 +6,8 @@ from .models import ValidatedProject
 from .models import Contact
 from django.core.validators import FileExtensionValidator
 from .models import ProductInfo
+from .models import ValidatedProductInfo
+from django.core.validators import MinValueValidator
 
 
 class ProjectSubmissionForm(forms.ModelForm):
@@ -240,4 +242,71 @@ class ProductInfoForm(forms.ModelForm):
             'quantity_unity': 'Unite de mesure',
             'unit_price': 'Prix unitaire',
             'media': 'Image du produit',
+        }
+
+class ValidatedProductInfoForm(forms.ModelForm):
+    class Meta:
+        model = ValidatedProductInfo
+        fields = [
+            'product_name',
+            'product_description',
+            'delivery_date',
+            'order_status',
+            'order_progress',
+            'quantity_available',
+            'product_unity',
+            'unit_price',
+            'media',
+        ]
+        widgets = {
+            'product_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Entrez le nom du produit',
+            }),
+            'product_description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Décrivez le produit ou service',
+            }),
+            'delivery_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
+            'order_status': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+            'order_progress': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 0,
+                'max': 100,
+                'placeholder': 'Progression en pourcentage',
+            }),
+            'quantity_available': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 0,
+                'placeholder': 'Quantité disponible',
+            }),
+            'product_unity': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Unité de mesure (ex: kg, pièces)',
+            }),
+            'unit_price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 0,
+                'placeholder': 'Prix unitaire',
+            }),
+            'media': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+            }),
+        }
+        labels = {
+            'product_name': 'Nom du Produit',
+            'product_description': 'Description du Produit',
+            'delivery_date': 'Date de Livraison',
+            'order_status': 'Statut de la Commande',
+            'order_progress': 'Progression de la Commande (%)',
+            'quantity_available': 'Quantité Disponible',
+            'product_unity': 'Unité de Mesure',
+            'unit_price': 'Prix Unitaire',
+            'media': 'Image du Produit',
         }
