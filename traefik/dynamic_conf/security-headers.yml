@@ -14,3 +14,6 @@ http:
         customResponseHeaders:
           X-Permitted-Cross-Domain-Policies: "none"
           Permissions-Policy: "geolocation=(), camera=(), microphone=()"
+
+
+          #les security headers
