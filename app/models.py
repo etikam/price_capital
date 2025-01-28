@@ -3,6 +3,10 @@ from django.conf import settings
 from django.core.validators import FileExtensionValidator
 import uuid
 from django.db.models import Sum
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from PIL import Image
+import os
 
 # porteur de projet, au cas où un utilisateur peut soumettre un projet avec d'autre informations
 class PorteurProject(models.Model):
@@ -13,6 +17,8 @@ class PorteurProject(models.Model):
     birthday = models.DateField()
     photo = models.ImageField(upload_to="img_porteur")
 
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
 class ProjectCategory(models.Model):
     name = models.CharField(max_length=50)
@@ -52,7 +58,7 @@ class Project(models.Model):
     )
     
     owner = models.ForeignKey(
-        "PorteurProject",
+        PorteurProject,
         related_name="projects",
         on_delete=models.CASCADE,
         verbose_name="Porteur de projet",
@@ -185,7 +191,7 @@ class ValidatedProject(models.Model):
     verbose_name="Identifiant unique",
         )
     project = models.OneToOneField(
-        "Project", on_delete=models.CASCADE, related_name="validated_project", verbose_name="Projet soumis"
+        Project, on_delete=models.CASCADE, related_name="validated_project", verbose_name="Projet soumis"
     )
     
     title = models.CharField(
@@ -416,7 +422,7 @@ class ValidatedProductInfo(models.Model):
     )
     
     def __str__(self):
-        return f"Informations sur {self.validated_project.title}"
+        return f"Informations sur {self.product_name}"
 
     class Meta:
         verbose_name = "Informations sur le Produit Validé"
@@ -433,3 +439,56 @@ class Contact(models.Model):
 
     def __str__(self):
         return f"Message de {self.name} - {self.subject}"
+
+def resize_image(image_field, max_width=800, max_height=600):
+    if not image_field:
+        return
+
+    img = Image.open(image_field)
+    
+    # Convertir en RGB si nécessaire
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+    
+    # Calculer les nouvelles dimensions en gardant le ratio
+    ratio = min(max_width/img.width, max_height/img.height)
+    new_width = int(img.width * ratio)
+    new_height = int(img.height * ratio)
+    
+    # Redimensionner l'image
+    img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    
+    # Sauvegarder l'image redimensionnée
+    img.save(image_field.path, quality=85, optimize=True)
+
+@receiver(pre_save, sender=ValidatedProject)
+def resize_project_image(sender, instance, **kwargs):
+    if instance.image:
+        resize_image(instance.image)
+
+@receiver(pre_save, sender=ValidatedProductInfo)
+def resize_product_image(sender, instance, **kwargs):
+    if instance.media:
+        resize_image(instance.media)
+
+
+class Realisation(models.Model):
+    uid = models.UUIDField(
+    default=uuid.uuid4,
+    editable=False,
+    unique=True,
+    verbose_name="Identifiant unique",
+        )
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    image = models.ImageField(upload_to="realisation_images", null=True, blank=True)
+    project = models.ForeignKey(ValidatedProject,on_delete=models.CASCADE,related_name="realisations")
+    
+    date = models.DateTimeField(verbose_name="Date de réalisation")
+    created_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ["-created_at"]
+    
+    
+    

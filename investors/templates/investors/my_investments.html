@@ -39,17 +39,17 @@
         <td>{{ investissement.percentage_on_goal|floatformat:2 }}%</td>
         <td>
           <div class="dropdown">
-            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ investissement.uid }}" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="fas fa-ellipsis-v"></i>
+            <button class="btn btn-link text-secondary mb-0" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa fa-ellipsis-v text-xs"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded" aria-labelledby="dropdownMenuButton{{ investissement.uid }}">
+            <ul class="dropdown-menu">
               <li>
                 <a class="dropdown-item" href="{% url 'detail-project' investissement.project.uid %}">
                   <i class="fas fa-eye me-2 text-primary"></i> Détails du projet
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'investor:investissement' investissement.uid %}">
+                <a class="dropdown-item" href="{% url 'investor:investment-details' investissement.uid %}">
                   <i class="fas fa-circle-info me-2 text-info"></i> Voir l'investissement
                 </a>
               </li>

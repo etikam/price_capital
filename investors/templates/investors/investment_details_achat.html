@@ -1,0 +1,319 @@
+{% extends 'investors/investment_base.html' %}
+{% load static %}
+
+{% block main_content %}
+<div class="container-fluid px-4">
+  <!-- En-tête -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="{% url 'investor:investment-dashboard' %}" class="btn btn-outline-primary btn-rounded">
+      <i class="fas fa-chevron-left me-2"></i>Retour
+    </a>
+    <h2 class="mb-0 text-center flex-grow-1">
+      <i class="fas fa-shopping-basket"></i> Détails de l'Achat
+    </h2>
+    <div style="width: 100px;"></div>
+  </div>
+
+  <!-- Cartes de statistiques -->
+  <div class="row g-4 mb-4">
+    <!-- Montant Total -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm hover-shadow">
+        <div class="card-body text-center">
+          <i class="fas fa-coins fa-4x text-primary mb-3"></i>
+          <h5 class="card-title text-primary fw-bold">Montant Total</h5>
+          <h2 class="card-text">{{ achat.total_amount|floatformat:2 }} {{ achat.currency }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quantité -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm hover-shadow">
+        <div class="card-body text-center">
+          <i class="fas fa-box fa-4x text-info mb-3"></i>
+          <h5 class="card-title text-info fw-bold">Quantité</h5>
+          <h2 class="card-text">{{ achat.quantity }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prix Unitaire -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm hover-shadow">
+        <div class="card-body text-center">
+          <i class="fas fa-dollar-sign fa-4x text-success mb-3"></i>
+          <h5 class="card-title text-success fw-bold">Prix Unitaire</h5>
+          <h2 class="card-text">{{ achat.product.unit_price }} {{ achat.currency }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu principal en deux colonnes -->
+  <div class="row g-4">
+    <!-- Colonne de gauche -->
+    <div class="col-lg-6">
+      <!-- Informations du produit -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-primary bg-gradient py-3">
+          <h5 class="card-title mb-0 text-white">
+            <i class="fas fa-box-open me-2"></i>Détails du Produit
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="d-flex align-items-start mb-4">
+            <div class="bg-light rounded p-3 shadow-sm me-4">
+              {% if achat.product.media %}
+              <a href="{{ achat.product.media.url }}" target="_blank" rel="noopener noreferrer" class="d-block">
+                <img src="{{ achat.product.media.url }}" alt="Image du produit" class="rounded"
+                  style="width: 120px; height: 120px; object-fit: cover; cursor: pointer;">
+              </a>
+              {% else %}
+              <img src="{% static 'img/default_product.jpg' %}" alt="Image par défaut" class="rounded"
+                style="width: 120px; height: 120px; object-fit: cover;">
+              {% endif %}
+            </div>
+            <div>
+              <h4 class="mb-2 text-primary fw-bold">{{ achat.product.product_name }}</h4>
+              <p class="text-muted mb-3">{{ achat.product.product_description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profil du vendeur -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-info bg-gradient py-3">
+          <h5 class="card-title mb-0 text-white">
+            <i class="fas fa-user-tie me-2"></i>Profil du Vendeur
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="me-4">
+              {% if achat.product.Project.owner.photo %}
+              <img src="{{ achat.product.Project.owner.photo.url }}" alt="Photo de profil" class="rounded-circle"
+                style="width: 80px; height: 80px; object-fit: cover;">
+              {% else %}
+              <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center"
+                style="width: 80px; height: 80px;">
+                <i class="fas fa-user fa-3x text-info"></i>
+              </div>
+              {% endif %}
+            </div>
+            <div>
+              <h4 class="mb-1 text-info fw-bold">{{ achat.product.Project.owner.get_full_name }}</h4>
+              <p class="text-muted mb-2">{{ achat.product.Project.owner.company_name }}</p>
+              <div class="d-flex align-items-center">
+                <span class="badge bg-success me-2">
+                  <i class="fas fa-star me-1"></i>{{ achat.product.Project.owner.rating|floatformat:1 }}
+                </span>
+                <span class="text-muted small">
+                  ({{ achat.product.Project.owner.total_reviews }} avis)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne de droite -->
+    <div class="col-lg-6">
+      <!-- Stepper de progression -->
+      <!-- Stepper de progression -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-success bg-gradient py-3">
+          <h5 class="card-title mb-0 text-white">
+            <i class="fas fa-shipping-fast me-2"></i>Progression de la Commande
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="bs-stepper">
+            <div class="bs-stepper-header mb-4" role="tablist">
+              <!-- Étape 1 : Commande validée -->
+              <div
+                class="step {% if achat.order_status >= 1 %}active{% endif %} {% if achat.order_status > 1 %}completed{% endif %}"
+                data-target="#step-1">
+                <button type="button" class="step-trigger" role="tab">
+                  <span class="bs-stepper-circle">
+                    {% if achat.order_status > 1 %}
+                    <i class="fas fa-check"></i>
+                    {% else %}
+                    1
+                    {% endif %}
+                  </span>
+                  <span class="bs-stepper-label">Commande validée</span>
+                </button>
+                <div class="bs-stepper-line"></div>
+              </div>
+
+              <!-- Étape 2 : En cours de production -->
+              <div
+                class="step {% if achat.order_status >= 2 %}active{% endif %} {% if achat.order_status > 2 %}completed{% endif %}"
+                data-target="#step-2">
+                <button type="button" class="step-trigger" role="tab">
+                  <span class="bs-stepper-circle">
+                    {% if achat.order_status > 2 %}
+                    <i class="fas fa-check"></i>
+                    {% else %}
+                    2
+                    {% endif %}
+                  </span>
+                  <span class="bs-stepper-label">En cours de production</span>
+                </button>
+                <div class="bs-stepper-line"></div>
+              </div>
+
+              <!-- Étape 3 : Livraison -->
+              <div
+                class="step {% if achat.order_status >= 3 %}active{% endif %} {% if achat.order_status > 3 %}completed{% endif %}"
+                data-target="#step-3">
+                <button type="button" class="step-trigger" role="tab">
+                  <span class="bs-stepper-circle">
+                    {% if achat.order_status > 3 %}
+                    <i class="fas fa-check"></i>
+                    {% else %}
+                    3
+                    {% endif %}
+                  </span>
+                  <span class="bs-stepper-label">Livraison</span>
+                </button>
+                <div class="bs-stepper-line"></div>
+              </div>
+
+              <!-- Étape 4 : Terminé -->
+              <div
+                class="step {% if achat.order_status >= 4 %}active{% endif %} {% if achat.order_status > 4 %}completed{% endif %}"
+                data-target="#step-4">
+                <button type="button" class="step-trigger" role="tab">
+                  <span class="bs-stepper-circle">
+                    {% if achat.order_status > 4 %}
+                    <i class="fas fa-check"></i>
+                    {% else %}
+                    4
+                    {% endif %}
+                  </span>
+                  <span class="bs-stepper-label">Terminé</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hover-shadow {
+    transition: all 0.3s ease;
+  }
+
+  .hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .bs-stepper {
+    position: relative;
+  }
+
+  .bs-stepper-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+  }
+
+  .step-trigger {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: default;
+    width: 100%;
+  }
+
+  .bs-stepper-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-weight: bold;
+    border: 2px solid #e9ecef;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+  }
+
+  .bs-stepper-line {
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 25px);
+    right: calc(-50% + 25px);
+    height: 3px;
+    background: #e9ecef;
+    transform: translateY(-50%);
+    z-index: 1;
+    transition: all 0.3s ease;
+  }
+
+  .step.active .bs-stepper-circle {
+    background-color: #4285f4;
+    border-color: #4285f4;
+    color: white;
+    box-shadow: 0 0 0 5px rgba(66, 133, 244, 0.2);
+  }
+
+  .step.completed .bs-stepper-circle {
+    background-color: #00c851;
+    border-color: #00c851;
+    color: white;
+    box-shadow: 0 0 0 5px rgba(0, 200, 81, 0.2);
+  }
+
+  .step.active .bs-stepper-line,
+  .step.completed .bs-stepper-line {
+    background-color: #00c851;
+  }
+
+  .bs-stepper-label {
+    margin-top: 10px;
+    font-size: 0.875rem;
+    color: #6c757d;
+    display: block;
+    font-weight: 500;
+  }
+
+  .step.active .bs-stepper-label {
+    color: #4285f4;
+    font-weight: 600;
+  }
+
+  .step.completed .bs-stepper-label {
+    color: #00c851;
+  }
+
+  @media (max-width: 768px) {
+    .bs-stepper-label {
+      font-size: 0.75rem;
+    }
+
+    .bs-stepper-circle {
+      width: 35px;
+      height: 35px;
+    }
+  }
+</style>
+{% endblock %}

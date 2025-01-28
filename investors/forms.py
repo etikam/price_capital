@@ -1,7 +1,5 @@
 from django import forms
-from investors.models import Investor
-from investors.models import Investissement
-
+from investors.models import Investor, Investissement, Achat
 from django.core.exceptions import ValidationError
 
 class InvestorForm(forms.ModelForm):
@@ -40,7 +38,6 @@ class InvestorForm(forms.ModelForm):
             })
 
         return cleaned_data
-    
 
 class InvestissementForm(forms.ModelForm):
     class Meta:
@@ -58,3 +55,22 @@ class InvestissementForm(forms.ModelForm):
             # Lever une exception de validation
             raise ValidationError(" Désolé, mais vous ne pouvez pas investir un montant inférieur ou égal à 0.")
         return amount  # Retourner la valeur si elle est valide
+
+class AchatForm(forms.ModelForm):
+    class Meta:
+        model = Achat
+        fields = ['quantity']
+        widgets = {
+            'quantity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Quantité souhaitée'
+            })
+        }
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data['quantity']
+        if quantity <= 0:
+            raise ValidationError("La quantité doit être supérieure à 0.")
+        if quantity > self.instance.product.quantity_available:
+            raise ValidationError(f"Vous ne pouvez pas acheter plus que la quantité disponible: {self.instance.product.quantity_available}.")
+        return quantity

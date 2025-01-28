@@ -4,6 +4,7 @@ from .models import PorteurProject
 from .models import ProjectCategory
 from .models import ValidatedProject
 from .models import Contact
+from .models import Realisation
 from django.core.validators import FileExtensionValidator
 from .models import ProductInfo
 from .models import ValidatedProductInfo
@@ -108,7 +109,7 @@ class ValidatedProjectForm(forms.ModelForm):
         fields = [
             "title",
             "category",
-            "goal",      
+            "goal",
             "location",
             "currency",
             "context",
@@ -162,29 +163,27 @@ class ValidatedProjectForm(forms.ModelForm):
 class ContactForm(forms.ModelForm):
     class Meta:
         model = Contact
-        fields = ['name', 'email', 'phone', 'subject', 'message']
+        fields = ["name", "email", "phone", "subject", "message"]
         widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'form-control border-0',
-                'placeholder': 'Votre Nom'
-            }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control border-0',
-                'placeholder': 'Votre Email'
-            }),
-            'phone': forms.TextInput(attrs={
-                'class': 'form-control border-0',
-                'placeholder': 'Téléphone'
-            }),
-            'subject': forms.TextInput(attrs={
-                'class': 'form-control border-0',
-                'placeholder': 'Sujet'
-            }),
-            'message': forms.Textarea(attrs={
-                'class': 'form-control border-0',
-                'placeholder': 'Votre message ici',
-                'style': 'height: 160px;'
-            }),
+            "name": forms.TextInput(
+                attrs={"class": "form-control border-0", "placeholder": "Votre Nom"}
+            ),
+            "email": forms.EmailInput(
+                attrs={"class": "form-control border-0", "placeholder": "Votre Email"}
+            ),
+            "phone": forms.TextInput(
+                attrs={"class": "form-control border-0", "placeholder": "Téléphone"}
+            ),
+            "subject": forms.TextInput(
+                attrs={"class": "form-control border-0", "placeholder": "Sujet"}
+            ),
+            "message": forms.Textarea(
+                attrs={
+                    "class": "form-control border-0",
+                    "placeholder": "Votre message ici",
+                    "style": "height: 160px;",
+                }
+            ),
         }
 
 
@@ -192,121 +191,172 @@ class ProductInfoForm(forms.ModelForm):
     class Meta:
         model = ProductInfo
         fields = [
-            'product_name',
-            'product_description',
-            'delivery_date',
-            'quantity_available',
+            "product_name",
+            "product_description",
+            "delivery_date",
+            "quantity_available",
             "product_unity",
-            'unit_price',
-            'media',
+            "unit_price",
+            "media",
         ]
         widgets = {
-            'product_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Entrez le nom du produit',
-            }),
-            
-            'product_description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 4,
-                'placeholder': 'Décrivez le produit ou service.',
-            }),
-            'delivery_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date',
-            }),
-
-            'quantity_available': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 0,
-                'placeholder': 'Quantité disponible',
-            }),
-            
-            'product_unity': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'ex:kilo,litre,bidon,sac...',
-            }),
-            'unit_price': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Prix unitaire',
-            }),
-            'media': forms.ClearableFileInput(attrs={
-                'class': 'form-control',
-            }),
+            "product_name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Entrez le nom du produit",
+                }
+            ),
+            "product_description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": "Décrivez le produit ou service.",
+                }
+            ),
+            "delivery_date": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date",
+                }
+            ),
+            "quantity_available": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": 0,
+                    "placeholder": "Quantité disponible",
+                }
+            ),
+            "product_unity": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "ex:kilo,litre,bidon,sac...",
+                }
+            ),
+            "unit_price": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Prix unitaire",
+                }
+            ),
+            "media": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
         }
         labels = {
-            'product_name': 'Nom du produit',
-            'product_description': 'Description',
-            'delivery_date': 'Date de livraison',
-            'quantity_available': 'Quantité disponible',
-            'quantity_unity': 'Unite de mesure',
-            'unit_price': 'Prix unitaire',
-            'media': 'Image du produit',
+            "product_name": "Nom du produit",
+            "product_description": "Description",
+            "delivery_date": "Date de livraison",
+            "quantity_available": "Quantité disponible",
+            "quantity_unity": "Unite de mesure",
+            "unit_price": "Prix unitaire",
+            "media": "Image du produit",
         }
+
 
 class ValidatedProductInfoForm(forms.ModelForm):
     class Meta:
         model = ValidatedProductInfo
         fields = [
-            'product_name',
-            'product_description',
-            'delivery_date',
-            'order_status',
-            'order_progress',
-            'quantity_available',
-            'product_unity',
-            'unit_price',
-            'media',
+            "product_name",
+            "product_description",
+            "delivery_date",
+            "order_status",
+            "order_progress",
+            "quantity_available",
+            "product_unity",
+            "unit_price",
+            "media",
         ]
         widgets = {
-            'product_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Entrez le nom du produit',
-            }),
-            'product_description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 4,
-                'placeholder': 'Décrivez le produit ou service',
-            }),
-            'delivery_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date',
-            }),
-            'order_status': forms.Select(attrs={
-                'class': 'form-control',
-            }),
-            'order_progress': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 0,
-                'max': 100,
-                'placeholder': 'Progression en pourcentage',
-            }),
-            'quantity_available': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 0,
-                'placeholder': 'Quantité disponible',
-            }),
-            'product_unity': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Unité de mesure (ex: kg, pièces)',
-            }),
-            'unit_price': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 0,
-                'placeholder': 'Prix unitaire',
-            }),
-            'media': forms.ClearableFileInput(attrs={
-                'class': 'form-control',
-            }),
+            "product_name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Entrez le nom du produit",
+                }
+            ),
+            "product_description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": "Décrivez le produit ou service",
+                }
+            ),
+            "delivery_date": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date",
+                }
+            ),
+            "order_status": forms.Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "order_progress": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": 0,
+                    "max": 100,
+                    "placeholder": "Progression en pourcentage",
+                }
+            ),
+            "quantity_available": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": 0,
+                    "placeholder": "Quantité disponible",
+                }
+            ),
+            "product_unity": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Unité de mesure (ex: kg, pièces)",
+                }
+            ),
+            "unit_price": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": 0,
+                    "placeholder": "Prix unitaire",
+                }
+            ),
+            "media": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
         }
         labels = {
-            'product_name': 'Nom du Produit',
-            'product_description': 'Description du Produit',
-            'delivery_date': 'Date de Livraison',
-            'order_status': 'Statut de la Commande',
-            'order_progress': 'Progression de la Commande (%)',
-            'quantity_available': 'Quantité Disponible',
-            'product_unity': 'Unité de Mesure',
-            'unit_price': 'Prix Unitaire',
-            'media': 'Image du Produit',
+            "product_name": "Nom du Produit",
+            "product_description": "Description du Produit",
+            "delivery_date": "Date de Livraison",
+            "order_status": "Statut de la Commande",
+            "order_progress": "Progression de la Commande (%)",
+            "quantity_available": "Quantité Disponible",
+            "product_unity": "Unité de Mesure",
+            "unit_price": "Prix Unitaire",
+            "media": "Image du Produit",
+        }
+
+
+class RealisationForm(forms.ModelForm):
+    """Form definition for Realisation."""
+
+    class Meta:
+        model = Realisation
+        fields = ("title", "description", "image","date")
+
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "date": forms.DateTimeInput(attrs={"class": "form-control", "type": "datetime-local"}),
+        }
+        label ={
+            "title":"Titre de la realisation",
+            "description":"Brève description de ce qui est fait",
+            "image":"image (si applicable)",
+            "date":"date de realisation"
         }

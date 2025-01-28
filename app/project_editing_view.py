@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.db import transaction
 from app.models import Project, ValidatedProject
 
 from django.utils import timezone
@@ -18,22 +20,18 @@ def detail_product(request,id):
     product= get_object_or_404(ValidatedProductInfo, uid=id)
     return render(request,"app/project/detail.html", {'product':product})
 
-
-
-
+@transaction.atomic
 def reformulate_project(request, uid):
     project = get_object_or_404(Project, uid=uid)
     
-    # Vérifier si un ValidatedProductInfo existe pour ce projet
-    try:
-        validated_product_info = ValidatedProductInfo.objects.get(Project=project)
-    except ValidatedProductInfo.DoesNotExist:
-        validated_product_info = None
-
-    # Si le type de projet est "ACHAT ANTICIPE", utiliser un template spécifique
     if project.project_type.name == "ACHAT ANTICIPE":
-        # Préremplir les formulaires
-        form = ValidatedProjectForm(instance=project)
+        # Pour les projets de type ACHAT ANTICIPE
+        try:
+            validated_product_info = ValidatedProductInfo.objects.get(Project=project)
+        except ValidatedProductInfo.DoesNotExist:
+            validated_product_info = None
+
+        # Initialize form
         product_form = ValidatedProductInfoForm(instance=validated_product_info)
 
         if request.method == "POST":
@@ -43,15 +41,16 @@ def reformulate_project(request, uid):
                 product_form = ValidatedProductInfoForm(request.POST, request.FILES)
 
             if product_form.is_valid():
+                # Save ValidatedProductInfo
                 product_info = product_form.save(commit=False)
-                product_info.Project = project  # Lier au projet
+                product_info.Project = project
                 product_info.save()
 
-                # Mettre à jour le statut du projet
+                # Update project status
                 project.status = "reformulated"
                 project.save()
 
-                # Préparer et envoyer un mail au propriétaire du projet
+                # Send email notification
                 html_path = "app/mailing/reformulated_project_mail.html"
                 subject = "Recommandation – Reformulation de votre projet"
                 user = project.user
@@ -68,31 +67,37 @@ def reformulate_project(request, uid):
                 
                 return redirect("cabinet-incoming")
             else:
-                messages.error(request, f"Erreur lors de l'enregistrement des informations du produit. {product_form.errors}")
+                messages.error(request, f"Erreur lors de l'enregistrement des informations du produit: {product_form.errors}")
 
         context = {
-            "form": form,
             "product_form": product_form,
             "project": project,
             "validated_product_info": validated_product_info,
         }
         return render(request, "app/project/reformulate_achat_anticipe.html", context)
-
-    # Pour les autres types de projet, utiliser le template de reformulation standard
+    
     else:
-        form = ValidatedProjectForm(instance=project)
-
+        # Pour tous les autres types de projets
+        try:
+            validated_project = ValidatedProject.objects.get(project=project)
+        except ValidatedProject.DoesNotExist:
+            validated_project = None
+        
+        form = ValidatedProjectForm(instance=validated_project)
+        
         if request.method == "POST":
-            form = ValidatedProjectForm(request.POST, instance=project)
-
+            form = ValidatedProjectForm(request.POST, request.FILES, instance=validated_project)
             if form.is_valid():
-                form.save()
-
-                # Mettre à jour le statut du projet
+                validated_project = form.save(commit=False)
+                validated_project.project = project
+                validated_project.save()
+                form.save_m2m()
+                
+                # Update project status
                 project.status = "reformulated"
                 project.save()
 
-                # Préparer et envoyer un mail au propriétaire du projet
+                # Send email notification
                 html_path = "app/mailing/reformulated_project_mail.html"
                 subject = "Recommandation – Reformulation de votre projet"
                 user = project.user
@@ -110,17 +115,12 @@ def reformulate_project(request, uid):
                 return redirect("cabinet-incoming")
             else:
                 messages.error(request, f"Veuillez corriger les erreurs du formulaire. {form.errors}")
-
+        
         context = {
             "form": form,
             "project": project,
         }
         return render(request, "app/project/reformulate.html", context)
-
-
-# def reject_project(request):
-#     pass
-
 
 
 def accepte_project(request, uid):

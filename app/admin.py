@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import PorteurProject, ProjectCategory, Project, ValidatedProject
-from .models import Contact, ProjectType
-
+from .models import Contact, ProjectType , Realisation
 # Enregistrement du modèle PorteurProject
 @admin.register(PorteurProject)
 class PorteurProjectAdmin(admin.ModelAdmin):
@@ -101,3 +100,9 @@ class ContactAdmin(admin.ModelAdmin):
 @admin.register(ProjectType)
 class AdminProjectType(admin.ModelAdmin):
     list_display = ['name']
+    
+    
+@admin.register(Realisation)
+class RealisationAdmin(admin.ModelAdmin):
+    class Meta:
+        list_display = "__all__"

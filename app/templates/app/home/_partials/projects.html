@@ -1,5 +1,58 @@
 {% load static %}
 
+<style>
+    .project-image {
+        width: 100%;
+        height: 250px; /* hauteur fixe */
+        object-fit: cover; /* garde les proportions en rognant si nécessaire */
+        object-position: center; /* centre l'image */
+    }
+
+    /* Style pour la pagination */
+    .custom-pagination {
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .custom-pagination .pagination {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .custom-pagination .page-item {
+        list-style: none;
+    }
+
+    .custom-pagination .page-link {
+        padding: 8px 12px;
+        color: #666;
+        background-color: transparent;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .custom-pagination .page-item.active .page-link {
+        background-color: #009CFF;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 156, 255, 0.2);
+    }
+
+    .custom-pagination .page-link:hover:not(.active) {
+        background-color: #f0f0f0;
+        color: #009CFF;
+    }
+
+    .custom-pagination .page-item.disabled .page-link {
+        color: #ccc;
+        pointer-events: none;
+    }
+</style>
+
 <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
     <h4 class="text-primary">Projets Soumis</h4>
     <h1 class="display-5 mb-4">Découvrez Nos Projets Soumis</h1>
@@ -20,11 +73,11 @@
                     <div class="service-img">
                         {% if project.image %}
                         <a href="{{ project.image.url }}" target="_blank">
-                            <img src="{{ project.image.url }}" class="img-fluid rounded-top w-100" alt="Image" />
+                            <img src="{{ project.image.url }}" class="project-image img-fluid rounded-top" alt="Image" />
                         </a>
                         {% else %}
                         <a href="{% static 'img/service-1.jpg' %}" target="_blank">
-                            <img src="{% static 'img/service-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                            <img src="{% static 'img/service-1.jpg' %}" class="project-image img-fluid rounded-top" alt="Image" />
                         </a>
                         {% endif %}
                     </div>
@@ -58,54 +111,30 @@
 </div>
 
 <!-- Pagination pour les projets -->
-<div class="d-flex justify-content-center mt-4">
-    <nav aria-label="Pagination" class="pagination-container">
-        <ul class="pagination pagination-lg justify-content-center">
+<div class="custom-pagination">
+    <nav aria-label="Navigation des projets">
+        <ul class="pagination">
             {% if page_obj_projects.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page_projects=1" aria-label="Première">
-                    <span aria-hidden="true">&laquo;&laquo;</span>
+                <a class="page-link" href="?page_projects={{ page_obj_projects.previous_page_number }}" aria-label="Précédent">
+                    <span aria-hidden="true">&lsaquo;</span>
                 </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page_projects={{ page_obj_projects.previous_page_number }}" aria-label="Précédente">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">&laquo;&laquo;</span>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">&laquo;</span>
             </li>
             {% endif %}
 
             {% for num in page_obj_projects.paginator.page_range %}
-            {% if page_obj_projects.number == num %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% elif num > page_obj_projects.number|add:'-3' and num < page_obj_projects.number|add:'3' %}
-            <li class="page-item"><a class="page-link" href="?page_projects={{ num }}">{{ num }}</a></li>
-            {% endif %}
+                {% if page_obj_projects.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj_projects.number|add:'-2' and num < page_obj_projects.number|add:'2' %}
+                    <li class="page-item"><a class="page-link" href="?page_projects={{ num }}">{{ num }}</a></li>
+                {% endif %}
             {% endfor %}
 
             {% if page_obj_projects.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page_projects={{ page_obj_projects.next_page_number }}" aria-label="Suivante">
-                    <span aria-hidden="true">&raquo;</span>
+                <a class="page-link" href="?page_projects={{ page_obj_projects.next_page_number }}" aria-label="Suivant">
+                    <span aria-hidden="true">&rsaquo;</span>
                 </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page_projects={{ page_obj_projects.paginator.num_pages }}" aria-label="Dernière">
-                    <span aria-hidden="true">&raquo;&raquo;</span>
-                </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">&raquo;</span>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">&raquo;&raquo;</span>
             </li>
             {% endif %}
         </ul>
@@ -123,11 +152,11 @@
                     <div class="service-img">
                         {% if product.media %}
                         <a href="{{ product.media.url }}" target="_blank">
-                            <img src="{{ product.media.url }}" class="img-fluid rounded-top w-100" alt="Image" />
+                            <img src="{{ product.media.url }}" class="project-image img-fluid rounded-top" alt="Image" />
                         </a>
                         {% else %}
                         <a href="{% static 'img/service-1.jpg' %}" target="_blank">
-                            <img src="{% static 'img/service-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image" />
+                            <img src="{% static 'img/service-1.jpg' %}" class="project-image img-fluid rounded-top" alt="Image" />
                         </a>
                         {% endif %}
                     </div>
@@ -152,54 +181,30 @@
 </div>
 
 <!-- Pagination pour les produits -->
-<div class="d-flex justify-content-center mt-4">
-    <nav aria-label="Pagination" class="pagination-container">
-        <ul class="pagination pagination-lg justify-content-center">
+<div class="custom-pagination">
+    <nav aria-label="Navigation des produits">
+        <ul class="pagination">
             {% if page_obj_products.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page_products=1" aria-label="Première">
-                    <span aria-hidden="true">&laquo;&laquo;</span>
+                <a class="page-link" href="?page_products={{ page_obj_products.previous_page_number }}" aria-label="Précédent">
+                    <span aria-hidden="true">&lsaquo;</span>
                 </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page_products={{ page_obj_products.previous_page_number }}" aria-label="Précédente">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">&laquo;&laquo;</span>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">&laquo;</span>
             </li>
             {% endif %}
 
             {% for num in page_obj_products.paginator.page_range %}
-            {% if page_obj_products.number == num %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% elif num > page_obj_products.number|add:'-3' and num < page_obj_products.number|add:'3' %}
-            <li class="page-item"><a class="page-link" href="?page_products={{ num }}">{{ num }}</a></li>
-            {% endif %}
+                {% if page_obj_products.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj_products.number|add:'-2' and num < page_obj_products.number|add:'2' %}
+                    <li class="page-item"><a class="page-link" href="?page_products={{ num }}">{{ num }}</a></li>
+                {% endif %}
             {% endfor %}
 
             {% if page_obj_products.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page_products={{ page_obj_products.next_page_number }}" aria-label="Suivante">
-                    <span aria-hidden="true">&raquo;</span>
+                <a class="page-link" href="?page_products={{ page_obj_products.next_page_number }}" aria-label="Suivant">
+                    <span aria-hidden="true">&rsaquo;</span>
                 </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page_products={{ page_obj_products.paginator.num_pages }}" aria-label="Dernière">
-                    <span aria-hidden="true">&raquo;&raquo;</span>
-                </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">&raquo;</span>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">&raquo;&raquo;</span>
             </li>
             {% endif %}
         </ul>

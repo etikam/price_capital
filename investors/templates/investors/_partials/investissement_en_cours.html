@@ -1,0 +1,166 @@
+<div class="row">
+    <div class="col-md-12">
+      <!-- Titre du tableau -->
+      <h2 class="mb-4 bg bg-secondary text-center text-white">Mes Investissements non terminés</h2>
+
+      <div class="table-wrap">
+        <table class="table table-responsive-xl">
+          <thead>
+            <tr>
+              <th>Projet</th>
+              <th>Objectif</th>
+              <th>Mon Investissement</th>
+              <th>Statut</th>
+              <th>Actions</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for investment in investments %}
+              <tr class="alert" role="alert">
+                <td class="d-flex align-items-center">
+                  <!-- Image du projet dans une balise <img> -->
+                  <img src="{{ investment.project.image.url }}" alt="{{ investment.project.title }}" class="img-fluid rounded-circle" style="width: 50px; height: 50px;" />
+                  <div class="pl-3">
+                    <!-- Titre du projet -->
+                    <span class="font-weight-bold">{{ investment.project.title }}</span>
+                    <!-- Date d'investissement -->
+                    <span class="d-block text-muted">Investi le: {{ investment.created_at|date:'d/m/Y' }}</span>
+                  </div>
+                </td>
+                <!-- Objectif du projet -->
+                <td>{{ investment.project.goal }} {{ investment.project.currency }}</td>
+                <!-- Barre de progression -->
+                <td>{{ investment.amount }} {{ investment.currency }}</td>
+                <!-- Statut de progression -->
+                <td class="status active">
+                  <span class="active">{{ investment.get_progress_display }}</span>
+                </td>
+                <!-- Actions -->
+                <td class="align-middle">
+                  <div class="dropdown">
+                    <button class="btn btn-link text-secondary mb-0" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="fa fa-ellipsis-v text-xs"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      {% if investment.progress < 100 %}
+                      <li>
+                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#investmentModal{{ investment.uid }}">
+                          <i class="fas fa-edit me-2 text-warning"></i> Modifier le montant
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmationModal{{ investment.uid }}">
+                          <i class="fas fa-times me-2 text-danger"></i> Annuler l'investissement
+                        </a>
+                      </li>
+                      {% endif %}
+                      <li>
+                        <a class="dropdown-item" href="{% url 'detail-project' investment.project.uid %}">
+                          <i class="fas fa-circle-info me-2 text-info"></i> Voir les détails
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Modale pour le formulaire d'investissement -->
+              <div class="modal fade text-dark" id="investmentModal{{ investment.uid }}" tabindex="-1" aria-labelledby="investmentModalLabel{{ investment.uid }}" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="investmentModalLabel{{ investment.uid }}">Poursuivre l'investissement</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Formulaire d'investissement -->
+                      <form method="post" action="{% url 'investor:investissement' investment.uid %}">
+                        {% csrf_token %}
+
+                        <!-- Champ Montant -->
+                        <div class="form-group mb-3">
+                          {{ investment_form.amount.label_tag }}
+                          {{ investment_form.amount }}
+                          {% if investment_form.amount.help_text %}
+                            <small class="form-text text-muted">{{ investment_form.amount.help_text }}</small>
+                          {% endif %}
+                          <!-- Afficher les erreurs de validation pour le champ amount -->
+                          {% if investment_form.amount.errors %}
+                            <div class="text-danger">
+                              {% for error in form.amount.errors %}
+                                <small>{{ error }}</small><br />
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+
+                        <!-- Champ Devise -->
+                        <div class="form-group mb-3">
+                          {{ investment_form.currency.label_tag }}
+                          {{ investment_form.currency }}
+                          {% if investment_form.currency.help_text %}
+                            <small class="form-text text-muted">{{ form.currency.help_text }}</small>
+                          {% endif %}
+                          <!-- Afficher les erreurs de validation pour le champ currency -->
+                          {% if investment_form.currency.errors %}
+                            <div class="text-danger">
+                              {% for error in investment_form.currency.errors %}
+                                <small>{{ error }}</small><br />
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+
+                        <!-- Champ Anonymat -->
+                        <div class="form-check mb-3">
+                          {{ investment_form.anonymity }}
+                          <label for="{{ investment_form.anonymity.id_for_label }}" class="form-check-label">{{ investment_form.anonymity.label }}</label>
+                          {% if investment_form.anonymity.help_text %}
+                            <small class="form-text text-muted">{{ investment_form.anonymity.help_text }}</small>
+                          {% endif %}
+                          <!-- Afficher les erreurs de validation pour le champ anonymity -->
+                          {% if investment_form.anonymity.errors %}
+                            <div class="text-danger">
+                              {% for error in form.anonymity.errors %}
+                                <small>{{ error }}</small><br />
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+
+                        <!-- Bouton de soumission -->
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modale de confirmation pour annuler l'investissement -->
+              <div class="modal fade" id="confirmationModal{{ investment.uid }}" tabindex="-1" aria-labelledby="confirmationModalLabel{{ investment.uid }}" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="confirmationModalLabel{{ investment.uid }}">Confirmer l'annulation</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-dark">😥😥 Voulez-vous vraiment rénoncer à votre décision de vouloir investir sur le projet {{ investment.project.title }} ?</div>
+                    <div class="modal-footer">
+                      <!-- Bouton pour fermer la modale -->
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                      <!-- Bouton pour confirmer l'annulation -->
+                      <form method="post" action="{% url 'investor:annuler_investissement' investment.uid %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Je Rénonce</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

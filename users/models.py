@@ -14,10 +14,10 @@ ROLE_CHOICES = [
 class User(AbstractUser):
     first_name = None
     last_name = None
-    username = None
+    username = models.CharField(default="not_username",max_length=20)
     email = models.EmailField(unique=True, max_length=255, verbose_name="email address")
 
-  
+    
     objects = UserManager()
 
     EMAIL_FIELD = "email"

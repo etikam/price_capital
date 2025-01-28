@@ -1,0 +1,124 @@
+<!-- Section Fonctionnement de la Plateforme -->
+<div class="container-fluid bg-light py-5">
+    <div class="container py-5">
+        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+            <h4 class="text-primary">Fonctionnement</h4>
+            <h1 class="display-5 mb-4">Comment ça marche ?</h1>
+            <p class="lead">Découvrez les étapes simples pour investir, soutenir ou soumettre un projet sur notre plateforme.</p>
+        </div>
+
+        <div class="row g-4 position-relative">
+            <!-- Flèche entre les étapes -->
+            <div class="steps-connector d-none d-lg-block">
+                <div class="connector-line"></div>
+                <div class="connector-arrow"></div>
+            </div>
+
+            <!-- Étape 1 : Soumission du Projet -->
+            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="feature-item p-4 text-center">
+                    <div class="feature-icon p-4 mb-4 bg-primary rounded-circle d-inline-flex align-items-center justify-content-center">
+                        <i class="fas fa-lightbulb fa-3x text-white"></i>
+                    </div>
+                    <div class="step-indicator bg-primary text-white rounded-circle mb-3 mx-auto" style="width: 40px; height: 40px; line-height: 40px;">1</div>
+                    <h4 class="mb-4">Soumission du Projet</h4>
+                    <p class="mb-4">
+                        Le <strong>soumetteur de projet</strong> (porteur de projet) soumet son idée ou son projet sur la plateforme. Il précise le type de soutien recherché : <strong>Don</strong>, <strong>Retour sur investissement</strong>, ou <strong>Achat anticipé</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Étape 2 : Revue et Publication -->
+            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.4s">
+                <div class="feature-item p-4 text-center">
+                    <div class="feature-icon p-4 mb-4 bg-primary rounded-circle d-inline-flex align-items-center justify-content-center">
+                        <i class="fas fa-search fa-3x text-white"></i>
+                    </div>
+                    <div class="step-indicator bg-primary text-white rounded-circle mb-3 mx-auto" style="width: 40px; height: 40px; line-height: 40px;">2</div>
+                    <h4 class="mb-4">Revue et Publication</h4>
+                    <p class="mb-4">
+                        Le <strong>cabinet</strong> examine le projet soumis, vérifie sa faisabilité et sa conformité. Une fois approuvé, le projet est publié sur la plateforme pour être visible par les investisseurs.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Étape 3 : Investissement -->
+            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="feature-item p-4 text-center">
+                    <div class="feature-icon p-4 mb-4 bg-primary rounded-circle d-inline-flex align-items-center justify-content-center">
+                        <i class="fas fa-hand-holding-usd fa-3x text-white"></i>
+                    </div>
+                    <div class="step-indicator bg-primary text-white rounded-circle mb-3 mx-auto" style="width: 40px; height: 40px; line-height: 40px;">3</div>
+                    <h4 class="mb-4">Investissement</h4>
+                    <p class="mb-4">
+                        Les <strong>investisseurs</strong> explorent les projets publiés et choisissent ceux qui correspondent à leurs intérêts. Ils investissent selon le type de soutien (don, retour sur investissement, ou achat anticipé).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Étape 4 : Suivi et Récompenses -->
+            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.8s">
+                <div class="feature-item p-4 text-center">
+                    <div class="feature-icon p-4 mb-4 bg-primary rounded-circle d-inline-flex align-items-center justify-content-center">
+                        <i class="fas fa-trophy fa-3x text-white"></i>
+                    </div>
+                    <div class="step-indicator bg-primary text-white rounded-circle mb-3 mx-auto" style="width: 40px; height: 40px; line-height: 40px;">4</div>
+                    <h4 class="mb-4">Suivi et Récompenses</h4>
+                    <p class="mb-4">
+                        Les investisseurs suivent l'évolution du projet et reçoivent leurs récompenses selon le type de soutien (retour sur investissement, produit, ou reconnaissance). Le soumetteur de projet réalise son rêve grâce au financement obtenu.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles pour les flèches et les connecteurs -->
+<style>
+    .steps-connector {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        transform: translateY(-50%);
+        height: 2px;
+        background: transparent;
+        z-index: 1;
+    }
+
+    .connector-line {
+        position: absolute;
+        top: 0;
+        left: 25%;
+        right: 25%;
+        height: 2px;
+        background: #009CFF;
+    }
+
+    .connector-arrow {
+        position: absolute;
+        top: -4px;
+        right: 24.5%;
+        width: 5px;
+        height: 0;
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-left: 10px solid #009CFF;
+    }
+
+    .feature-item {
+        position: relative;
+        z-index: 2;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+        transition: transform 0.3s ease;
+    }
+
+    .feature-item:hover .feature-icon {
+        transform: scale(1.1);
+    }
+</style>

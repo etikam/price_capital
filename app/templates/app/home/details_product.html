@@ -147,7 +147,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Annuler</button>
-                <a class="btn btn-primary" href="#">Continuer</a>
+                <a class="btn btn-primary" href="{% url 'investor:achat-initiate' product.uid %}">Continuer</a>
             </div>
         </div>
     </div>
@@ -162,3 +162,6 @@
     });
 </script>
 {% endblock %}
+
+
+

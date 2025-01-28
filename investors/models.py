@@ -5,7 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from app.models import ProjectCategory
-from app.models import ValidatedProject 
+from app.models import ValidatedProject, ValidatedProductInfo
 from django.db.models import Sum
 
 class Investor(models.Model):
@@ -145,7 +145,6 @@ class Investor(models.Model):
         verbose_name_plural = "Investisseurs"
 
 
-
 class Investissement(models.Model):
     uid = models.UUIDField(
         default=uuid.uuid4,
@@ -185,13 +184,6 @@ class Investissement(models.Model):
         help_text="Montant que vous voulez investir (ex. 10,000 GNF)"
     )
 
-    # gains = models.DecimalField(
-    #     default = 0,
-    #     max_digits=15,
-    #     decimal_places=2,
-    #     verbose_name="gains sur le projet",
-    # )
-    # Devise de l'investissement
     currency = models.CharField(
         max_length=3,
         choices=[
@@ -216,8 +208,6 @@ class Investissement(models.Model):
         verbose_name="Progression"
     )
     
-    
-
     payment_done = models.BooleanField(default=False) #pour savoir si le payement est efectué ou pas
 
     # Champs automatiques
@@ -233,7 +223,7 @@ class Investissement(models.Model):
         if self.project and self.project.goal:
             return (self.amount / self.project.goal) * 100
         return 0
-    
+
     @property
     def gains(self):
         """
@@ -252,7 +242,128 @@ class Investissement(models.Model):
         verbose_name_plural = "Investissements"
         unique_together = (('project', 'investor'),)
         
+
+class Achat(models.Model):
+    STATUS_CHOICES = [
+        (1, 'Commande validée'),
+        (2, 'En cours de production'),
+        (3, 'Livraison'),
+        (4, 'Terminé')
+    ]
+
+    uid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        verbose_name="Identifiant unique"
+    )
+
+    # Lien avec l'acheteur
+    buyer = models.ForeignKey(
+        Investor,
+        on_delete=models.CASCADE,
+        related_name="achats",
+        verbose_name="Acheteur"
+    )
+
+    # Lien avec le produit
+    product = models.ForeignKey(
+        ValidatedProductInfo,
+        on_delete=models.CASCADE,
+        related_name="achats",
+        verbose_name="Produit"
+    )
+
+    # Quantité achetée
+    quantity = models.PositiveIntegerField(
+        verbose_name="Quantité",
+        help_text="Quantité que vous souhaitez acheter",
+        default=1
+    )
+
+    # Montant total
+    total_amount = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2,
+        verbose_name="Montant total",
+        help_text="Montant total de l'achat"
+    )
+
+    # Statut de la commande
+    order_status = models.IntegerField(choices=STATUS_CHOICES, default=1)
+    progress = models.IntegerField(default=0)
+
+    currency = models.CharField(
+        max_length=3,
+        choices=[
+            ("GNF", "GNF - Franc Guinéen"),
+            ("USD", "USD - Dollar Américain"),
+            ("EUR", "EUR - Euro"),
+        ],
+        default="GNF",
+        verbose_name="Devise",
+        help_text="Dans quelle devise est votre montant"
+    )
+
+    # Champs automatiques
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Dernière mise à jour")
+    estimated_delivery_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Achat de {self.product.product_name} par {self.buyer.email}"
+
+    def get_progress_display(self):
+        """Retourne une description lisible et descriptive du progrès"""
+        progress_text = {
+            1: "Commande validée",
+            2: "En production",
+            3: "Livraison",
+            4: "Terminé"
+        }
+        return progress_text.get(self.order_status, "Statut inconnu")
+
+    def save(self, *args, **kwargs):
+        # Calculer le montant total
+        if not self.total_amount:
+            self.total_amount = self.quantity * self.product.unit_price
         
+        # Mettre à jour le progress en fonction du order_status
+        if self.order_status == 1:  # Production
+            self.progress = 25
+        elif self.order_status == 2:  # Contrôle
+            self.progress = 50
+        elif self.order_status == 3:  # Livraison
+            self.progress = 75
+        elif self.order_status == 4:  # Terminé
+            self.progress = 100
+            
+        super().save(*args, **kwargs)
+
+    def get_status_color(self):
+        """Retourne la couleur Bootstrap en fonction du statut"""
+        status_colors = {
+            1: 'info',      # Production - Bleu
+            2: 'warning',   # Contrôle - Orange
+            3: 'primary',   # Livraison - Bleu foncé
+            4: 'success'    # Terminé - Vert
+        }
+        return status_colors.get(self.order_status, 'secondary')
+
+    def get_status_step(self):
+        """Retourne les informations de l'étape actuelle pour le stepper"""
+        return {
+            'current_step': self.order_status,
+            'progress': self.progress,
+            'status_text': self.get_order_status_display()
+        }
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Achat"
+        verbose_name_plural = "Achats"
+        unique_together = ['product','buyer']
+
 #Gains/Interet sur les projet
 class GainRecord(models.Model):
     project = models.ForeignKey(ValidatedProject, on_delete=models.CASCADE, related_name='gain_records')

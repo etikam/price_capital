@@ -1,0 +1,16 @@
+http:
+  middlewares:
+    security-headers:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsSeconds: 31536000
+        stsPreload: true
+        referrerPolicy: strict-origin-when-cross-origin
+        customFrameOptionsValue: SAMEORIGIN
+        customResponseHeaders:
+          X-Permitted-Cross-Domain-Policies: "none"
+          Permissions-Policy: "geolocation=(), camera=(), microphone=()"

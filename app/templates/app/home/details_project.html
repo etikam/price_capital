@@ -2,193 +2,328 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
+  <div class="container">
     <div class="card shadow">
-        <div class="card-header text-center">
-            <h4 class="display-4">{{ validate_project.title }} </h4>
-            <h3><i class="fas fa-project-diagram"></i> Type: <span class="text-primary">{{ validate_project.project_type }}</span></h3>
-            <h5><i class="fas fa-coins"></i> Financement Demandé: <span class="text-warning">{{ validate_project.goal }}</span> <small>{{ validate_project.currency }}</small></h5>
-            <p class="text-muted"><i class="fas fa-calendar-alt"></i> Projet créé il y a {{ validate_project.created_at|timesince }}</p>
-        </div>
+      <div class="card-header text-center">
+        <h4 class="display-4">{{ validate_project.title }}</h4>
+        <h3><i class="fas fa-project-diagram"></i> Type: <span class="text-primary">{{ validate_project.project_type }}</span></h3>
+        <h5><i class="fas fa-coins"></i> Financement Demandé: <span class="text-warning">{{ validate_project.goal }}</span> <small>{{ validate_project.currency }}</small></h5>
+        <p class="text-muted">
+          <i class="fas fa-calendar-alt"></i> Projet créé il y a {{ validate_project.created_at|timesince }}
+        </p>
+      </div>
 
-        <div class="card-body">
-            <ul class="nav nav-tabs" id="projectTab" role="tablist">
-                <li class="nav-item">
-                    <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true"><i class="fas fa-info-circle"></i> Détails du Projet</button>
-                </li>
-                {% if user.is_authenticated and user.investor %}
-                <li class="nav-item">
-                    <button class="nav-link" id="invest-tab" data-bs-toggle="tab" data-bs-target="#invest" type="button" role="tab" aria-controls="invest" aria-selected="false"><i class="fas fa-hand-holding-usd"></i> Investir</button>
-                </li>
-                {% endif %}
-            </ul>
+      <div class="card-body">
+        <ul class="nav nav-tabs" id="projectTab" role="tablist">
+          <li class="nav-item">
+            <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true"><i class="fas fa-info-circle"></i> Détails du Projet</button>
+          </li>
+          {% if user.is_authenticated and user.investor %}
+            <li class="nav-item">
+              <button class="nav-link" id="invest-tab" data-bs-toggle="tab" data-bs-target="#invest" type="button" role="tab" aria-controls="invest" aria-selected="false">
+                <i class="fas fa-hand-holding-usd"></i>
+                Investir
+              </button>
+            </li>
+          {% endif %}
+        </ul>
 
-            <div class="tab-content" id="projectTabContent">
-                <!-- Détails du Projet -->
-                <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
-                    <div class="row">
-                        <!-- Colonne de gauche -->
-                        <div class="col-lg-4">
-                            <!-- Détails du porteur -->
-                            <div class="card mb-4 border-outline-primary">
-                                <div class="card-header bg-light">
-                                    <h4 class="text-primary"><i class="fas fa-user"></i> Porteur de Projet</h4>
-                                </div>
-                                <div class="card-body">
-                                    <p><strong><i class="fas fa-user-tag"></i> Nom :</strong> {{ validate_project.project.owner.first_name }} {{ validate_project.project.owner.last_name }}</p>
-                                    <p><strong><i class="fas fa-phone"></i> Téléphone :</strong> {{ validate_project.project.owner.phone }}</p>
-                                    <p><strong><i class="fas fa-map-marker-alt"></i> Adresse :</strong> {{ validate_project.project.owner.adress }}</p>
-                                    <p><strong><i class="fas fa-envelope"></i> Email :</strong> {{ validate_project.project.user.email }}</p>
-                                    <p><strong><i class="fas fa-birthday-cake"></i> Date de Naissance :</strong> {{ validate_project.project.owner.birthday|date:"d M Y" }}</p>
-                                    <div class="text-center">
-                                    {% if validate_project.project.owner.photo %}
-                                    <img src="{{ validate_project.project.owner.photo.url }}" class="img-thumbnail rounded-circle" alt="Photo du porteur de projet" style="width: 150px; height: 150px;">
-                                    {% endif %}
-                                </div>
-                                </div>
-                            </div>
-
-                            <!-- Détails des investisseurs -->
-                            <div class="card border-outline-success">
-                                <div class="card-header bg-light">
-                                    <h4 class="text-success"><i class="fas fa-hand-holding-usd"></i> Investisseurs</h4>
-                                </div>
-                                <div class="card-body">
-                                    {% if validate_project.investor.all %}
-                                    <ul>
-                                        {% for investor in validate_project.investor.all %}
-                                        <li>{{ investor.name }} - <strong>{{ investor.amount|floatformat:2 }} GNF</strong></li>
-                                        {% endfor %}
-                                    </ul>
-                                    {% else %}
-                                    <p class="text-muted">Aucun investisseur pour ce projet.</p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Colonne de droite -->
-                        <div class="col-lg-8">
-                            <div class="card border-outline-info">
-                                <div class="card-header bg-light">
-                                    <h4 class="text-info"><i class="fas fa-info-circle"></i> Détails du Projet</h4>
-                                </div>
-                                <div class="card-body">
-                                    {% if validate_project.image %}
-                                    <img src="{{ validate_project.image.url }}" class="img-thumbnail w-100 mb-3" alt="Photo de couverture du projet">
-                                    {% endif %}
-                                    <ul class="list-unstyled">
-                                        <li><strong><i class="fas fa-tag"></i> Catégorie :</strong> {{ validate_project.category.name }}</li>
-                                        <li><strong><i class="fas fa-project-diagram"></i> Type de projet :</strong> {{ validate_project.project_type }}</li>
-                                        <li><strong><i class="fas fa-map-marker-alt"></i> Localisation :</strong> {{ validate_project.location }}</li>
-                                        <li><strong><i class="fas fa-check-circle"></i> Statut :</strong> Publié</li>
-                                        <li><strong><i class="fas fa-calendar-alt"></i> Date de dernière modification :</strong> {{ validate_project.updated_at|date:"d M Y" }}</li>
-                                    </ul>
-                                    <p><strong><i class="fas fa-align-left"></i> Description :</strong> {{ validate_project.description }}</p>
-
-                                    <!-- Documents -->
-                                    <h5 class="mt-4"><i class="fas fa-file"></i> Documents Associés</h5>
-                                    <ul>
-                                        {% if validate_project.documents %}
-                                        <li>
-                                            <a href="{{ validate_project.documents.url }}" target="_blank"
-                                                class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-file-pdf"></i> Document associé
-                                            </a>
-                                        </li>
-                                        {% else %}
-                                        <p class="text-muted">Aucun document disponible pour ce projet.</p>
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <!-- Informations validées -->
-                            {% if validate_project %}
-                            <div class="card mt-4 border-outline-success">
-                                <div class="card-header bg-light">
-                                    <h4 class="text-success"><i class="fas fa-check-circle"></i> Autres Détails (Du cabinet)</h4>
-                                </div>
-                                <div class="card-body">
-                                    <p><strong><i class="fas fa-edit"></i> Titre Reformulé :</strong> {{ validate_project.title }}</p>
-                                    <p><strong><i class="fas fa-file-alt"></i> Résumé :</strong> {{ validate_project.summary }}</p>
-                                    <p><strong><i class="fas fa-book"></i> Contexte :</strong> {{ validate_project.context }}</p>
-                                    <p><strong><i class="fas fa-bullseye"></i> Objectif Général :</strong> {{ validate_project.general_objective }}</p>
-                                    <p><strong><i class="fas fa-tasks"></i> Livrables :</strong> {{ validate_project.deliverables }}</p>
-                                    <p><strong><i class="fas fa-users"></i> Public Cible :</strong> {{ validate_project.target_audience }}</p>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
+        <div class="tab-content" id="projectTabContent">
+          <!-- Détails du Projet -->
+          <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+            <div class="row">
+              <!-- Colonne de gauche -->
+              <div class="col-lg-4">
+                <!-- Détails du porteur -->
+                <div class="card mb-4 border-outline-primary">
+                  <div class="card-header bg-light">
+                    <h4 class="text-primary"><i class="fas fa-user"></i> Porteur de Projet</h4>
+                  </div>
+                  <div class="card-body">
+                    <p>
+                      <strong><i class="fas fa-user-tag"></i> Nom :</strong> {{ validate_project.project.owner.first_name }} {{ validate_project.project.owner.last_name }}
+                    </p>
+                    <p>
+                      <strong><i class="fas fa-phone"></i> Téléphone :</strong> {{ validate_project.project.owner.phone }}
+                    </p>
+                    <p>
+                      <strong><i class="fas fa-map-marker-alt"></i> Adresse :</strong> {{ validate_project.project.owner.adress }}
+                    </p>
+                    <p>
+                      <strong><i class="fas fa-envelope"></i> Email :</strong> {{ validate_project.project.user.email }}
+                    </p>
+                    <p>
+                      <strong><i class="fas fa-birthday-cake"></i> Date de Naissance :</strong> {{ validate_project.project.owner.birthday|date:'d M Y' }}
+                    </p>
+                    <div class="text-center">
+                      {% if validate_project.project.owner.photo %}
+                        <img src="{{ validate_project.project.owner.photo.url }}" class="img-thumbnail rounded-circle" alt="Photo du porteur de projet" style="width: 150px; height: 150px;" />
+                      {% endif %}
                     </div>
+                  </div>
                 </div>
 
-                <!-- Onglet Investir (visible uniquement pour les investisseurs) -->
-               <!-- Onglet Investir (visible uniquement pour les investisseurs) -->
-{% if user.is_authenticated and user.investor %}
-<div class="tab-pane fade" id="invest" role="tabpanel" aria-labelledby="invest-tab">
-    <form>
-        <section>
-            <h3 class="text-primary"><i class="fas fa-info-circle"></i> Informations pour l'investissement</h3>
-            <div class="mb-3">
-                <p><strong><i class="fas fa-tag"></i> Titre du projet :</strong> {{ validate_project.title }}</p>
-                <p><strong><i class="fas fa-coins"></i> Objectif financier :</strong> {{ validate_project.goal }} {{ validate_project.currency }}</p>
-                <p><strong><i class="fas fa-map-marker-alt"></i> Localisation :</strong> {{ validate_project.location }}</p>
-                <p><strong><i class="fas fa-project-diagram"></i> Catégorie :</strong> {{ validate_project.category }}</p>
-                <p><strong><i class="fas fa-file-alt"></i> Résumé :</strong> {{ validate_project.summary }}</p>
-            </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="confirmInvestmentCheckbox">
-                <label class="form-check-label" for="confirmInvestmentCheckbox">
-                    <i class="fas fa-check"></i> Je confirme que je souhaite investir dans ce projet.
-                </label>
-            </div>
-            <button type="button" class="btn btn-primary" id="investButton" data-bs-toggle="modal" data-bs-target="#confirmationModal" disabled>
-                <i class="fas fa-hand-holding-usd"></i> Investir sur ce projet
-            </button>
-        </section>
-    </form>
-</div>
-{% endif %}
-            </div>
-        </div>
-    </div>
-</div>
+                <!-- Détails des investisseurs -->
+                <div class="card border-outline-success">
+                  <div class="card-header bg-light">
+                    <h4 class="text-success"><i class="fas fa-hand-holding-usd"></i> Investisseurs</h4>
+                  </div>
+                  <div class="card-body">
+                    {% if validate_project.investor.all %}
+                      <ul>
+                        {% for investor in validate_project.investor.all %}
+                          <li>
+                            {{ investor.name }} - <strong>
+                              {{ investor.amount|floatformat:2 }}
+                              GNF
+                            </strong>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% else %}
+                      <p class="text-muted">Aucun investisseur pour ce projet.</p>
+                    {% endif %}
+                  </div>
+                </div>
 
-<!-- Modal de confirmation d'investissement -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel"><i class="fas fa-check-circle"></i> Confirmation d'investissement</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               
+              </div>
+
+              <!-- Colonne de droite -->
+              <div class="col-lg-8">
+                <div class="card border-outline-info">
+                  <div class="card-header bg-light">
+                    <h4 class="text-info"><i class="fas fa-info-circle"></i> Détails du Projet</h4>
+                  </div>
+                  <div class="card-body">
+                    {% if validate_project.image %}
+                      <img src="{{ validate_project.image.url }}" class="img-thumbnail w-100 mb-3" alt="Photo de couverture du projet" />
+                    {% endif %}
+                    <ul class="list-unstyled">
+                      <li>
+                        <strong><i class="fas fa-tag"></i> Catégorie :</strong> {{ validate_project.category.name }}
+                      </li>
+                      <li>
+                        <strong><i class="fas fa-project-diagram"></i> Type de projet :</strong> {{ validate_project.project_type }}
+                      </li>
+                      <li>
+                        <strong><i class="fas fa-map-marker-alt"></i> Localisation :</strong> {{ validate_project.location }}
+                      </li>
+                      <li>
+                        <strong><i class="fas fa-check-circle"></i> Statut :</strong> Publié
+                      </li>
+                      <li>
+                        <strong><i class="fas fa-calendar-alt"></i> Date de dernière modification :</strong> {{ validate_project.updated_at|date:'d M Y' }}
+                      </li>
+                    </ul>
+                    <p>
+                      <strong><i class="fas fa-align-left"></i> Description :</strong> {{ validate_project.description }}
+                    </p>
+
+                    <!-- Documents -->
+                    <h5 class="mt-4"><i class="fas fa-file"></i> Documents Associés</h5>
+                    <ul>
+                      {% if validate_project.documents %}
+                        <li>
+                          <a href="{{ validate_project.documents.url }}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fas fa-file-pdf"></i> Document associé</a>
+                        </li>
+                      {% else %}
+                        <p class="text-muted">Aucun document disponible pour ce projet.</p>
+                      {% endif %}
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Informations validées -->
+                {% if validate_project %}
+                  <div class="card mt-4 border-outline-success">
+                    <div class="card-header bg-light">
+                      <h4 class="text-success"><i class="fas fa-check-circle"></i> Autres Détails (Du cabinet)</h4>
+                    </div>
+                    <div class="card-body">
+                      <p>
+                        <strong><i class="fas fa-edit"></i> Titre Reformulé :</strong> {{ validate_project.title }}
+                      </p>
+                      <p>
+                        <strong><i class="fas fa-file-alt"></i> Résumé :</strong> {{ validate_project.summary }}
+                      </p>
+                      <p>
+                        <strong><i class="fas fa-book"></i> Contexte :</strong> {{ validate_project.context }}
+                      </p>
+                      <p>
+                        <strong><i class="fas fa-bullseye"></i> Objectif Général :</strong> {{ validate_project.general_objective }}
+                      </p>
+                      <p>
+                        <strong><i class="fas fa-tasks"></i> Livrables :</strong> {{ validate_project.deliverables }}
+                      </p>
+                      <p>
+                        <strong><i class="fas fa-users"></i> Public Cible :</strong> {{ validate_project.target_audience }}
+                      </p>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+
+               <!-- REALISATIONS DU EFFECTUEES PAR LE PORTEUR DU PROJET -->
+                <!--  -->
+                <div class="card border-outline-success">
+                    <div class="card-header bg-light">
+                      <h4 class="text-success"> Réalisations</h4>
+                    
+                    
+                    {% if request.user == validate_project.project.user %}
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                      Ajouter une Réalisation
+                    </button>
+                    {% endif %}
+                      
+
+                    </div>
+        
+                    <div class="card-body">
+                        {% if validate_project.realisations %}
+                        <ul class="list-group">
+                            {% for realisation in validate_project.realisations.all %}
+                              <li class="list-group-item d-flex justify-content-between align-items-center mb-2 border-primary shadow hover-scale">
+                                <div class="d-flex align-items-center">
+                                  <!-- Afficher l'image uniquement si elle existe -->
+                                  {% if realisation.image %}
+                                    <div class="me-3">
+                                      <a href="{{ realisation.image.url }}" target="_blank">
+                                        <img src="{{ realisation.image.url }}" alt="{{ realisation.title }}" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                                      </a>
+                                    </div>
+                                  {% endif %}
+                                  <div>
+                                    <!-- Titre -->
+                                    <p class="fw-bold mb-1">{{ realisation.title }}</p>
+                                    <!-- Description -->
+                                    <p class="text-muted mb-0">{{ realisation.description }}</p>
+                                    <!-- Date de réalisation -->
+                                    <small class="text-muted">Réalisé le : {{ realisation.date|date:"d/m/Y H:i" }}</small>
+                                  </div>
+                                </div>
+                              </li>
+                            {% empty %}
+                              <li class="list-group-item">
+                                <p class="text-muted">Aucune réalisation pour ce projet.</p>
+                              </li>
+                            {% endfor %}
+                          </ul>
+                          
+                          <!-- Style personnalisé pour l'effet hover -->
+                          <style>
+                            .hover-scale {
+                              transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                            }
+                            .hover-scale:hover {
+                              transform: scale(1.02); /* Légère augmentation de la taille */
+                              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée au survol */
+                            }
+                          </style>
+                        {% else %}
+                            <p class="text-muted">Aucune Réalisation pour ce projet.</p>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="modal-body text-black">
-                En continuant, ce projet sera ajouté à votre espace <b>Investissement</b> et vous serez le/l'un des investisseurs de ce projet.
-                Là dans votre espace, pourrez continuer avec la procedure de financement et suivre le cours du projet.#
-                <p>Voulez-vous Continuer ?</p>
+          </div>
+
+          <!-- Onglet Investir (visible uniquement pour les investisseurs) -->
+          {% if user.is_authenticated and user.investor %}
+            <div class="tab-pane fade" id="invest" role="tabpanel" aria-labelledby="invest-tab">
+              <form>
+                <section>
+                  <h3 class="text-primary"><i class="fas fa-info-circle"></i> Informations pour l'investissement</h3>
+                  <div class="mb-3">
+                    <p>
+                      <strong><i class="fas fa-tag"></i> Titre du projet :</strong> {{ validate_project.title }}
+                    </p>
+                    <p>
+                      <strong><i class="fas fa-coins"></i> Objectif financier :</strong> {{ validate_project.goal }} {{ validate_project.currency }}
+                    </p>
+                    <p>
+                      <strong><i class="fas fa-map-marker-alt"></i> Localisation :</strong> {{ validate_project.location }}
+                    </p>
+                    <p>
+                      <strong><i class="fas fa-project-diagram"></i> Catégorie :</strong> {{ validate_project.category }}
+                    </p>
+                    <p>
+                      <strong><i class="fas fa-file-alt"></i> Résumé :</strong> {{ validate_project.summary }}
+                    </p>
+                  </div>
+                  <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="confirmInvestmentCheckbox" />
+                    <label class="form-check-label" for="confirmInvestmentCheckbox"><i class="fas fa-check"></i> Je confirme que je souhaite investir dans ce projet.</label>
+                  </div>
+                  <button type="button" class="btn btn-primary" id="investButton" data-bs-toggle="modal" data-bs-target="#confirmationModal" disabled><i class="fas fa-hand-holding-usd"></i> Investir sur ce projet</button>
+                </section>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- MODAL REALISATION -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+  
+            <h5 class="modal-title" id="exampleModalLabel">Ajouter une réalisation</h5>
+
+          
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{% url 'detail-project' validate_project.uid %}" method="post" enctype='multipart/form-data'>
+        <div class="modal-body">
+                {% csrf_token %}
+                {{form}}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Annuler</button>
-                <a class="btn btn-primary" href="{% url 'investor:investment-initiate' validate_project.uid %}">Continuer</a>
-            </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sortir</button>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
         </div>
+      </div>
     </div>
-</div>
+  </div>
+<!-- FIN MODAL REALISATION -->
+  <!-- Modal de confirmation d'investissement -->
+  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmationModalLabel"><i class="fas fa-check-circle"></i> Confirmation d'investissement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-black">
+          En continuant, ce projet sera ajouté à votre espace <b>Investissement</b> et vous serez le/l'un des investisseurs de ce projet. Là dans votre espace, pourrez continuer avec la procedure de financement et suivre le cours du projet.#<p>Voulez-vous Continuer ?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times"></i>
+            Annuler
+          </button>
+          <a class="btn btn-primary" href="{% url 'investor:investment-initiate' validate_project.uid %}">Continuer</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<script>
-   
-
-
-        // Récupérer les éléments
-        const confirmCheckbox = document.getElementById('confirmInvestmentCheckbox');
-        const investButton = document.getElementById('investButton');
+  <script>
+    // Récupérer les éléments
+    const confirmCheckbox = document.getElementById('confirmInvestmentCheckbox')
+    const investButton = document.getElementById('investButton')
     
-        // Écouter l'événement de changement de la case à cocher
-        confirmCheckbox.addEventListener('change', function() {
-            // Activer ou désactiver le bouton en fonction de l'état de la case
-            investButton.disabled = !this.checked;
-        });
-</script>
-
+    // Écouter l'événement de changement de la case à cocher
+    confirmCheckbox.addEventListener('change', function () {
+      // Activer ou désactiver le bouton en fonction de l'état de la case
+      investButton.disabled = !this.checked
+    })
+  </script>
 {% endblock %}

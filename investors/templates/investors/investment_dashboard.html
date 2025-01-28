@@ -1,278 +1,23 @@
 {% extends 'investors/investment_base.html' %}
 
 {% block main_content %}
+<div class="container-fluid py-4">
   <div class="tab-pane fade show active" id="dashboard">
-    <h2 class="mb-4 text-center fs-1"><i class="fas fa-tachometer-alt"></i> Tableau de Bord</h2>
+    <h2 class="mb-4 text-center fs-1"><i class="fas fa-tachometer-alt"></i> Tableau de Bord Investissement</h2>
 
-    <!-- Statistiques clés -->
-    <div class="row mb-4">
-      <div class="col-md-4 mb-3">
-        <div class="card border-primary shadow-sm h-100">
-          <div class="card-body text-center">
-            <i class="fas fa-coins fa-3x text-primary mb-3"></i>
-            <h5 class="card-title">Total Investi</h5>
-            <h2 class="card-text">{{ total_invested|floatformat:2 }} GNF</h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 mb-3">
-        <div class="card border-success shadow-sm h-100">
-          <div class="card-body text-center">
-            <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
-            <h5 class="card-title">Gains Totaux</h5>
-            <h2 class="card-text">{{ total_gains|floatformat:2 }} GNF</h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 mb-3">
-        <div class="card border-info shadow-sm h-100">
-          <div class="card-body text-center">
-            <i class="fas fa-wallet fa-3x text-info mb-3"></i>
-            <h5 class="card-title">Nombre de projet Investis</h5>
-            <h2 class="card-text">{{ nombre_project_investi }}</h2>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    {% include 'investors/_partials/statistiques_investissement.html' %}
     <!-- Graphiques -->
-    <div class="row mb-4">
-      <!-- Fréquence des investissements -->
-      <div class="col-md-6">
-        <div class="card shadow-sm">
-          <div class="card-header bg-primary text-white">
-            <h5 class="card-title mb-0 text-white">
-              <i class="fas fa-chart-bar"></i>
-              Fréquence des Investissements
-            </h5>
-          </div>
-          <div class="card-body">
-            <canvas id="investmentFrequencyChart"></canvas>
-          </div>
-        </div>
-      </div>
-      <!-- Évolution des intérêts -->
-      <div class="col-md-6">
-        <div class="card shadow-sm">
-          <div class="card-header bg-success text-white">
-            <h5 class="card-title mb-0 text-white">
-              <i class="fas fa-chart-line"></i>
-              Évolution des Intérêts
-            </h5>
-          </div>
-          <div class="card-body">
-            <canvas id="interestEvolutionChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% include 'investors/_partials/graphiques.html' %}
+    <!-- Fin Graphiques -->
+    {% include "investors/_partials/investissement_en_cours.html" %}
   </div>
+  <div class="tab-pane fade show active" id="dashboard">
+    <h2 class="mb-4 text-center fs-1"><i class="fas fa-tachometer-alt"></i> Tableau de Board Achat</h2>
 
-  <!-- Investissement en cours -->
-  <div class="row">
-    <div class="col-md-12">
-      <!-- Titre du tableau -->
-      <h2 class="mb-4 bg bg-secondary text-center text-white">Mes Investissements non terminés</h2>
-
-      <div class="table-wrap">
-        <table class="table table-responsive-xl">
-          <thead>
-            <tr>
-              <th>Projet</th>
-              <th>Objectif</th>
-              <th>Mon Investissement</th>
-              <th>Statut</th>
-              <th>Actions</th>
-              <th>&nbsp;</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for investment in investments %}
-              <tr class="alert" role="alert">
-                <td class="d-flex align-items-center">
-                  <!-- Image du projet dans une balise <img> -->
-                  <img src="{{ investment.project.image.url }}" alt="{{ investment.project.title }}" class="img-fluid rounded-circle" style="width: 50px; height: 50px;" />
-                  <div class="pl-3">
-                    <!-- Titre du projet -->
-                    <span class="font-weight-bold">{{ investment.project.title }}</span>
-                    <!-- Date d'investissement -->
-                    <span class="d-block text-muted">Investi le: {{ investment.created_at|date:'d/m/Y' }}</span>
-                  </div>
-                </td>
-                <!-- Objectif du projet -->
-                <td>{{ investment.project.goal }} {{ investment.project.currency }}</td>
-                <!-- Barre de progression -->
-                <td>{{ investment.amount }} {{ investment.currency }}</td>
-                <!-- Statut de progression -->
-                <td class="status active">
-                  <span class="active">{{ investment.get_progress_display }}</span>
-                </td>
-                <!-- Actions -->
-                <td>
-                        <!-- Dropdown modernisé -->
-                        <div class="dropdown">
-                          <button class="btn btn-light btn-sm dropdown-toggle shadow-sm" 
-                                  type="button" 
-                                  id="dropdownMenuButton{{ investment.uid }}" 
-                                  data-bs-toggle="dropdown" 
-                                  aria-expanded="false" 
-                                  style="border: 1px solid #ddd; border-radius: 10px; padding: 8px 12px;">
-                            <i class="fas fa-ellipsis-v"></i>
-                          </button>
-                          <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded" 
-                              aria-labelledby="dropdownMenuButton{{ investment.uid }}" 
-                              style="border: none; border-radius: 12px; overflow: hidden;">
-                      
-                            <!-- Bouton Détails -->
-                            <li>
-                              <a class="dropdown-item d-flex align-items-center" 
-                                 href="{% url 'detail-project' investment.project.uid %}" 
-                                 title="Détails" 
-                                 style="padding: 10px;">
-                                <i class="fas fa-eye me-2 text-primary"></i> 
-                                <span>Détails du projet</span>
-                              </a>
-                            </li>
-                      
-                            <!-- Bouton Poursuivre ou Payer -->
-                            <li>
-                              {% if investment.amount > 0 %}
-                              <a class="dropdown-item d-flex align-items-center" 
-                                 href="#" 
-                                 style="padding: 10px;">
-                                <i class="fas fa-coins me-2 text-success"></i> 
-                                <span>Procéder au paiement</span>
-                              </a>
-                              {% else %}
-                              <a class="dropdown-item d-flex align-items-center" 
-                                 data-bs-toggle="modal" 
-                                 data-bs-target="#investmentModal{{ investment.uid }}" 
-                                 title="Poursuivre" 
-                                 style="padding: 10px;">
-                                <i class="fas fa-arrow-right me-2 text-warning"></i> 
-                                <span>Poursuivre l'investissement</span>
-                              </a>
-                              {% endif %}
-                            </li>
-                      
-                            <!-- Bouton Annuler l'investissement -->
-                            <li>
-                              <button class="dropdown-item d-flex align-items-center text-danger" 
-                                      data-bs-toggle="modal" 
-                                      data-bs-target="#confirmationModal{{ investment.uid }}" 
-                                      title="Annuler l'investissement" 
-                                      style="padding: 10px;">
-                                <i class="fas fa-times-circle me-2"></i> 
-                                <span>Annuler l'investissement</span>
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
-                      </td>
-                      
-              </tr>
-
-              <!-- Modale pour le formulaire d'investissement -->
-              <div class="modal fade text-dark" id="investmentModal{{ investment.uid }}" tabindex="-1" aria-labelledby="investmentModalLabel{{ investment.uid }}" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="investmentModalLabel{{ investment.uid }}">Poursuivre l'investissement</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                      <!-- Formulaire d'investissement -->
-                      <form method="post" action="{% url 'investor:investissement' investment.uid %}">
-                        {% csrf_token %}
-
-                        <!-- Champ Montant -->
-                        <div class="form-group mb-3">
-                          {{ form.amount.label_tag }}
-                          {{ form.amount }}
-                          {% if form.amount.help_text %}
-                            <small class="form-text text-muted">{{ form.amount.help_text }}</small>
-                          {% endif %}
-                          <!-- Afficher les erreurs de validation pour le champ amount -->
-                          {% if form.amount.errors %}
-                            <div class="text-danger">
-                              {% for error in form.amount.errors %}
-                                <small>{{ error }}</small><br />
-                              {% endfor %}
-                            </div>
-                          {% endif %}
-                        </div>
-
-                        <!-- Champ Devise -->
-                        <div class="form-group mb-3">
-                          {{ form.currency.label_tag }}
-                          {{ form.currency }}
-                          {% if form.currency.help_text %}
-                            <small class="form-text text-muted">{{ form.currency.help_text }}</small>
-                          {% endif %}
-                          <!-- Afficher les erreurs de validation pour le champ currency -->
-                          {% if form.currency.errors %}
-                            <div class="text-danger">
-                              {% for error in form.currency.errors %}
-                                <small>{{ error }}</small><br />
-                              {% endfor %}
-                            </div>
-                          {% endif %}
-                        </div>
-
-                        <!-- Champ Anonymat -->
-                        <div class="form-check mb-3">
-                          {{ form.anonymity }}
-                          <label for="{{ form.anonymity.id_for_label }}" class="form-check-label">{{ form.anonymity.label }}</label>
-                          {% if form.anonymity.help_text %}
-                            <small class="form-text text-muted">{{ form.anonymity.help_text }}</small>
-                          {% endif %}
-                          <!-- Afficher les erreurs de validation pour le champ anonymity -->
-                          {% if form.anonymity.errors %}
-                            <div class="text-danger">
-                              {% for error in form.anonymity.errors %}
-                                <small>{{ error }}</small><br />
-                              {% endfor %}
-                            </div>
-                          {% endif %}
-                        </div>
-
-                        <!-- Bouton de soumission -->
-                        <button type="submit" class="btn btn-primary">Enregistrer</button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Modale de confirmation pour annuler l'investissement -->
-              <div class="modal fade" id="confirmationModal{{ investment.uid }}" tabindex="-1" aria-labelledby="confirmationModalLabel{{ investment.uid }}" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="confirmationModalLabel{{ investment.uid }}">Confirmer l'annulation</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-dark">😥😥 Voulez-vous vraiment rénoncer à votre décision de vouloir investir sur le projet {{ investment.projet.title }} ?</div>
-                    <div class="modal-footer">
-                      <!-- Bouton pour fermer la modale -->
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                      <!-- Bouton pour confirmer l'annulation -->
-                      <form method="post" action="{% url 'investor:annuler_investissement' investment.uid %}" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Je Rénonce</button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    {% include 'investors/_partials/statistiques_achats.html' %}
+    {% include "investors/_partials/achats_en_cours.html" %}
   </div>
-  <!-- Fin Investissement en cours -->
-
+  
   <!-- Scripts pour les graphiques -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
@@ -353,4 +98,5 @@
         }
     });
   </script>
+</div>
 {% endblock %}

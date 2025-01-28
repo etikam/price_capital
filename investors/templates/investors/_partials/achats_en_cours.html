@@ -1,0 +1,147 @@
+<div class="row">
+    <div class="col-md-12">
+      <!-- Titre du tableau -->
+      <h2 class="mb-4 bg bg-secondary text-center text-white">Mes Achats non terminés</h2>
+
+      <div class="table-wrap">
+        <table class="table table-responsive-xl">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Quantité</th>
+              <th>Prix Unitaire</th>
+              <th>Total</th>
+              <th>Statut</th>
+              <th>Actions</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for achat in achats %}
+              <tr class="alert" role="alert">
+                <td class="d-flex align-items-center">
+                  <!-- Image du produit dans une balise <img> -->
+                  <div class="d-flex px-2 py-1">
+                    <div>
+                      {% if achat.product.media %}
+                      <img src="{{ achat.product.media.url }}" style="width: 40px; height: 40px; object-fit: cover;" alt="produit">
+                      {% else %}
+                      <img src="/static/img/default-product.jpg" style="width: 40px; height: 40px; object-fit: cover;" alt="produit">
+                      {% endif %}
+                    </div>
+                    <div class="d-flex flex-column justify-content-center ms-3">
+                      <h6 class="mb-0 text-sm">{{ achat.product.Project.title }}</h6>
+                      <p class="text-xs text-secondary mb-0">{{ achat.created_at|date:"d/m/Y" }}</p>
+                    </div>
+                  </div>
+                </td>
+                <!-- Quantité -->
+                <td>{{ achat.quantity }}</td>
+                <!-- Prix Unitaire -->
+                <td>{{ achat.product.unit_price }} {{ achat.product.currency }}</td>
+                <!-- Total -->
+                <td>{{ achat.total_amount }} {{ achat.product.currency }}</td>
+                <!-- Statut de progression -->
+                <td class="status active">
+                  <span class="active">{{ achat.get_progress_display }}</span>
+                </td>
+                <!-- Actions -->
+                <td class="align-middle">
+                  <div class="dropdown">
+                    <button class="btn btn-link text-secondary mb-0" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="fa fa-ellipsis-v text-xs"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      {% if achat.amount > 0 %}
+                      <li>
+                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#achatModal{{ achat.uid }}">
+                          <i class="fas fa-edit me-2 text-warning"></i> Procéder au paiement
+                        </a>
+                      </li>
+                      {% else %}
+                      <li>
+                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#achatModal{{ achat.uid }}">
+                          <i class="fas fa-edit me-2 text-warning"></i> Poursuivre l'achat
+                        </a>
+                      </li>
+                      {% endif %}
+                      <li>
+                        <a class="dropdown-item" href="{% url 'detail-product' achat.product.uid %}">
+                          <i class="fas fa-circle-info me-2 text-info"></i> Voir les détails
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#confirmationModalAchat{{ achat.uid }}">
+                          <i class="fas fa-times me-2 text-danger"></i> Annuler l'achat
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Modale pour le formulaire d'achat -->
+              <div class="modal fade text-dark" id="achatModal{{ achat.uid }}" tabindex="-1" aria-labelledby="achatModalLabel{{ achat.uid }}" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="achatModalLabel{{ achat.uid }}">Poursuivre l'achat</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Formulaire d'achat -->
+                      <form method="post" action="{% url 'investor:achat' achat.uid %}">
+                        {% csrf_token %}
+
+                        <!-- Champ Quantité -->
+                        <div class="form-group mb-3">
+                          {{ achat_form.quantity.label_tag }}
+                          {{ achat_form.quantity }}
+                          {% if achat_form.quantity.help_text %}
+                            <small class="form-text text-muted">{{ achat_form.quantity.help_text }}</small>
+                          {% endif %}
+                          <!-- Afficher les erreurs de validation pour le champ quantity -->
+                          {% if achat_form.quantity.errors %}
+                            <div class="text-danger">
+                              {% for error in form.quantity.errors %}
+                                <small>{{ error }}</small><br />
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+
+                        <!-- Bouton de soumission -->
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modale de confirmation pour annuler l'achat -->
+              <div class="modal fade" id="confirmationModalAchat{{ achat.uid }}" tabindex="-1" aria-labelledby="confirmationModalLabelAchat{{ achat.uid }}" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="confirmationModalLabelAchat{{ achat.uid }}">Confirmer l'annulation</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-dark">😥😥 Voulez-vous vraiment annuler votre achat de {{ achat.product.name }} ?</div>
+                    <div class="modal-footer">
+                      <!-- Bouton pour fermer la modale -->
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                      <!-- Bouton pour confirmer l'annulation -->
+                      <form method="post" action="#" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Je Rénonce</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

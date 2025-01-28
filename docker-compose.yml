@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    restart: always
+    env_file: .env
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.${PROJECT_NAME}.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.${PROJECT_NAME}.entrypoints=https
+      - traefik.http.routers.${PROJECT_NAME}.tls=true
+      - traefik.http.routers.${PROJECT_NAME}.tls.certresolver=le
+      - traefik.http.services.${PROJECT_NAME}.loadbalancer.server.port=${WEB_PORT}
+      - traefik.http.middlewares.${PROJECT_NAME}-compress.compress=true
+      - traefik.http.routers.${PROJECT_NAME}.middlewares=${PROJECT_NAME}-compress
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    env_file: .env
+    environment:
+      - POSTGRES_INITDB_ARGS=--data-checksums
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - traefik-public
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+
+networks:
+  traefik-public:
+    external: true

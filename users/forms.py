@@ -83,3 +83,10 @@ class MoralPersonForm(forms.ModelForm):
         if len(rccm) < 5:
             raise ValidationError("Le RCCM doit contenir au moins 5 caractères.")
         return rccm
+
+
+
+
+
+class EmailAuthenticationForm(AuthenticationForm):
+    username = forms.EmailField(label="Email")  
