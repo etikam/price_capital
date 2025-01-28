@@ -9,7 +9,7 @@ try:
     server.sendmail(
         "etiro2005@gmail.com",  # Expéditeur
         "etiennedheleine2000@gmail.com",  # Destinataire
-        "Subject: Test Email\n\nCeci est un test direct via smtplib."
+        "Subject: Test Email\n\nCeci est un test direct via smtplib.",
     )
     server.quit()
     print("Email envoyé avec succès via smtplib !")

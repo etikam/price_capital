@@ -1,25 +1,25 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import InvestorForm
-from django.contrib.auth.decorators import login_required
-from .models import Investor, GainRecord
-from django.contrib import messages
-from investors.models import Investissement, Achat
-from investors.forms import InvestissementForm, AchatForm
-from app.models import ValidatedProject
-from django.db.models import Sum, Count, F
-from django.utils.timezone import now
-from datetime import timedelta
-from django.db.models.functions import ExtractMonth
-from django.db.models.functions import ExtractYear
-from django.utils.html import strip_tags
-from django.views.decorators.http import require_POST
-from django.views.generic import ListView, DetailView
-from django.utils import timezone
 from collections import defaultdict
+from datetime import datetime, timedelta
 from decimal import Decimal
-from datetime import datetime
-from django.views.generic import TemplateView
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count, F, Sum
+from django.db.models.functions import ExtractMonth, ExtractYear
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.utils.html import strip_tags
+from django.utils.timezone import now
+from django.views.decorators.http import require_POST
+from django.views.generic import DetailView, ListView, TemplateView
+
+from app.models import ValidatedProject
+from investors.forms import AchatForm, InvestissementForm
+from investors.models import Achat, Investissement
+
+from .forms import InvestorForm
+from .models import GainRecord, Investor
 
 
 @login_required
@@ -31,9 +31,7 @@ def become_investor(request):
             investor.user = request.user
             investor.save()
             form.save_m2m()  # Sauvegarde les relations ManyToMany (comme preferred_sectors)
-            return redirect(
-                "my-space"
-            )  # Redirige vers l'espace personnel de l'utilisateur
+            return redirect("my-space")  # Redirige vers l'espace personnel de l'utilisateur
     else:
         form = InvestorForm()
 
@@ -129,14 +127,12 @@ def become_investor(request):
 @login_required
 def investment_dashboard(request):
     # Récupérer les investissements en cours (progression < 100) de l'investisseur connecté
-    investments = Investissement.objects.filter(
-        investor=request.user.investor, progress__lt=100
-    ).order_by("-updated_at")
+    investments = Investissement.objects.filter(investor=request.user.investor, progress__lt=100).order_by(
+        "-updated_at"
+    )
 
     # Récupérer les achats
-    achats = Achat.objects.filter(
-        buyer=request.user.investor, progress__lt=100
-    ).order_by("-created_at")
+    achats = Achat.objects.filter(buyer=request.user.investor, progress__lt=100).order_by("-created_at")
 
     # Création d'un deux formulaire pour l'investissement et pour l'achat
     investissement_form = InvestissementForm()
@@ -149,10 +145,7 @@ def investment_dashboard(request):
 
     # Calculer les statistiques clés pour les achats
     # total investi sur les produits achetes
-    total_spent_on_products = (
-        achats.aggregate(total=Sum(F("quantity") * F("product__unit_price")))["total"]
-        or 0
-    )
+    total_spent_on_products = achats.aggregate(total=Sum(F("quantity") * F("product__unit_price")))["total"] or 0
     nombre_products_achetes = achats.count()
 
     # Graphiques des investissements
@@ -165,23 +158,19 @@ def investment_dashboard(request):
         .order_by("year", "month")
     )
 
-
     # ============================================================
     frequency_data = (
         investments.filter(created_at__gte=six_months_ago)
-        .annotate(month=ExtractMonth('created_at'), year=ExtractYear('created_at'))
-        .values('year', 'month')
-        .annotate(count=Count('id'))
-        .order_by('year', 'month')
+        .annotate(month=ExtractMonth("created_at"), year=ExtractYear("created_at"))
+        .values("year", "month")
+        .annotate(count=Count("id"))
+        .order_by("year", "month")
     )
 
     # Évolution des gains par semaine (tous les projets)
     interest_data = {}
     for investment in investments:
-        gain_records = GainRecord.objects.filter(
-            project=investment.project,
-            created_at__gte=six_months_ago
-        )
+        gain_records = GainRecord.objects.filter(project=investment.project, created_at__gte=six_months_ago)
         for record in gain_records:
             week_number = record.created_at.isocalendar()[1]  # Numéro de la semaine
             year = record.created_at.year
@@ -189,10 +178,7 @@ def investment_dashboard(request):
             interest_data[week_key] = interest_data.get(week_key, 0) + record.amount
 
     # Trier les semaines par ordre chronologique
-    sorted_weeks = sorted(
-        interest_data.keys(),
-        key=lambda x: (int(x.split(' ')[-1].strip('()')), int(x.split(' ')[1]))
-    )
+    sorted_weeks = sorted(interest_data.keys(), key=lambda x: (int(x.split(" ")[-1].strip("()")), int(x.split(" ")[1])))
 
     # Préparer les labels et les données pour les graphiques
     frequency_labels = []
@@ -201,9 +187,9 @@ def investment_dashboard(request):
     interest_values = []
 
     for data in frequency_data:
-        month_name = timezone.datetime(year=data['year'], month=data['month'], day=1).strftime('%B')
+        month_name = timezone.datetime(year=data["year"], month=data["month"], day=1).strftime("%B")
         frequency_labels.append(month_name)
-        frequency_values.append(data['count'])
+        frequency_values.append(data["count"])
 
     if interest_data:
         interest_labels = sorted_weeks
@@ -212,8 +198,6 @@ def investment_dashboard(request):
         interest_labels = ["Aucune donnée"]
         interest_values = [0]
 
-    
-    
     # ================================================================
     context = {
         "investments": investments,
@@ -267,9 +251,7 @@ def initiate_investment(request, uid):
         else:
 
             try:
-                investissement = Investissement.objects.create(
-                    project=project, investor=investor
-                )
+                investissement = Investissement.objects.create(project=project, investor=investor)
                 messages.success(
                     request,
                     f"Felicatation, Nous vous remercions de vouloir etre financier "
@@ -309,9 +291,7 @@ def investissement(request, uid=None):
 
             # Supprimer les balises HTML des erreurs
             clean_errors = strip_tags(str(form.errors))
-            messages.error(
-                request, f"Il y'a eu des erreurs lors de la soumission de votre projet, {clean_errors}"
-            )
+            messages.error(request, f"Il y'a eu des erreurs lors de la soumission de votre projet, {clean_errors}")
     else:
         # Initialiser le formulaire
         form = InvestissementForm(instance=investissement)
@@ -323,9 +303,7 @@ def investissement(request, uid=None):
 @require_POST
 def annuler_investissement(request, uid):
     # Récupérer l'investissement
-    investissement = get_object_or_404(
-        Investissement, uid=uid, investor=request.user.investor
-    )
+    investissement = get_object_or_404(Investissement, uid=uid, investor=request.user.investor)
 
     # Annuler l'investissement (par exemple, marquer comme annulé)
     investissement.delete()
@@ -380,14 +358,10 @@ class InvestmentDetailView(DetailView):
             print(f"JE RECUPERE LES INFOMATION DE L4INVESTISSEMENT")
             # Logique pour les projets de type "Retour sur Investissement"
             percentage_on_goal = (
-                Decimal(self.object.percentage_on_goal) / 100
-                if self.object.percentage_on_goal
-                else Decimal(0)
+                Decimal(self.object.percentage_on_goal) / 100 if self.object.percentage_on_goal else Decimal(0)
             )
             context["remaining_percentage"] = 100 - float(percentage_on_goal * 100)
-            gain_records = GainRecord.objects.filter(project=project).order_by(
-                "created_at"
-            )
+            gain_records = GainRecord.objects.filter(project=project).order_by("created_at")
             gains_by_week = defaultdict(Decimal)
             for record in gain_records:
                 week_start = datetime.combine(
@@ -396,12 +370,8 @@ class InvestmentDetailView(DetailView):
                 )
                 gains_by_week[week_start] += record.amount * percentage_on_goal
             sorted_weeks = sorted(gains_by_week.keys())
-            context["gain_evolution_labels"] = [
-                week.strftime("%d %b %Y") for week in sorted_weeks
-            ]
-            context["gain_evolution_data"] = [
-                float(gains_by_week[week]) for week in sorted_weeks
-            ]
+            context["gain_evolution_labels"] = [week.strftime("%d %b %Y") for week in sorted_weeks]
+            context["gain_evolution_data"] = [float(gains_by_week[week]) for week in sorted_weeks]
 
         elif project.project.project_type.name == "DON":
             # Logique pour les projets de type "Don"
@@ -431,12 +401,8 @@ class InvestorPortfolioView(LoginRequiredMixin, TemplateView):
         investments = Investissement.objects.filter(investor=investor)
 
         # Calculer les statistiques clés
-        total_invested = investments.aggregate(Sum("amount"))["amount__sum"] or Decimal(
-            0
-        )
-        total_gains = sum(
-            investment.gains for investment in investments
-        )  # Utilise la propriété 'gains'
+        total_invested = investments.aggregate(Sum("amount"))["amount__sum"] or Decimal(0)
+        total_gains = sum(investment.gains for investment in investments)  # Utilise la propriété 'gains'
         # available_balance = total_gains - total_invested  # Exemple de calcul
 
         # Ajouter les données au contexte

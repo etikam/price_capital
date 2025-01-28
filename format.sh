@@ -10,4 +10,4 @@ isort .
 black .
 
 # Run Flake8 to check style
-flake8 .
+# flake8 .

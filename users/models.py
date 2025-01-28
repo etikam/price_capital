@@ -1,23 +1,24 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from .managers import UserManager
 from django.utils import timezone
-from django.conf import settings
+
+from .managers import UserManager
 
 ROLE_CHOICES = [
-        ('PHYSICAL', 'Personne Physique'),
-        ('MORAL', 'Personne Morale'),
-        ('INVESTOR', 'Investisseur'),
-        ('ADMIN', 'Administrateur'),
-    ]
+    ("PHYSICAL", "Personne Physique"),
+    ("MORAL", "Personne Morale"),
+    ("INVESTOR", "Investisseur"),
+    ("ADMIN", "Administrateur"),
+]
+
 
 class User(AbstractUser):
     first_name = None
     last_name = None
-    username = models.CharField(default="not_username",max_length=20)
+    username = models.CharField(default="not_username", max_length=20)
     email = models.EmailField(unique=True, max_length=255, verbose_name="email address")
 
-    
     objects = UserManager()
 
     EMAIL_FIELD = "email"
@@ -33,9 +34,9 @@ class MoralPerson(models.Model):
     company_name = models.CharField(max_length=255)
     telephone = models.CharField(max_length=15)
     adresse = models.TextField()
-    rccm = models.CharField(max_length=100, unique=True, blank=True, null=True) 
+    rccm = models.CharField(max_length=100, unique=True, blank=True, null=True)
     logo = models.ImageField(upload_to="company_logos/")
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='PHYSICAL')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="PHYSICAL")
 
     def __str__(self):
         return self.company_name

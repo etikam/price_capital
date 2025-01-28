@@ -1,29 +1,20 @@
-from django.contrib.auth.views import LoginView
-from django.views.generic.edit import CreateView, View
-from django.views.generic import ListView
-from django.urls import reverse_lazy, reverse
-from django.shortcuts import redirect, render, get_object_or_404
-from django.utils.http import urlsafe_base64_decode
 from django.contrib import messages
-from django.db import transaction
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth import logout
-from .forms import CustomAuthenticationForm
-from .forms import CustomUserCreationForm
-from users.models import User, PhysicalPerson, MoralPerson
-from .utils.mailing import send_activation_email, send_password_reset_mail
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import (
-    PhysicalPersonForm,
-    MoralPersonForm,
-    PhysicalPersonForm,
-    MoralPersonForm,
-)
-from django.urls import reverse_lazy
-from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login, authenticate
-from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import LoginView
+from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.utils.http import urlsafe_base64_decode
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView, View
+
+from users.models import MoralPerson, PhysicalPerson, User
+
+from .forms import CustomAuthenticationForm, CustomUserCreationForm, MoralPersonForm, PhysicalPersonForm
+from .utils.mailing import send_activation_email, send_password_reset_mail
 
 User = get_user_model()
 # class CustomLoginView(LoginView):
@@ -35,15 +26,11 @@ def login_view(request):
         form = CustomAuthenticationForm(request.POST)
         if form.is_valid():
             clean_data = form.cleaned_data
-            user = authenticate(
-                request, email=clean_data["email"], password=clean_data["password"]
-            )
+            user = authenticate(request, email=clean_data["email"], password=clean_data["password"])
             if user:
                 login(request, user)
 
-                messages.success(
-                    request, f"Bienvenu, Vous êtes connecté en tant que {user.email}"
-                )
+                messages.success(request, f"Bienvenu, Vous êtes connecté en tant que {user.email}")
                 return redirect("home")
             else:
                 messages.error(request, "Email ou mot de passe incorrecte")
@@ -61,9 +48,7 @@ class LogoutView(View):
 
     def get(self, request):
         logout(request)
-        messages.success(
-            self.request, "Vous êtes maintenant deconnecté de la Prices Capital"
-        )
+        messages.success(self.request, "Vous êtes maintenant deconnecté de la Prices Capital")
         return redirect(self.login_url)
 
 
@@ -77,14 +62,12 @@ class CustomUserCreationView(CreateView):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
-            context ={}
+            context = {}
             send_activation_email(user)
 
             messages.success(
                 self.request,
-                (
-                    "Un lien vous a été envoyé dans votre boite mail, veuillez le consulter pour continuer l'inscription"
-                ),
+                ("Un lien vous a été envoyé dans votre boite mail, veuillez le consulter pour continuer l'inscription"),
             )
             return redirect(self.success_url)
 
@@ -124,13 +107,9 @@ def profile_view(request):
 
     # Déterminez si l'utilisateur est une personne physique ou morale
     if hasattr(user, "physical_person"):
-        form = PhysicalPersonForm(
-            request.POST or None, request.FILES or None, instance=user.physical_person
-        )
+        form = PhysicalPersonForm(request.POST or None, request.FILES or None, instance=user.physical_person)
     elif hasattr(user, "moral_person"):
-        form = MoralPersonForm(
-            request.POST or None, request.FILES or None, instance=user.moral_person
-        )
+        form = MoralPersonForm(request.POST or None, request.FILES or None, instance=user.moral_person)
     else:
         messages.error(request, "Aucun profil associé à cet utilisateur.")
         return redirect("home")

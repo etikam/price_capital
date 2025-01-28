@@ -1,12 +1,14 @@
 import random
 import string
 import uuid
-from django.db import models
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from app.models import ProjectCategory
-from app.models import ValidatedProject, ValidatedProductInfo
+from django.db import models
 from django.db.models import Sum
+
+from app.models import ProjectCategory, ValidatedProductInfo, ValidatedProject
+
 
 class Investor(models.Model):
     def generate_investor_id():
@@ -15,26 +17,20 @@ class Investor(models.Model):
         Vérifie que l'ID généré n'existe pas déjà dans la base de données.
         """
         while True:
-            letters = ''.join(random.choices(string.ascii_uppercase, k=4))
-            digits = ''.join(random.choices(string.digits, k=2))
+            letters = "".join(random.choices(string.ascii_uppercase, k=4))
+            digits = "".join(random.choices(string.digits, k=2))
             investor_id = f"{letters}{digits}"
             if not Investor.objects.filter(investor_id=investor_id).exists():
                 return investor_id
 
     # Identifiant unique de l'investisseur
     investor_id = models.CharField(
-        max_length=6,
-        unique=True,
-        default=generate_investor_id,
-        verbose_name="Identifiant Investisseur"
+        max_length=6, unique=True, default=generate_investor_id, verbose_name="Identifiant Investisseur"
     )
 
     # Association avec un utilisateur existant
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="investor",
-        verbose_name="Utilisateur"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="investor", verbose_name="Utilisateur"
     )
 
     # Identité de l'investisseur
@@ -43,21 +39,18 @@ class Investor(models.Model):
     email = models.EmailField(verbose_name="Email", help_text="Adresse email de l'investisseur")
     phone = models.CharField(max_length=20, verbose_name="Numéro de téléphone")
     address = models.TextField(verbose_name="Adresse postale")
-    
+
     # Informations financières
     available_budget = models.DecimalField(
-        max_digits=15, 
-        decimal_places=2, 
-        verbose_name="Budget disponible", 
-        help_text="Montant que l'investisseur est prêt à investir (ex. 10,000 GNF)"
+        max_digits=15,
+        decimal_places=2,
+        verbose_name="Budget disponible",
+        help_text="Montant que l'investisseur est prêt à investir (ex. 10,000 GNF)",
     )
-    
+
     # Préférences d'investissement
     preferred_sectors = models.ManyToManyField(
-        ProjectCategory,
-        blank=True,
-        related_name="interested_investors",
-        verbose_name="Secteurs d'intérêt"
+        ProjectCategory, blank=True, related_name="interested_investors", verbose_name="Secteurs d'intérêt"
     )
 
     preferred_currency = models.CharField(
@@ -68,25 +61,25 @@ class Investor(models.Model):
             ("EUR", "EUR - Euro"),
         ],
         default="GNF",
-        verbose_name="Monnaie préférée"
+        verbose_name="Monnaie préférée",
     )
-    
+
     minimum_investment = models.DecimalField(
-        max_digits=15, 
-        decimal_places=2, 
+        max_digits=15,
+        decimal_places=2,
         default=0,
         verbose_name="Montant minimal d'investissement",
-        help_text="Seuil minimum que l'investisseur est prêt à investir"
+        help_text="Seuil minimum que l'investisseur est prêt à investir",
     )
-    
+
     maximum_investment = models.DecimalField(
-        max_digits=15, 
-        decimal_places=2, 
+        max_digits=15,
+        decimal_places=2,
         default=0,
         verbose_name="Montant maximal d'investissement",
-        help_text="Seuil maximum que l'investisseur est prêt à investir"
+        help_text="Seuil maximum que l'investisseur est prêt à investir",
     )
-    
+
     investment_type = models.CharField(
         max_length=50,
         choices=[
@@ -95,7 +88,7 @@ class Investor(models.Model):
             ("innovation", "Innovation et technologie"),
         ],
         default="long_term",
-        verbose_name="Type de projets recherchés"
+        verbose_name="Type de projets recherchés",
     )
 
     # Informations supplémentaires
@@ -103,9 +96,9 @@ class Investor(models.Model):
         max_length=255,
         blank=True,
         verbose_name="Domaine d'expertise",
-        help_text="Domaine professionnel ou secteur de l'investisseur"
+        help_text="Domaine professionnel ou secteur de l'investisseur",
     )
-    
+
     investment_experience = models.CharField(
         max_length=20,
         choices=[
@@ -114,7 +107,7 @@ class Investor(models.Model):
             ("expert", "Expert"),
         ],
         default="beginner",
-        verbose_name="Expérience en investissement"
+        verbose_name="Expérience en investissement",
     )
 
     # Champs automatiques
@@ -132,9 +125,9 @@ class Investor(models.Model):
     def clean(self):
         """Validation personnalisée pour s'assurer que le montant minimal est inférieur ou égal au montant maximal."""
         if self.minimum_investment > self.maximum_investment:
-            raise ValidationError({
-                'minimum_investment': "Le montant minimal doit être inférieur ou égal au montant maximal."
-            })
+            raise ValidationError(
+                {"minimum_investment": "Le montant minimal doit être inférieur ou égal au montant maximal."}
+            )
 
     def is_active(self):
         """Vérifie si l'investisseur est actif (budget disponible > 0)."""
@@ -146,19 +139,11 @@ class Investor(models.Model):
 
 
 class Investissement(models.Model):
-    uid = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-        verbose_name="Identifiant unique"
-        )
-        
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name="Identifiant unique")
+
     # Lien avec l'investisseur
     investor = models.ForeignKey(
-        Investor,
-        on_delete=models.CASCADE,
-        related_name="investissements",
-        verbose_name="Investisseur"
+        Investor, on_delete=models.CASCADE, related_name="investissements", verbose_name="Investisseur"
     )
 
     # Lien avec le projet (si applicable)
@@ -168,20 +153,21 @@ class Investissement(models.Model):
         null=True,
         blank=True,
         related_name="investissements",
-        verbose_name="Projet à investir"
+        verbose_name="Projet à investir",
     )
 
-    anonymity = models.BooleanField(default=False, 
-                                    help_text="Si vous ne voulez pas être vu par le porteur de projet (s'applique pour les projets de type Don)",
-                                    verbose_name="Je Veux Rester Anonyme"
-                                    )
+    anonymity = models.BooleanField(
+        default=False,
+        help_text="Si vous ne voulez pas être vu par le porteur de projet (s'applique pour les projets de type Don)",
+        verbose_name="Je Veux Rester Anonyme",
+    )
     # Montant de l'investissement
     amount = models.DecimalField(
-        default = 0,
+        default=0,
         max_digits=15,
         decimal_places=2,
         verbose_name="Montant à Investir",
-        help_text="Montant que vous voulez investir (ex. 10,000 GNF)"
+        help_text="Montant que vous voulez investir (ex. 10,000 GNF)",
     )
 
     currency = models.CharField(
@@ -193,22 +179,21 @@ class Investissement(models.Model):
         ],
         default="GNF",
         verbose_name="Devise D'investissement",
-        help_text="Dans quelle devise est votre montant"
+        help_text="Dans quelle devise est votre montant",
     )
 
-
-     # Niveau d'avancement (en pourcentage)
+    # Niveau d'avancement (en pourcentage)
     progress = models.IntegerField(
         choices=[
             (0, "Initié"),
-            (50,"Payment en cours"),
+            (50, "Payment en cours"),
             (100, "Terminé"),
         ],
         default=0,
-        verbose_name="Progression"
+        verbose_name="Progression",
     )
-    
-    payment_done = models.BooleanField(default=False) #pour savoir si le payement est efectué ou pas
+
+    payment_done = models.BooleanField(default=False)  # pour savoir si le payement est efectué ou pas
 
     # Champs automatiques
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
@@ -230,7 +215,7 @@ class Investissement(models.Model):
         Calculer les gains totaux pour cet investissement en fonction des enregistrements de gains du projet.
         """
         if self.percentage_on_goal:
-            total_project_gains = self.project.gain_records.aggregate(total_gains=Sum('amount'))['total_gains'] or 0
+            total_project_gains = self.project.gain_records.aggregate(total_gains=Sum("amount"))["total_gains"] or 0
             return total_project_gains * (self.percentage_on_goal / 100)
         return 0
 
@@ -240,53 +225,30 @@ class Investissement(models.Model):
     class Meta:
         verbose_name = "Investissement"
         verbose_name_plural = "Investissements"
-        unique_together = (('project', 'investor'),)
-        
+        unique_together = (("project", "investor"),)
+
 
 class Achat(models.Model):
-    STATUS_CHOICES = [
-        (1, 'Commande validée'),
-        (2, 'En cours de production'),
-        (3, 'Livraison'),
-        (4, 'Terminé')
-    ]
+    STATUS_CHOICES = [(1, "Commande validée"), (2, "En cours de production"), (3, "Livraison"), (4, "Terminé")]
 
-    uid = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-        verbose_name="Identifiant unique"
-    )
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name="Identifiant unique")
 
     # Lien avec l'acheteur
-    buyer = models.ForeignKey(
-        Investor,
-        on_delete=models.CASCADE,
-        related_name="achats",
-        verbose_name="Acheteur"
-    )
+    buyer = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name="achats", verbose_name="Acheteur")
 
     # Lien avec le produit
     product = models.ForeignKey(
-        ValidatedProductInfo,
-        on_delete=models.CASCADE,
-        related_name="achats",
-        verbose_name="Produit"
+        ValidatedProductInfo, on_delete=models.CASCADE, related_name="achats", verbose_name="Produit"
     )
 
     # Quantité achetée
     quantity = models.PositiveIntegerField(
-        verbose_name="Quantité",
-        help_text="Quantité que vous souhaitez acheter",
-        default=1
+        verbose_name="Quantité", help_text="Quantité que vous souhaitez acheter", default=1
     )
 
     # Montant total
     total_amount = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2,
-        verbose_name="Montant total",
-        help_text="Montant total de l'achat"
+        max_digits=10, decimal_places=2, verbose_name="Montant total", help_text="Montant total de l'achat"
     )
 
     # Statut de la commande
@@ -302,7 +264,7 @@ class Achat(models.Model):
         ],
         default="GNF",
         verbose_name="Devise",
-        help_text="Dans quelle devise est votre montant"
+        help_text="Dans quelle devise est votre montant",
     )
 
     # Champs automatiques
@@ -315,19 +277,14 @@ class Achat(models.Model):
 
     def get_progress_display(self):
         """Retourne une description lisible et descriptive du progrès"""
-        progress_text = {
-            1: "Commande validée",
-            2: "En production",
-            3: "Livraison",
-            4: "Terminé"
-        }
+        progress_text = {1: "Commande validée", 2: "En production", 3: "Livraison", 4: "Terminé"}
         return progress_text.get(self.order_status, "Statut inconnu")
 
     def save(self, *args, **kwargs):
         # Calculer le montant total
         if not self.total_amount:
             self.total_amount = self.quantity * self.product.unit_price
-        
+
         # Mettre à jour le progress en fonction du order_status
         if self.order_status == 1:  # Production
             self.progress = 25
@@ -337,38 +294,39 @@ class Achat(models.Model):
             self.progress = 75
         elif self.order_status == 4:  # Terminé
             self.progress = 100
-            
+
         super().save(*args, **kwargs)
 
     def get_status_color(self):
         """Retourne la couleur Bootstrap en fonction du statut"""
         status_colors = {
-            1: 'info',      # Production - Bleu
-            2: 'warning',   # Contrôle - Orange
-            3: 'primary',   # Livraison - Bleu foncé
-            4: 'success'    # Terminé - Vert
+            1: "info",  # Production - Bleu
+            2: "warning",  # Contrôle - Orange
+            3: "primary",  # Livraison - Bleu foncé
+            4: "success",  # Terminé - Vert
         }
-        return status_colors.get(self.order_status, 'secondary')
+        return status_colors.get(self.order_status, "secondary")
 
     def get_status_step(self):
         """Retourne les informations de l'étape actuelle pour le stepper"""
         return {
-            'current_step': self.order_status,
-            'progress': self.progress,
-            'status_text': self.get_order_status_display()
+            "current_step": self.order_status,
+            "progress": self.progress,
+            "status_text": self.get_order_status_display(),
         }
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
         verbose_name = "Achat"
         verbose_name_plural = "Achats"
-        unique_together = ['product','buyer']
+        unique_together = ["product", "buyer"]
 
-#Gains/Interet sur les projet
+
+# Gains/Interet sur les projet
 class GainRecord(models.Model):
-    project = models.ForeignKey(ValidatedProject, on_delete=models.CASCADE, related_name='gain_records')
+    project = models.ForeignKey(ValidatedProject, on_delete=models.CASCADE, related_name="gain_records")
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Montant du gain")
     created_at = models.DateField(verbose_name="Date du gain")
-    
+
     def __str__(self):
         return f"{self.amount} {self.project.currency} le {self.created_at}"

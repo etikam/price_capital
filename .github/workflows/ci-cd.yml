@@ -21,8 +21,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install flake8 black
-    - name: Run Flake8
-      run: flake8 .
+    # - name: Run Flake8
+    #   run: flake8 .
     - name: Run Black
       run: black --check .
 

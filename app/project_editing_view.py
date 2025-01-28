@@ -1,29 +1,30 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
-from app.models import Project, ValidatedProject
-
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.contrib import messages
-from .forms import ValidatedProjectForm
 from django.views.decorators.http import require_POST
+
+from app.models import Project, ValidatedProject
 from app.utils.mailing import send_report_mail_on_project
-from .models import ProjectCategory
-from .models import ValidatedProductInfo
-from .forms import  ValidatedProductInfoForm
 
-def detail_project(request,uid):
+from .forms import ValidatedProductInfoForm, ValidatedProjectForm
+from .models import ProjectCategory, ValidatedProductInfo
+
+
+def detail_project(request, uid):
     project = get_object_or_404(Project, uid=uid)
-    return render(request,"app/project/detail.html", {'project':project})
+    return render(request, "app/project/detail.html", {"project": project})
 
-def detail_product(request,id):
-    product= get_object_or_404(ValidatedProductInfo, uid=id)
-    return render(request,"app/project/detail.html", {'product':product})
+
+def detail_product(request, id):
+    product = get_object_or_404(ValidatedProductInfo, uid=id)
+    return render(request, "app/project/detail.html", {"product": product})
+
 
 @transaction.atomic
 def reformulate_project(request, uid):
     project = get_object_or_404(Project, uid=uid)
-    
+
     if project.project_type.name == "ACHAT ANTICIPE":
         # Pour les projets de type ACHAT ANTICIPE
         try:
@@ -54,20 +55,22 @@ def reformulate_project(request, uid):
                 html_path = "app/mailing/reformulated_project_mail.html"
                 subject = "Recommandation – Reformulation de votre projet"
                 user = project.user
-                context = {
-                    "Nom": project.owner.first_name,
-                    "titre_du_projet": project.title
-                }
+                context = {"Nom": project.owner.first_name, "titre_du_projet": project.title}
                 messages.success(request, f"Le projet {project.title} a été reformulé avec succès.")
                 try:
                     send_report_mail_on_project(user, subject, html_path, context)
-                    messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informer de l'état actuel de son projet.")
+                    messages.success(
+                        request,
+                        "Un mail de retour a été envoyé au soumetteur de projet pour l'informer de l'état actuel de son projet.",
+                    )
                 except Exception as e:
                     messages.warning(request, f"Le projet a été reformulé, mais l'envoi du mail a échoué. {str(e)}")
-                
+
                 return redirect("cabinet-incoming")
             else:
-                messages.error(request, f"Erreur lors de l'enregistrement des informations du produit: {product_form.errors}")
+                messages.error(
+                    request, f"Erreur lors de l'enregistrement des informations du produit: {product_form.errors}"
+                )
 
         context = {
             "product_form": product_form,
@@ -75,16 +78,16 @@ def reformulate_project(request, uid):
             "validated_product_info": validated_product_info,
         }
         return render(request, "app/project/reformulate_achat_anticipe.html", context)
-    
+
     else:
         # Pour tous les autres types de projets
         try:
             validated_project = ValidatedProject.objects.get(project=project)
         except ValidatedProject.DoesNotExist:
             validated_project = None
-        
+
         form = ValidatedProjectForm(instance=validated_project)
-        
+
         if request.method == "POST":
             form = ValidatedProjectForm(request.POST, request.FILES, instance=validated_project)
             if form.is_valid():
@@ -92,7 +95,7 @@ def reformulate_project(request, uid):
                 validated_project.project = project
                 validated_project.save()
                 form.save_m2m()
-                
+
                 # Update project status
                 project.status = "reformulated"
                 project.save()
@@ -101,21 +104,21 @@ def reformulate_project(request, uid):
                 html_path = "app/mailing/reformulated_project_mail.html"
                 subject = "Recommandation – Reformulation de votre projet"
                 user = project.user
-                context = {
-                    "Nom": project.owner.first_name,
-                    "titre_du_projet": project.title
-                }
+                context = {"Nom": project.owner.first_name, "titre_du_projet": project.title}
                 messages.success(request, f"Le projet {project.title} a été reformulé avec succès.")
                 try:
                     send_report_mail_on_project(user, subject, html_path, context)
-                    messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informer de l'état actuel de son projet.")
+                    messages.success(
+                        request,
+                        "Un mail de retour a été envoyé au soumetteur de projet pour l'informer de l'état actuel de son projet.",
+                    )
                 except Exception as e:
                     messages.warning(request, f"Le projet a été reformulé, mais l'envoi du mail a échoué. {str(e)}")
-                
+
                 return redirect("cabinet-incoming")
             else:
                 messages.error(request, f"Veuillez corriger les erreurs du formulaire. {form.errors}")
-        
+
         context = {
             "form": form,
             "project": project,
@@ -127,13 +130,13 @@ def accepte_project(request, uid):
     project = get_object_or_404(Project, uid=uid)
     project.status = "accepted"
     project.save()
-    
+
     # Création du contexte à passer au template
     context = {
-        'Nom': project.owner.first_name,  # Le nom de l'utilisateur (si vous avez un champ first_name dans User)
-        'Titre': project.title,  # Le titre du projet
+        "Nom": project.owner.first_name,  # Le nom de l'utilisateur (si vous avez un champ first_name dans User)
+        "Titre": project.title,  # Le titre du projet
     }
-    
+
     html_path = "app/mailing/accept_project_mail.html"
     subject = f"Acceptation du projet {project.title}"
     user = project.user
@@ -142,9 +145,12 @@ def accepte_project(request, uid):
     send_report_mail_on_project(user, subject, html_path, context)
 
     messages.success(request, f"Le projet {project.title} a été accepté avec succès.")
-    messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informer de l'état actuel de son projet.")
-    
-    return redirect('cabinet-incoming')
+    messages.success(
+        request,
+        "Un mail de retour a été envoyé au soumetteur de projet pour l'informer de l'état actuel de son projet.",
+    )
+
+    return redirect("cabinet-incoming")
 
 
 @require_POST
@@ -164,21 +170,21 @@ def publish_project(request, uid):
         if is_published:
             project.status = "published"  # Mettre à jour le statut du projet
             project.approved_at = timezone.now()
-            #envoie du mail
+            # envoie du mail
             html_path = "app/mailing/published_project_mail.html"
             subject = "Votre projet est publié"
             user = project.user
-            context = {
-                "Nom":project.owner.first_name,
-                "titre_du_projet":project.title
-            }
-            send_report_mail_on_project(user,subject,html_path,context)
+            context = {"Nom": project.owner.first_name, "titre_du_projet": project.title}
+            send_report_mail_on_project(user, subject, html_path, context)
             messages.success(request, f"Le projet '{project.title}' a été publié avec succès.")
-            messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet pour l'informé de l'état actuel de son projet")
+            messages.success(
+                request,
+                "Un mail de retour a été envoyé au soumetteur de projet pour l'informé de l'état actuel de son projet",
+            )
         else:
             project.status = "reformulated"  # Rétablir un statut neutre
             messages.warning(request, f"La publication du projet '{project.title}' a été annulée.")
-        
+
         # Sauvegarder les modifications
         validated_project.save()
         project.save()
@@ -189,40 +195,39 @@ def publish_project(request, uid):
     return redirect("cabinet-validated")
 
 
-
 def reject_project(request, uid):
     project = get_object_or_404(Project, uid=uid)
 
     # Si la requête est en POST, récupérer la raison
-    if request.method == 'POST':
-        raison = request.POST.get('reason', '')
-        
+    if request.method == "POST":
+        raison = request.POST.get("reason", "")
+
         # Mettre à jour le statut du projet à "rejeté"
         project.status = "rejected"
         project.save()
 
         # Créer le contexte pour l'email
         context = {
-            'Nom': project.owner.first_name,
-            'Titre_du_projet': project.title,
-            'raison': raison,  # Passer la raison du rejet
+            "Nom": project.owner.first_name,
+            "Titre_du_projet": project.title,
+            "raison": raison,  # Passer la raison du rejet
         }
 
         # Envoi du mail
         html_path = "app/mailing/rejected_project_mail.html"
         subject = f"Rejet du projet {project.title}"
         user = project.user
-        
+
         send_report_mail_on_project(user, subject, html_path, context)
 
         # Message de succès pour l'interface utilisateur
         messages.success(request, f"Le projet '{project.title}' a été rejeté avec succès.")
         messages.success(request, "Un mail de retour a été envoyé au soumetteur de projet.")
 
-        return redirect('cabinet-incoming')
-    
+        return redirect("cabinet-incoming")
+
     # Si ce n'est pas une requête POST, on redirige
-    return redirect('cabinet-incoming')
+    return redirect("cabinet-incoming")
 
 
 def add_category(request):
@@ -238,7 +243,7 @@ def add_category(request):
             messages.error(request, "Veuillez entrer un nom valide pour la catégorie.")
 
         # Retourner à la page précédente avec les données du formulaire précédemment saisies
-        referer = request.META.get('HTTP_REFERER', '/')
+        referer = request.META.get("HTTP_REFERER", "/")
         return redirect(referer)
     else:
         return redirect("reformulate_project")

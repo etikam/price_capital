@@ -1,14 +1,16 @@
 from django import forms
-from .models import Project
-from .models import PorteurProject
-from .models import ProjectCategory
-from .models import ValidatedProject
-from .models import Contact
-from .models import Realisation
-from django.core.validators import FileExtensionValidator
-from .models import ProductInfo
-from .models import ValidatedProductInfo
-from django.core.validators import MinValueValidator
+from django.core.validators import FileExtensionValidator, MinValueValidator
+
+from .models import (
+    Contact,
+    PorteurProject,
+    ProductInfo,
+    Project,
+    ProjectCategory,
+    Realisation,
+    ValidatedProductInfo,
+    ValidatedProject,
+)
 
 
 class ProjectSubmissionForm(forms.ModelForm):
@@ -27,9 +29,7 @@ class ProjectSubmissionForm(forms.ModelForm):
             "business_plan",
         ]
         widgets = {
-            "title": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Titre du projet"}
-            ),
+            "title": forms.TextInput(attrs={"class": "form-control", "placeholder": "Titre du projet"}),
             "description": forms.Textarea(
                 attrs={
                     "class": "form-control",
@@ -39,9 +39,7 @@ class ProjectSubmissionForm(forms.ModelForm):
             ),
             "category": forms.Select(attrs={"class": "form-select"}),
             "project_type": forms.Select(attrs={"class": "form-select"}),
-            "goal": forms.NumberInput(
-                attrs={"class": "form-control", "placeholder": "Budget estimé"}
-            ),
+            "goal": forms.NumberInput(attrs={"class": "form-control", "placeholder": "Budget estimé"}),
             "location": forms.TextInput(
                 attrs={
                     "class": "form-control",
@@ -73,21 +71,11 @@ class PorteurProjectForm(forms.ModelForm):
         fields = ["first_name", "last_name", "phone", "adress", "birthday", "photo"]
 
         widgets = {
-            "first_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Prénom"}
-            ),
-            "last_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Nom"}
-            ),
-            "phone": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Numéro de téléphone"}
-            ),
-            "adress": forms.Textarea(
-                attrs={"class": "form-control", "placeholder": "Adresse", "rows": 4}
-            ),
-            "birthday": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
-            ),
+            "first_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Prénom"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nom"}),
+            "phone": forms.TextInput(attrs={"class": "form-control", "placeholder": "Numéro de téléphone"}),
+            "adress": forms.Textarea(attrs={"class": "form-control", "placeholder": "Adresse", "rows": 4}),
+            "birthday": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
             "photo": forms.ClearableFileInput(attrs={"class": "form-control-file"}),
         }
 
@@ -96,11 +84,7 @@ class ProjectCategoryForm(forms.ModelForm):
     class Meta:
         model = ProjectCategory
         fields = ["name"]
-        widgets = {
-            "name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Nom de la catégorie"}
-            )
-        }
+        widgets = {"name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nom de la catégorie"})}
 
 
 class ValidatedProjectForm(forms.ModelForm):
@@ -127,9 +111,7 @@ class ValidatedProjectForm(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "category": forms.Select(attrs={"class": "form-select"}),
-            "goal": forms.NumberInput(
-                attrs={"class": "form-control", "placeholder": "Budget estimé"}
-            ),
+            "goal": forms.NumberInput(attrs={"class": "form-control", "placeholder": "Budget estimé"}),
             "location": forms.TextInput(
                 attrs={
                     "class": "form-control",
@@ -139,23 +121,13 @@ class ValidatedProjectForm(forms.ModelForm):
             "currency": forms.Select(attrs={"class": "form-select"}),
             "context": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "summary": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
-            "problem_statement": forms.Textarea(
-                attrs={"rows": 4, "class": "form-control"}
-            ),
-            "general_objective": forms.Textarea(
-                attrs={"rows": 3, "class": "form-control"}
-            ),
-            "specific_objectives": forms.Textarea(
-                attrs={"rows": 4, "class": "form-control"}
-            ),
+            "problem_statement": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+            "general_objective": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "specific_objectives": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "deliverables": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
-            "target_audience": forms.Textarea(
-                attrs={"rows": 3, "class": "form-control"}
-            ),
+            "target_audience": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
             "key_partners": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
-            "additional_details": forms.Textarea(
-                attrs={"rows": 3, "class": "form-control"}
-            ),
+            "additional_details": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }
 
@@ -165,18 +137,10 @@ class ContactForm(forms.ModelForm):
         model = Contact
         fields = ["name", "email", "phone", "subject", "message"]
         widgets = {
-            "name": forms.TextInput(
-                attrs={"class": "form-control border-0", "placeholder": "Votre Nom"}
-            ),
-            "email": forms.EmailInput(
-                attrs={"class": "form-control border-0", "placeholder": "Votre Email"}
-            ),
-            "phone": forms.TextInput(
-                attrs={"class": "form-control border-0", "placeholder": "Téléphone"}
-            ),
-            "subject": forms.TextInput(
-                attrs={"class": "form-control border-0", "placeholder": "Sujet"}
-            ),
+            "name": forms.TextInput(attrs={"class": "form-control border-0", "placeholder": "Votre Nom"}),
+            "email": forms.EmailInput(attrs={"class": "form-control border-0", "placeholder": "Votre Email"}),
+            "phone": forms.TextInput(attrs={"class": "form-control border-0", "placeholder": "Téléphone"}),
+            "subject": forms.TextInput(attrs={"class": "form-control border-0", "placeholder": "Sujet"}),
             "message": forms.Textarea(
                 attrs={
                     "class": "form-control border-0",
@@ -346,7 +310,7 @@ class RealisationForm(forms.ModelForm):
 
     class Meta:
         model = Realisation
-        fields = ("title", "description", "image","date")
+        fields = ("title", "description", "image", "date")
 
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
@@ -354,9 +318,9 @@ class RealisationForm(forms.ModelForm):
             "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "date": forms.DateTimeInput(attrs={"class": "form-control", "type": "datetime-local"}),
         }
-        label ={
-            "title":"Titre de la realisation",
-            "description":"Brève description de ce qui est fait",
-            "image":"image (si applicable)",
-            "date":"date de realisation"
+        label = {
+            "title": "Titre de la realisation",
+            "description": "Brève description de ce qui est fait",
+            "image": "image (si applicable)",
+            "date": "date de realisation",
         }

@@ -1,76 +1,86 @@
 from django import forms
-from investors.models import Investor, Investissement, Achat
 from django.core.exceptions import ValidationError
+
+from investors.models import Achat, Investissement, Investor
+
 
 class InvestorForm(forms.ModelForm):
     class Meta:
         model = Investor
         fields = [
-            'first_name', 'last_name', 'email', 'phone', 'address',
-            'available_budget', 'preferred_sectors', 'preferred_currency',
-            'minimum_investment', 'maximum_investment', 'investment_type',
-            'expertise_domain', 'investment_experience'
+            "first_name",
+            "last_name",
+            "email",
+            "phone",
+            "address",
+            "available_budget",
+            "preferred_sectors",
+            "preferred_currency",
+            "minimum_investment",
+            "maximum_investment",
+            "investment_type",
+            "expertise_domain",
+            "investment_experience",
         ]
         widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénom'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Numéro de téléphone'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Adresse postale', 'rows': 3}),
-            'available_budget': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Budget disponible'}),
-            'preferred_sectors': forms.SelectMultiple(attrs={'class': 'form-select'}),
-            'preferred_currency': forms.Select(attrs={'class': 'form-select'}),
-            'minimum_investment': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant minimal'}),
-            'maximum_investment': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant maximal'}),
-            'investment_type': forms.Select(attrs={'class': 'form-select'}),
-            'expertise_domain': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Domaine d\'expertise'}),
-            'investment_experience': forms.Select(attrs={'class': 'form-select'}),
+            "first_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Prénom"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nom"}),
+            "email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email"}),
+            "phone": forms.TextInput(attrs={"class": "form-control", "placeholder": "Numéro de téléphone"}),
+            "address": forms.Textarea(attrs={"class": "form-control", "placeholder": "Adresse postale", "rows": 3}),
+            "available_budget": forms.NumberInput(attrs={"class": "form-control", "placeholder": "Budget disponible"}),
+            "preferred_sectors": forms.SelectMultiple(attrs={"class": "form-select"}),
+            "preferred_currency": forms.Select(attrs={"class": "form-select"}),
+            "minimum_investment": forms.NumberInput(attrs={"class": "form-control", "placeholder": "Montant minimal"}),
+            "maximum_investment": forms.NumberInput(attrs={"class": "form-control", "placeholder": "Montant maximal"}),
+            "investment_type": forms.Select(attrs={"class": "form-select"}),
+            "expertise_domain": forms.TextInput(attrs={"class": "form-control", "placeholder": "Domaine d'expertise"}),
+            "investment_experience": forms.Select(attrs={"class": "form-select"}),
         }
 
     def clean(self):
         cleaned_data = super().clean()
-        minimum_investment = cleaned_data.get('minimum_investment')
-        maximum_investment = cleaned_data.get('maximum_investment')
+        minimum_investment = cleaned_data.get("minimum_investment")
+        maximum_investment = cleaned_data.get("maximum_investment")
 
         if minimum_investment and maximum_investment and minimum_investment > maximum_investment:
-            raise ValidationError({
-                'minimum_investment': "Le montant minimal doit être inférieur ou égal au montant maximal."
-            })
+            raise ValidationError(
+                {"minimum_investment": "Le montant minimal doit être inférieur ou égal au montant maximal."}
+            )
 
         return cleaned_data
+
 
 class InvestissementForm(forms.ModelForm):
     class Meta:
         model = Investissement
-        fields = ['anonymity', 'amount', 'currency']
+        fields = ["anonymity", "amount", "currency"]
         widgets = {
-            'anonymity': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
-            'currency': forms.Select(attrs={'class': 'form-select'}),
+            "anonymity": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "amount": forms.NumberInput(attrs={"class": "form-control"}),
+            "currency": forms.Select(attrs={"class": "form-select"}),
         }
 
     def clean_amount(self):
-        amount = self.cleaned_data['amount']  # Récupérer la valeur nettoyée du champ
+        amount = self.cleaned_data["amount"]  # Récupérer la valeur nettoyée du champ
         if amount <= 0:
             # Lever une exception de validation
             raise ValidationError(" Désolé, mais vous ne pouvez pas investir un montant inférieur ou égal à 0.")
         return amount  # Retourner la valeur si elle est valide
 
+
 class AchatForm(forms.ModelForm):
     class Meta:
         model = Achat
-        fields = ['quantity']
-        widgets = {
-            'quantity': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Quantité souhaitée'
-            })
-        }
+        fields = ["quantity"]
+        widgets = {"quantity": forms.NumberInput(attrs={"class": "form-control", "placeholder": "Quantité souhaitée"})}
 
     def clean_quantity(self):
-        quantity = self.cleaned_data['quantity']
+        quantity = self.cleaned_data["quantity"]
         if quantity <= 0:
             raise ValidationError("La quantité doit être supérieure à 0.")
         if quantity > self.instance.product.quantity_available:
-            raise ValidationError(f"Vous ne pouvez pas acheter plus que la quantité disponible: {self.instance.product.quantity_available}.")
+            raise ValidationError(
+                f"Vous ne pouvez pas acheter plus que la quantité disponible: {self.instance.product.quantity_available}."
+            )
         return quantity
