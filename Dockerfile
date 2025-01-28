@@ -14,6 +14,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Create directories for static and media files
+RUN mkdir -p /app/staticfiles /app/mediafiles
+
+# Collect static files if RUN_COLLECTSTATIC is true
+RUN if [ "$RUN_COLLECTSTATIC" = "true" ]; then \
+    python manage.py collectstatic --noinput; \
+    fi
+
+# Set permissions for static and media directories
+RUN chmod -R 755 /app/staticfiles /app/mediafiles
 
 EXPOSE 8000
 

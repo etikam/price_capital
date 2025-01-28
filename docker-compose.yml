@@ -6,8 +6,11 @@ services:
     restart: always
     env_file: .env
     volumes:
+      - ./:/app
       - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      - media_volume:/app/mediafiles
+    environment:
+      - RUN_COLLECTSTATIC=true
     depends_on:
       db:
         condition: service_healthy

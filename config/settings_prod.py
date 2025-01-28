@@ -33,6 +33,25 @@ DATABASES["default"]["OPTIONS"] = {
     "keepalives_count": 5,
 }
 
+# Static and media files configuration
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
+MEDIA_URL = "/media/"
+
+# WhiteNoise configuration
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Add WhiteNoise middleware
+    # ... other middleware
+]
+
+# WhiteNoise storage
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Ensure static files are collected
+RUN_COLLECTSTATIC = os.environ.get("RUN_COLLECTSTATIC", "true").lower() == "true"
+
 # Logging configuration
 LOGGING = {
     "version": 1,
