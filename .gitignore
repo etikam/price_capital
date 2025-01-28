@@ -51,7 +51,12 @@ coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
-.pytest_cache/
+.pytest_cache/# Ignore all virtual environments
+env/
+venv/
+ENV/
+.env/
+*.venv
 cover/
 
 # Translations
