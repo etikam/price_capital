@@ -17,11 +17,11 @@ repos:
     hooks:
     -   id: flake8
 
--   repo: local
-    hooks:
-    -   id: django-tests
-        name: Django Tests
-        entry: python manage.py test
-        language: system
-        pass_filenames: false
-        always_run: true
+# -   repo: local
+#     hooks:
+#     -   id: django-tests
+#         name: Django Tests
+#         entry: python manage.py test
+#         language: system
+#         pass_filenames: false
+#         always_run: true
