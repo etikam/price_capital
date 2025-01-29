@@ -10,8 +10,8 @@
         }, 1);
     };
     spinner(0);
-    
-    
+
+
     // Initiate the wowjs
     new WOW().init();
 
@@ -111,11 +111,11 @@
     });
 
 
-    // Facts counter
-    $('[data-toggle="counter-up"]').counterUp({
-        delay: 5,
-        time: 2000
-    });
+    // // Facts counter
+    // $('[data-toggle="counter-up"]').counterUp({
+    //     delay: 5,
+    //     time: 2000
+    // });
 
 
    // Back to top button
@@ -133,4 +133,3 @@
 
 
 })(jQuery);
-
