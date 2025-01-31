@@ -64,7 +64,9 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # Ensure static files are collected
 RUN_COLLECTSTATIC = os.environ.get("RUN_COLLECTSTATIC", "true").lower() == "true"
 
-# Logging configuration
+LOG_DIR = "/app/logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -72,7 +74,7 @@ LOGGING = {
         "file": {
             "level": "ERROR",
             "class": "logging.FileHandler",
-            "filename": "/app/logs/django_error.log",
+            "filename": os.path.join(LOG_DIR, "django_error.log"),
         },
     },
     "loggers": {
@@ -80,11 +82,6 @@ LOGGING = {
             "handlers": ["file"],
             "level": "ERROR",
             "propagate": True,
-        },
-        "django.db.backends": {
-            "handlers": ["file"],
-            "level": "ERROR",
-            "propagate": False,
         },
     },
 }
