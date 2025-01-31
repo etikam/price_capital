@@ -31,20 +31,7 @@ EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() == "true"
 ACME_EMAIL = os.environ.get("ACME_EMAIL")
 
 # Database configuration using dj-database-url
-DATABASES = {
-    "default": dj_database_url.config(
-        default="postgresql://localhost/defaultdb", conn_max_age=600, conn_health_checks=True, ssl_require=False
-    )
-}
-
-# Ensure database connection is secure and performant
-DATABASES["default"]["OPTIONS"] = {
-    "sslmode": "require",
-    "keepalives": 1,
-    "keepalives_idle": 30,
-    "keepalives_interval": 10,
-    "keepalives_count": 5,
-}
+DATABASES = {"default": dj_database_url.config(conn_health_checks=True)}
 
 # Static and media files configuration
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
