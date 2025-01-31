@@ -103,7 +103,7 @@ def project_submision(request):
             if project.project_type.name == "ACHAT ANTICIPE":
                 form_product = ProductInfoForm(request.POST, request.FILES)
                 if form_product.is_valid():
-                    print(f"ENREGISTREMENT DU PRODUIT")
+
                     product_info = form_product.save(commit=False)
                     product_info.project = project
                     product_info.save()
@@ -185,8 +185,6 @@ def detail_project(request, uid):
     else:
         form = RealisationForm()
 
-        print(f"L'utiliisateur: {request.user}")
-        print(f"Le porteur: {project.project.user}")
         add_realisation = request.user == project.project.user
     context = {
         "validate_project": project,
@@ -293,7 +291,7 @@ def contact_view(request):
             return redirect("contact")
 
     form = ContactForm()
-    print(f"=========={form}============")
+
     return render(request, "app/contact/contact.html", {"form": form})
 
 
