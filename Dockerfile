@@ -18,7 +18,7 @@ COPY . .
 
 # Create directories for static and media files
 RUN mkdir -p /app/staticfiles /app/mediafiles
-
+RUN mkdir -p /app/logs
 # Collect static files if RUN_COLLECTSTATIC is true
 RUN if [ "$RUN_COLLECTSTATIC" = "true" ]; then \
     python manage.py collectstatic --noinput; \
