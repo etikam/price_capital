@@ -22,7 +22,7 @@ services:
       - traefik.http.routers.${PROJECT_NAME}.rule=Host(`${DOMAIN}`)
       - traefik.http.routers.${PROJECT_NAME}.entrypoints=https
       - traefik.http.routers.${PROJECT_NAME}.tls=true
-      - traefik.http.routers.${PROJECT_NAME}.tls.certresolver=le
+      - traefik.http.routers.${PROJECT_NAME}.tls.certresolver=letsencrypt
       - traefik.http.services.${PROJECT_NAME}.loadbalancer.server.port=${WEB_PORT}
       - traefik.http.middlewares.${PROJECT_NAME}-compress.compress=true
       - traefik.http.routers.${PROJECT_NAME}.middlewares=${PROJECT_NAME}-compress
