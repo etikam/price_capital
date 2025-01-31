@@ -1,43 +1,7 @@
-
-services:
-  traefik:
-    image: traefik:v2.11
-    restart: always
-    env_file: .env
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
-      - ./traefik/dynamic_conf:/etc/traefik/dynamic_conf
-      - ./traefik/ssl:/etc/traefik/ssl
-      - /var/log/traefik:/var/log
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik-public
-      - traefik.constraint-label=traefik-public
-      - traefik.http.middlewares.https-compress.compress=true
-      - traefik.http.middlewares.redirect-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.redirect-https.redirectscheme.permanent=false
-    command:
-      - --providers.docker
-      - --providers.docker.exposedbydefault=false
-      - --entrypoints.http.address=:80
-      - --entrypoints.https.address=:443
-      - --certificatesresolvers.le.acme.email=${ACME_EMAIL}
-      - --certificatesresolvers.le.acme.storage=/etc/traefik/ssl/acme.json
-      - --certificatesresolvers.le.acme.tlschallenge=true
-      - --accesslog
-      - --log
-      - --accesslog.filepath=/var/log/access.log
-      - --api
-    networks:
-      - traefik-public
-
-volumes:
-  traefik-public-certificates:
-
-networks:
-  traefik-public:
-    external: true
+docker compose exec web python manage.py migrate auth zero
+docker compose exec web python manage.py migrate admin zero
+docker compose exec web python manage.py migrate users zero
+docker compose exec web python manage.py migrate --no-inputdocker compose exec web python manage.py migrate auth zero
+docker compose exec web python manage.py migrate admin zero
+docker compose exec web python manage.py migrate users zero
+docker compose exec web python manage.py migrate --no-input
