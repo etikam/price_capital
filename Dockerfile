@@ -27,7 +27,5 @@ RUN if [ "$RUN_COLLECTSTATIC" = "true" ]; then \
 # Set permissions for static and media directories
 RUN chmod -R 755 /app/staticfiles /app/mediafiles
 
-EXPOSE 8000
-
 # Fallback command if Gunicorn fails
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]

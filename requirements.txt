@@ -32,4 +32,4 @@ tqdm==4.67.1
 typing_extensions==4.12.2
 tzdata==2024.2
 virtualenv==20.29.1
-psycopg[binary]>=3.1.0
+whitenoise==6.8.2
