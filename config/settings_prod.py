@@ -33,7 +33,7 @@ ACME_EMAIL = os.environ.get("ACME_EMAIL")
 # Database configuration using dj-database-url
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgresql://localhost/defaultdb", conn_max_age=600, conn_health_checks=True, ssl_require=True
+        default="postgresql://localhost/defaultdb", conn_max_age=600, conn_health_checks=True, ssl_require=False
     )
 }
 
@@ -55,8 +55,13 @@ MEDIA_URL = "/media/"
 # WhiteNoise configuration
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # Add WhiteNoise middleware
-    # ... other middleware
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",  # Déplacez cette ligne avant l'authentification
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 # WhiteNoise storage
@@ -86,15 +91,3 @@ LOGGING = {
         },
     },
 }
-
-
-MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",  # Déplacez cette ligne avant l'authentification
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
